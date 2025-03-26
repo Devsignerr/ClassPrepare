@@ -1,14 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "C_CharacterBase.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
@@ -39,9 +35,7 @@ AC_CharacterBase::AC_CharacterBase()
 	GetCharacterMovement()->BrakingDecelerationWalking = 500.f;
 	GetCharacterMovement()->GroundFriction = 2.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.2f;
-
 	
-
 	BattleComponent = CreateDefaultSubobject<UC_BattleComponent>(TEXT("BattleComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
 	WidgetComponent = CreateDefaultSubobject<UC_WidgetComponent>(TEXT("WidgetComponent"));
@@ -49,7 +43,7 @@ AC_CharacterBase::AC_CharacterBase()
 	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
 
 	//TODO 데이터 분리 필요
-	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_HPBar.WBP_HPBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
 		WidgetComponent->SetWidgetClass(HpBarWidgetRef.Class);
@@ -73,7 +67,7 @@ void AC_CharacterBase::PostInitializeComponents()
 	StatComponent->OnStatChanged.AddUObject(this, &ThisClass::ApplyStat);
 }
 
-void AC_CharacterBase::ApplyStat(const FC_CharacterStat& BaseStat, const FC_CharacterStat& ModifierStat)
+void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
 {
 	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
@@ -92,14 +86,9 @@ void AC_CharacterBase::AttackTrace(bool bStart, FName TraceBoneName)
 
 void AC_CharacterBase::SetupCharacterWidget(UC_UserWidget* InUserWidget)
 {
-	UC_HpBarWidget* HpBarWidget = Cast<UC_HpBarWidget>(InUserWidget);
-	if (HpBarWidget)
+	if (UC_HpBarWidget* HpBarWidget = Cast<UC_HpBarWidget>(InUserWidget))
 	{
 		HpBarWidget->UpdateHpBar(StatComponent->GetCurrentHp(), StatComponent->GetMaxHp());
 		StatComponent->OnHpChanged.AddUObject(HpBarWidget, &UC_HpBarWidget::UpdateHpBar);
 	}
 }
-
-
-
-

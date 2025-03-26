@@ -3,6 +3,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ProjectC/UI/C_HUDWidget.h"
 
 AC_PlayableCharacter::AC_PlayableCharacter()
 {
@@ -80,6 +81,15 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Attack);
 
+	}
+}
+
+void AC_PlayableCharacter::SetupHUDWidget(UC_HUDWidget* InHUDWidget)
+{
+	if (InHUDWidget)
+	{
+		InHUDWidget->UpdateStat(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		StatComponent->OnStatChanged.AddUObject(InHUDWidget, &UC_HUDWidget::UpdateStat);
 	}
 }
 

@@ -7,7 +7,7 @@
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
-#include "ProjectC/Data/C_CharacterStat.h"
+#include "..\Data\C_TableRows.h"
 #include "ProjectC/Interface/C_AnimationAttackInterface.h"
 #include "ProjectC/Interface/C_CharacterWidgetInterface.h"
 #include "C_CharacterBase.generated.h"
@@ -30,9 +30,11 @@ protected:
 	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) override;
 	
 public:
-	void ApplyStat(const FC_CharacterStat& BaseStat, const FC_CharacterStat& ModifierStat);
+	void ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat);
 	
 public:
+	UPROPERTY(EditAnywhere) 
+	EC_CharacterType CharacterType;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_BattleComponent> BattleComponent;

@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ProjectC/Data/C_CharacterStat.h"
+#include "..\..\Data\C_TableRows.h"
 #include "C_StatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHpChangedDelegate, float /*CurrentHp*/, float /*MaxHp*/);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FC_CharacterStat& /*BaseStat*/, const FC_CharacterStat& /*ModifierStat*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FC_CharacterStatTableRow& /*BaseStat*/, const FC_CharacterStatTableRow& /*ModifierStat*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnC_leComponent) )
 class PROJECTC_API UC_StatComponent : public UActorComponent
@@ -26,13 +26,13 @@ public:
 	FOnHpChangedDelegate OnHpChanged;
 	FOnStatChangedDelegate OnStatChanged;
 	
-	void AddBaseStat(const FC_CharacterStat& InAddBaseStat);
-	void SetBaseStat(const FC_CharacterStat& InBaseStat);
-	void SetModifierStat(const FC_CharacterStat& InModifierStat);
+	void AddBaseStat(const FC_CharacterStatTableRow& InAddBaseStat);
+	void SetBaseStat(const FC_CharacterStatTableRow& InBaseStat);
+	void SetModifierStat(const FC_CharacterStatTableRow& InModifierStat);
 	
-	const FC_CharacterStat& GetBaseStat() const { return BaseStat; }
-	const FC_CharacterStat& GetModifierStat() const { return ModifierStat; }
-	FC_CharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	const FC_CharacterStatTableRow& GetBaseStat() const { return BaseStat; }
+	const FC_CharacterStatTableRow& GetModifierStat() const { return ModifierStat; }
+	FC_CharacterStatTableRow GetTotalStat() const { return BaseStat + ModifierStat; }
 	
 	float GetCurrentHp() const { return CurrentHp; }
 	float GetMaxHp() const { return MaxHp; }
@@ -47,10 +47,10 @@ public:
 	float CurrentHp;
 
 	UPROPERTY(Meta = (AllowPrivateAccess = "true"))
-	FC_CharacterStat BaseStat;
+	FC_CharacterStatTableRow BaseStat;
 
 	UPROPERTY(Meta = (AllowPrivateAccess = "true"))
-	FC_CharacterStat ModifierStat;
+	FC_CharacterStatTableRow ModifierStat;
 
 public:
 	void ResetStat();

@@ -3,13 +3,13 @@
 
 #include "C_CharacterStatWidget.h"
 #include "Components/TextBlock.h"
-#include "ProjectC/Data/C_CharacterStat.h"
+#include "..\Data\C_TableRows.h"
 
 void UC_CharacterStatWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	for (TFieldIterator<FNumericProperty> PropIt(FC_CharacterStat::StaticStruct()); PropIt; ++PropIt)
+	for (TFieldIterator<FNumericProperty> PropIt(FC_CharacterStatTableRow::StaticStruct()); PropIt; ++PropIt)
 	{
 		const FName PropKey(PropIt->GetName());
 		const FName TextBaseControlName = *FString::Printf(TEXT("Txt%sBase"), *PropIt->GetName());
@@ -29,16 +29,16 @@ void UC_CharacterStatWidget::NativeConstruct()
 	}
 }
 
-void UC_CharacterStatWidget::UpdateStat(const FC_CharacterStat& BaseStat, const FC_CharacterStat& ModifierStat)
+void UC_CharacterStatWidget::UpdateStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
 {
-	for (TFieldIterator<FNumericProperty> PropIt(FC_CharacterStat::StaticStruct()); PropIt; ++PropIt)
+	for (TFieldIterator<FNumericProperty> PropIt(FC_CharacterStatTableRow::StaticStruct()); PropIt; ++PropIt)
 	{
 		const FName PropKey(PropIt->GetName());
 
 		float BaseData = 0.0f;
-		PropIt->GetValue_InContainer((const void*)&BaseStat, &BaseData);
+		PropIt->GetValue_InContainer(&BaseStat, &BaseData);
 		float ModifierData = 0.0f;
-		PropIt->GetValue_InContainer((const void*)&ModifierStat, &ModifierData);
+		PropIt->GetValue_InContainer(&ModifierStat, &ModifierData);
 
 		UTextBlock** BaseTextBlockPtr = BaseLookup.Find(PropKey);
 		if (BaseTextBlockPtr)

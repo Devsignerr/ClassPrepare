@@ -15,6 +15,7 @@
 #include "CoreMinimal.h"
 #include "C_CharacterBase.h"
 #include "InputActionValue.h"
+#include "ProjectC/Interface/C_CharacterHUDInterface.h"
 #include "C_PlayableCharacter.generated.h"
 
 
@@ -22,7 +23,7 @@ class UCameraComponent;
 class USpringArmComponent;
 
 UCLASS(config=Game)
-class AC_PlayableCharacter : public AC_CharacterBase
+class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -33,6 +34,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+public:
+	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
+	
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

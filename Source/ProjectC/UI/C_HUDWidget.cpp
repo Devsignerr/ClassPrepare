@@ -2,7 +2,6 @@
 
 
 #include "C_HUDWidget.h"
-#include "C_HpBarWidget.h"
 #include "C_CharacterStatWidget.h"
 #include "ProjectC/Interface/C_CharacterHUDInterface.h"
 
@@ -10,23 +9,15 @@ UC_HUDWidget::UC_HUDWidget(const FObjectInitializer& ObjectInitializer) : Super(
 {
 }
 
-void UC_HUDWidget::UpdateStat(const FC_CharacterStat& BaseStat, const FC_CharacterStat& ModifierStat)
+void UC_HUDWidget::UpdateStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
 {
-	FC_CharacterStat TotalStat = BaseStat + ModifierStat;
+	FC_CharacterStatTableRow TotalStat = BaseStat + ModifierStat;
 	CharacterStatWidget->UpdateStat(BaseStat, ModifierStat);
-}
-
-void UC_HUDWidget::UpdateHpBar(float NewCurrentHp, float NewMaxHp)
-{
-	HpBarWidget->UpdateHpBar(NewCurrentHp, NewMaxHp);
 }
 
 void UC_HUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	HpBarWidget = Cast<UC_HpBarWidget>(GetWidgetFromName(TEXT("WidgetHpBar")));
-	ensure(HpBarWidget);
 
 	CharacterStatWidget = Cast<UC_CharacterStatWidget>(GetWidgetFromName(TEXT("WidgetCharacterStat")));
 	ensure(CharacterStatWidget);
@@ -35,5 +26,4 @@ void UC_HUDWidget::NativeConstruct()
 	{
 		HUDPawn->SetupHUDWidget(this);
 	}
-
 }

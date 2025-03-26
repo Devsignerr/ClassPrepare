@@ -33,7 +33,9 @@ void UC_HpBarWidget::UpdateHpBar(float NewCurrentHp, float NewMaxHp)
 	CurrentHp = NewCurrentHp;
 	MaxHp = NewMaxHp;
 
-	ensure(MaxHp > 0.0f);
+	if (MaxHp <= 0.f)
+		return;
+	
 	if (PB_HP)
 	{
 		PB_HP->SetPercent(CurrentHp / MaxHp);

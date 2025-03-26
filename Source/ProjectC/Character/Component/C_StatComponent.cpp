@@ -3,29 +3,40 @@
 
 #include "C_StatComponent.h"
 
+#include "ProjectC/Character/C_CharacterBase.h"
+#include "ProjectC/Utils/C_GameUtil.h"
+
 UC_StatComponent::UC_StatComponent()
 {
+	bWantsInitializeComponent = true;
 }
 
 void UC_StatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
+
+	if (AC_CharacterBase* CharacterBase = Cast<AC_CharacterBase>(GetOwner()))
+	{
+		if (FC_CharacterStatTableRow* StatRow = FC_GameUtil::GetCharacterStatData(CharacterBase->CharacterType))
+			BaseStat = *StatRow;
+	}
+	
 	ResetStat();
 }
 
-void UC_StatComponent::AddBaseStat(const FC_CharacterStat& InAddBaseStat)
+void UC_StatComponent::AddBaseStat(const FC_CharacterStatTableRow& InAddBaseStat)
 {
 	BaseStat = BaseStat + InAddBaseStat; 
 	OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
 }
 
-void UC_StatComponent::SetBaseStat(const FC_CharacterStat& InBaseStat)
+void UC_StatComponent::SetBaseStat(const FC_CharacterStatTableRow& InBaseStat)
 {
 	BaseStat = InBaseStat;
 	OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); 
 }
 
-void UC_StatComponent::SetModifierStat(const FC_CharacterStat& InModifierStat)
+void UC_StatComponent::SetModifierStat(const FC_CharacterStatTableRow& InModifierStat)
 {
 	ModifierStat = InModifierStat;
 	OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());

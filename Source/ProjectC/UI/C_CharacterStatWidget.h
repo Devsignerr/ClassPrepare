@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "ProjectC/Data/C_CharacterStat.h"
+#include "C_UserWidget.h"
+#include "..\Data\C_TableRows.h"
 #include "C_CharacterStatWidget.generated.h"
 
 UCLASS()
-class PROJECTC_API UC_CharacterStatWidget : public UUserWidget
+class PROJECTC_API UC_CharacterStatWidget : public UC_UserWidget
 {
 	GENERATED_BODY()
 
@@ -16,7 +16,7 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	void UpdateStat(const FC_CharacterStat& BaseStat, const FC_CharacterStat& ModifierStat);
+	void UpdateStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat);
 
 private:
 	UPROPERTY()
