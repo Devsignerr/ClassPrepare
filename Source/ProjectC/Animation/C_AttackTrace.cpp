@@ -1,7 +1,7 @@
 
 #include "C_AttackTrace.h"
 
-#include "ProjectC/Character/ClassCharacter.h"
+#include "ProjectC/Character/C_CharacterBase.h"
 #include "ProjectC/Character/Component/C_BattleComponent.h"
 
 

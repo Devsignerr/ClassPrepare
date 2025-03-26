@@ -4,7 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 #include "ProjectC/ProjectC.h"
-#include "ProjectC/Character/ClassCharacter.h"
+#include "ProjectC/Character/C_CharacterBase.h"
 
 UC_BattleComponent::UC_BattleComponent()
 {
@@ -31,7 +31,7 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 		{
 			TraceElapsedTime = 0.f;
 
-			const AClassCharacter* ClassCharacter = Cast<AClassCharacter>(GetOwner());
+			const AC_CharacterBase* ClassCharacter = Cast<AC_CharacterBase>(GetOwner());
 			if (!ClassCharacter)
 				return;
 
@@ -67,10 +67,13 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 			//TODO --먼저 상수 Height 값 넣는거 보여주고 나서 Height 구하는거 보여주기 --
 			const float Height = (PrevLocation - CurrentLocation).Length();
+
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(GetOwner());
 			
 			TArray<FHitResult> HitResults;
 			CurrentWorld->SweepMultiByChannel(HitResults, PrevLocation, CurrentLocation,
-				Rot.Quaternion(), ECC_Pawn, FCollisionShape::MakeCapsule(20.f, Height * 0.5f), FCollisionQueryParams::DefaultQueryParam);
+				Rot.Quaternion(), ECC_Pawn, FCollisionShape::MakeCapsule(20.f, Height * 0.5f), QueryParams);
 
 			DrawDebugCapsule(CurrentWorld, FMath::Lerp(CurrentLocation, PrevLocation, 0.5f), Height * 0.5f, 20.f, Rot.Quaternion(),
 				FColor::Red, false, 3.f);
@@ -100,7 +103,7 @@ void UC_BattleComponent::StartTrace(FName InTraceBoneName)
 	TraceBoneName = InTraceBoneName;
 	bTracing = true;
 
-	if (const AClassCharacter* ClassCharacter = Cast<AClassCharacter>(GetOwner()))
+	if (const AC_CharacterBase* ClassCharacter = Cast<AC_CharacterBase>(GetOwner()))
 	{
 		if (const USkeletalMeshComponent* SkeletalMeshComponent = ClassCharacter->GetMesh())
 		{
