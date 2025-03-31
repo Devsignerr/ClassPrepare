@@ -14,6 +14,7 @@ void UC_DataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	TArray<TPair<EC_DataTableType, FSoftObjectPath>> LoadList;
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::CharacterStat, CharacterStat_DataTablePath));
+	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Enemy, Enemy_DataTablePath));
 	
 	for (const auto& Element : LoadList)
 	{

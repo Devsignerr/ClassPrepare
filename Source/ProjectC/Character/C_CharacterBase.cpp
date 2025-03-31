@@ -92,3 +92,10 @@ void AC_CharacterBase::SetupCharacterWidget(UC_UserWidget* InUserWidget)
 		StatComponent->OnHpChanged.AddUObject(HpBarWidget, &UC_HpBarWidget::UpdateHpBar);
 	}
 }
+
+float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
+{
+	StatComponent->ApplyDamage(DamageAmount);
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}

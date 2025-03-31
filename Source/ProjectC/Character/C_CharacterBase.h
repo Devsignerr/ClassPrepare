@@ -28,6 +28,7 @@ protected:
 protected:
 	virtual void AttackTrace(bool bStart, FName TraceBoneName) override;
 	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
 	void ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat);

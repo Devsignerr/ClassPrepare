@@ -25,4 +25,7 @@ public:
 private:
 	UPROPERTY(config)
 	FSoftObjectPath CharacterStat_DataTablePath;
+
+	UPROPERTY(config)
+	FSoftObjectPath Enemy_DataTablePath;
 };

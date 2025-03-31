@@ -14,6 +14,7 @@ enum class EC_DataTableType : int32
 {
 	None,
 	CharacterStat,
+	Enemy,
 	Num
 };
 
@@ -22,6 +23,6 @@ enum class EC_CharacterType : int32
 {
 	None,
 	Player,
-	Enemy,
+	Kallari,
 	Num
 };
