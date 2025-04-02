@@ -17,6 +17,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
@@ -27,12 +28,21 @@ protected:
 	virtual void Attack() override;
 	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 
+	virtual void SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished) override;
+	virtual void TurnInPlace(float TurnAnimDegree) override;
+
 private:
 	FAICharacterAttackFinished OnAttackFinished;
+	FAICharacterTurnFinished OnCharacterTurnFinished;
 	
 	FC_EnemyTableRow* EnemyTableRow = nullptr;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> AttackAnim = nullptr;
+	UPROPERTY()
+	TObjectPtr<UAnimMontage> TurnAnimMontage = nullptr;
+
+	bool IsTurning = false;
+
+	float TurnStartYaw = 0.f;
+	float TurnDegree = 0.f;
 };
 

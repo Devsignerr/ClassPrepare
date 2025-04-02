@@ -7,6 +7,7 @@
 #include "C_CharacterAIInterface.generated.h"
 
 DECLARE_DELEGATE(FAICharacterAttackFinished);
+DECLARE_DELEGATE(FAICharacterTurnFinished);
 
 UINTERFACE(MinimalAPI)
 class UC_CharacterAIInterface : public UInterface
@@ -23,6 +24,9 @@ public:
 	virtual float GetAIDetectRange() = 0;
 	virtual float GetAIAttackRange() = 0;
 	virtual float GetAITurnSpeed() = 0;
+
+	virtual void TurnInPlace(float TurnAnimDegree) = 0;
+	virtual void SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished) = 0;
 
 	virtual void SetAIAttackFinishDelegate(const FAICharacterAttackFinished& InOnAttackFinished) = 0;
 	virtual void Attack() = 0;
