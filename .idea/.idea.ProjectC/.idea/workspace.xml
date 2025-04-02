@@ -10,35 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1820419-0fe4-4569-b1f1-b156d7d882ad" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_CanAttack.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_CanAttack.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTService_Detect.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTService_Detect.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_Attack.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_Attack.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/C_AIController.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/C_AIController.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterAIInterface.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterAIInterface.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Data/CharacterStat.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/CharacterStat.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Level/Test.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/Test.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Saved/Logs/UnrealVersionSelector-2025.03.26-23.30.30.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Saved/Logs/UnrealVersionSelector-2025.03.26-23.30.30.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/enums.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/enums.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BB_EnemyBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BB_EnemyBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/AI/BTService_Detect.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTService_Detect.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Misc/GameMode/ClassGameMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Misc/GameMode/ClassGameMode.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +25,30 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -282,7 +282,8 @@
       <workItem from="1743096873160" duration="635000" />
       <workItem from="1743300112395" duration="8993000" />
       <workItem from="1743400742195" duration="1860000" />
-      <workItem from="1743404735671" duration="14594000" />
+      <workItem from="1743404735671" duration="15967000" />
+      <workItem from="1743577741909" duration="5441000" />
     </task>
     <servers />
   </component>
@@ -291,16 +292,5 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Source/ProjectC/AI/BTTask_Attack.cpp</url>
-          <line>13</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

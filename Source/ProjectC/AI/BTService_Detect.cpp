@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
+#include "ProjectC/Character/C_PlayableCharacter.h"
 #include "ProjectC/Interface/C_CharacterAIInterface.h"
 
 UBTService_Detect::UBTService_Detect()
@@ -33,7 +34,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	FVector PawnLocation = ControllingPawn->GetActorLocation();
 
 	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
+	FCollisionQueryParams CollisionQueryParam;
+	CollisionQueryParam.bTraceComplex = false;
+	CollisionQueryParam.AddIgnoredActor(ControllingPawn);
+	
 	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,
 		PawnLocation,
@@ -47,14 +51,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-			if (Pawn && Pawn->GetController()->IsPlayerController())
+			if (AC_PlayableCharacter* Player = Cast<AC_PlayableCharacter>(OverlapResult.GetActor()))
 			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Pawn);
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Player);
 				DrawDebugSphere(World, PawnLocation, DetectRadius, 16, FColor::Green, false, 0.2f);
 
-				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+				DrawDebugPoint(World, Player->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Player->GetActorLocation(), FColor::Green, false, 0.27f);
 				return;
 			}
 		}

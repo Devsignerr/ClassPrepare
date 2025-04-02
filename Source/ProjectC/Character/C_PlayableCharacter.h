@@ -22,6 +22,8 @@
 class UCameraComponent;
 class USpringArmComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDie);
+
 UCLASS(config=Game)
 class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface
 {
@@ -34,14 +36,11 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-public:
-	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
-	
-protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
+	
 public:
+	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
 	virtual void Attack(const FInputActionValue& Value);
 	
 	UFUNCTION(BlueprintCallable)
@@ -50,19 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetCombo();
 
+	FOnCharacterDie OnCharacterDie;
+
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsAttacking = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool SaveAttack = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int AttackCount = 0;
-	
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> AttackMontages;
-
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -89,5 +78,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AttackAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsAttacking = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool SaveAttack = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int AttackCount = 0;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> AttackMontages;
 };
 
