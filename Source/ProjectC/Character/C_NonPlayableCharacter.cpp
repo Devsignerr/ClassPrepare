@@ -3,6 +3,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/ProjectC.h"
+#include "ProjectC/AI/Actor/C_PatrolRoute.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 AC_NonPlayableCharacter::AC_NonPlayableCharacter()
@@ -25,7 +26,7 @@ void AC_NonPlayableCharacter::BeginPlay()
 		MeshComponent->SetAnimClass(EnemyTableRow->AnimInstance);
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed;
+	ResetState();
 }
 
 void AC_NonPlayableCharacter::Tick(float DeltaSeconds)
@@ -70,6 +71,43 @@ float AC_NonPlayableCharacter::GetAIAttackRange()
 float AC_NonPlayableCharacter::GetAITurnSpeed()
 {
 	return EnemyTableRow->TurnSpeed;
+}
+
+void AC_NonPlayableCharacter::ResetState()
+{
+	ChangeState(EC_EnemyStateType::Patrol);
+}
+
+void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
+{
+	EnemyState = StateType;
+
+	if (EnemyState == EC_EnemyStateType::Patrol)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Walk;
+	}
+	else if (EnemyState == EC_EnemyStateType::Battle)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Run;
+	}
+}
+
+EC_EnemyStateType AC_NonPlayableCharacter::GetState()
+{
+	return EnemyState;
+}
+
+AActor* AC_NonPlayableCharacter::GetPatrolRoute()
+{
+	return PatrolRoute;
+}
+
+void AC_NonPlayableCharacter::IncrementPatrolIndex()
+{
+	if (AC_PatrolRoute* PatrolRouteActor = Cast<AC_PatrolRoute>(PatrolRoute))
+	{
+		PatrolRouteActor->IncrementIndex();
+	}
 }
 
 void AC_NonPlayableCharacter::SetAIAttackFinishDelegate(const FAICharacterAttackFinished& InOnAttackFinished)

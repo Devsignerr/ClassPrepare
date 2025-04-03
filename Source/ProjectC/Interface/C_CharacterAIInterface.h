@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectC/enums.h"
 #include "UObject/Interface.h"
 #include "C_CharacterAIInterface.generated.h"
 
@@ -24,6 +25,13 @@ public:
 	virtual float GetAIDetectRange() = 0;
 	virtual float GetAIAttackRange() = 0;
 	virtual float GetAITurnSpeed() = 0;
+
+	virtual void ResetState() = 0;
+	virtual void ChangeState(EC_EnemyStateType StateType) = 0;
+	virtual EC_EnemyStateType GetState() = 0;
+
+	virtual AActor* GetPatrolRoute() = 0;
+	virtual void IncrementPatrolIndex() = 0;
 
 	virtual void TurnInPlace(float TurnAnimDegree) = 0;
 	virtual void SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished) = 0;

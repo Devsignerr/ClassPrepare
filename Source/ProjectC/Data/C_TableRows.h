@@ -60,7 +60,10 @@ struct FC_EnemyTableRow : public FTableRowBase
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MovementSpeed = 0.f;
+	float MovementSpeed_Walk = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MovementSpeed_Run = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed = 0.f;

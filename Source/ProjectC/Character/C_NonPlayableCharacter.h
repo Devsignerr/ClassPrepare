@@ -24,12 +24,24 @@ protected:
 	virtual float GetAIAttackRange() override;
 	virtual float GetAITurnSpeed() override;
 
+	virtual void ResetState() override;
+	virtual void ChangeState(EC_EnemyStateType StateType) override;
+	
+	virtual AActor* GetPatrolRoute() override;
+
 	virtual void SetAIAttackFinishDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void Attack() override;
 	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 
 	virtual void SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished) override;
 	virtual void TurnInPlace(float TurnAnimDegree) override;
+
+public:
+	UFUNCTION(BlueprintCallable) 
+	virtual EC_EnemyStateType GetState() override;
+	
+	UFUNCTION()
+	virtual void IncrementPatrolIndex() override;
 
 private:
 	FAICharacterAttackFinished OnAttackFinished;
@@ -39,6 +51,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAnimMontage> TurnAnimMontage = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<AActor> PatrolRoute = nullptr;
+
+	EC_EnemyStateType EnemyState = EC_EnemyStateType::None;
 
 	bool IsTurning = false;
 

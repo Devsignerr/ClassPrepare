@@ -2,8 +2,10 @@
 
 
 #include "C_AIController.h"
+#include "Actor/C_PatrolRoute.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "ProjectC/Character/C_NonPlayableCharacter.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
@@ -26,6 +28,22 @@ void AC_AIController::StopAI()
 	if (BTComponent)
 	{
 		BTComponent->StopTree();
+	}
+}
+
+void AC_AIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	Super::OnMoveCompleted(RequestID, Result);
+
+	if (Result.Code == EPathFollowingResult::Success)
+	{
+		if (IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn()))
+		{
+			if (AC_PatrolRoute* PatrolRoute = Cast<AC_PatrolRoute>(AIPawn->GetPatrolRoute()))
+			{
+				PatrolRoute->IncrementIndex();
+			}
+		}
 	}
 }
 

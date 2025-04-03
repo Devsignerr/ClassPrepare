@@ -26,3 +26,12 @@ enum class EC_CharacterType : int32
 	Kallari,
 	Num
 };
+
+UENUM(BlueprintType)
+enum class EC_EnemyStateType : uint8
+{
+	None = 0,
+	Patrol = 1,
+	Battle = 2,
+	Num = 3
+};

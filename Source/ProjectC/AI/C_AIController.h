@@ -14,6 +14,8 @@ class PROJECTC_API AC_AIController : public AAIController
 public:
 	void RunAI();
 	void StopAI();
+	
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;

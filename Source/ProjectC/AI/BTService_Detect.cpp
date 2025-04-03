@@ -54,6 +54,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (AC_PlayableCharacter* Player = Cast<AC_PlayableCharacter>(OverlapResult.GetActor()))
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Player);
+				AIPawn->ChangeState(EC_EnemyStateType::Battle);
+				
 				DrawDebugSphere(World, PawnLocation, DetectRadius, 16, FColor::Green, false, 0.2f);
 
 				DrawDebugPoint(World, Player->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
@@ -64,6 +66,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
+
+	if (AIPawn->GetState() != EC_EnemyStateType::Patrol)
+		AIPawn->ChangeState(EC_EnemyStateType::Patrol);
+	
 	DrawDebugSphere(World, PawnLocation, DetectRadius, 16, FColor::Red, false, 0.2f);
 }
 
