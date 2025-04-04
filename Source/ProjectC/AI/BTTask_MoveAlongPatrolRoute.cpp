@@ -35,11 +35,11 @@ EBTNodeResult::Type UBTTask_MoveAlongPatrolRoute::ExecuteTask(UBehaviorTreeCompo
 	EPathFollowingRequestResult::Type PathFollowingRequestResult = AIController->MoveToLocation(TargetLocation, 1.f, false);
 	if (PathFollowingRequestResult == EPathFollowingRequestResult::RequestSuccessful)
 	{
-		UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Successful"));
+		//UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Successful"));
 	}
 	else
 	{
-		UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Failed or Already Moving"));
+		//UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Failed or Already Moving"));
 	}
 	
 	return EBTNodeResult::Succeeded;

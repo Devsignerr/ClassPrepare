@@ -4,6 +4,7 @@
 #include "BTDecorator_IsInAttackRange.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Interface/C_CharacterAIInterface.h"
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
@@ -26,9 +27,12 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	const APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
 	if (!Target)
 		return false;
+
+	FC_EnemyTableRow* EnemyTableRow = AIPawn->GetEnemyData();
+	ensure(EnemyTableRow);
  
 	const float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
-	const float AttackRangeWithRadius = AIPawn->GetAIAttackRange();
+	const float AttackRangeWithRadius = EnemyTableRow->AttackRange;
 
 	bResult = DistanceToTarget <= AttackRangeWithRadius;
 	

@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "C_CharacterAIInterface.generated.h"
 
+struct FC_EnemyTableRow;
+
 DECLARE_DELEGATE(FAICharacterAttackFinished);
 DECLARE_DELEGATE(FAICharacterTurnFinished);
 
@@ -21,10 +23,7 @@ class PROJECTC_API IC_CharacterAIInterface
 	GENERATED_BODY()
 
 public:
-	virtual float GetAIPatrolRadius() = 0;
-	virtual float GetAIDetectRange() = 0;
-	virtual float GetAIAttackRange() = 0;
-	virtual float GetAITurnSpeed() = 0;
+	virtual FC_EnemyTableRow* GetEnemyData() = 0;
 
 	virtual void ResetState() = 0;
 	virtual void ChangeState(EC_EnemyStateType StateType) = 0;

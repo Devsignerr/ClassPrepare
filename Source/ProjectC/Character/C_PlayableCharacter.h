@@ -19,6 +19,7 @@
 #include "C_PlayableCharacter.generated.h"
 
 
+class UAIPerceptionStimuliSourceComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -38,6 +39,8 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
+	virtual void Jump() override;
 	
 public:
 	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
@@ -59,6 +62,9 @@ public:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimulusSource;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -90,5 +96,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<UAnimMontage*> AttackMontages;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> JumpSound;
 };
 

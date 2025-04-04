@@ -69,10 +69,20 @@ struct FC_EnemyTableRow : public FTableRowBase
 	float TurnSpeed = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DetectRange = 0.f;
+	float AttackRange = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AttackRange = 0.f;
+	float SightRadius = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LoseSightRadius = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PeripheralVisionAngleDegrees = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoSuccessRangeFromLastSeenLocation = 0.f;
+	
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> AttackAnim = nullptr;

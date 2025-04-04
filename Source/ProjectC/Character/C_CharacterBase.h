@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
@@ -14,7 +15,7 @@
 
 
 UCLASS(config=Game)
-class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_AnimationAttackInterface , public IC_CharacterWidgetInterface
+class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_AnimationAttackInterface , public IC_CharacterWidgetInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -32,10 +33,16 @@ protected:
 	
 public:
 	void ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat);
+
+	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 	
 public:
 	UPROPERTY(EditAnywhere) 
 	EC_CharacterType CharacterType;
+
+	UPROPERTY()
+	FGenericTeamId GenericTeamId = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_BattleComponent> BattleComponent;

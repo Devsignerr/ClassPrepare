@@ -1,8 +1,11 @@
 
 #include "C_NonPlayableCharacter.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Perception/AISense_Damage.h"
 #include "ProjectC/ProjectC.h"
+#include "ProjectC/AI/C_AIController.h"
 #include "ProjectC/AI/Actor/C_PatrolRoute.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
@@ -53,24 +56,23 @@ void AC_NonPlayableCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-float AC_NonPlayableCharacter::GetAIPatrolRadius()
+void AC_NonPlayableCharacter::PossessedBy(AController* NewController)
 {
-	return 0.f;
+	Super::PossessedBy(NewController);
+
+	if (NewController->GetClass() == AC_AIController::StaticClass())
+		SetGenericTeamId(FGenericTeamId(1));
 }
 
-float AC_NonPlayableCharacter::GetAIDetectRange()
+FC_EnemyTableRow* AC_NonPlayableCharacter::GetEnemyData()
 {
-	return EnemyTableRow->DetectRange;
-}
-
-float AC_NonPlayableCharacter::GetAIAttackRange()
-{
-	return EnemyTableRow->AttackRange;
-}
-
-float AC_NonPlayableCharacter::GetAITurnSpeed()
-{
-	return EnemyTableRow->TurnSpeed;
+	if (EnemyTableRow)
+		return EnemyTableRow;
+	
+	FC_EnemyTableRow* TableRow = FC_GameUtil::GetEnemyData(CharacterType);
+	ensure(TableRow);
+	
+	return TableRow;
 }
 
 void AC_NonPlayableCharacter::ResetState()
@@ -89,6 +91,15 @@ void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
 	else if (EnemyState == EC_EnemyStateType::Battle)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Run;
+	}
+	else if (EnemyState == EC_EnemyStateType::Investigating)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Walk;
+	}
+
+	if (AAIController* AIContoller = Cast<AAIController>(GetController()))
+	{
+		AIContoller->GetBlackboardComponent()->SetValueAsEnum(TEXT("State"), static_cast<uint8>(StateType));
 	}
 }
 
@@ -169,4 +180,17 @@ void AC_NonPlayableCharacter::TurnInPlace(float TurnAnimDegree)
 	
 	FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnMontageEnd);
 	GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(EndDelegate);
+}
+
+float AC_NonPlayableCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	UAISense_Damage::ReportDamageEvent(
+		GetWorld(), 
+		this,
+		DamageCauser,
+		DamageAmount,
+		DamageCauser->GetActorLocation(),
+		GetActorLocation());
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

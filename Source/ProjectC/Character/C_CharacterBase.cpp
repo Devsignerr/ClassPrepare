@@ -8,6 +8,7 @@
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
+#include "Perception/AISense_Damage.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
 
 AC_CharacterBase::AC_CharacterBase()
@@ -71,6 +72,16 @@ void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const
 {
 	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+}
+
+void AC_CharacterBase::SetGenericTeamId(const FGenericTeamId& TeamID)
+{
+	GenericTeamId = TeamID.GetId();
+}
+
+FGenericTeamId AC_CharacterBase::GetGenericTeamId() const
+{
+	return GenericTeamId;
 }
 
 void AC_CharacterBase::AttackTrace(bool bStart, FName TraceBoneName)

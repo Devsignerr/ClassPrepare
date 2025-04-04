@@ -6,9 +6,35 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "ProjectC/Character/C_NonPlayableCharacter.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
+
+AC_AIController::AC_AIController()
+{
+	UAIPerceptionComponent* AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	SetPerceptionComponent(*AIPerceptionComponent);
+
+	SightSense = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	HearingSense = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
+	DamageSense = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
+
+	PerceptionComponent->ConfigureSense(*SightSense);
+	PerceptionComponent->ConfigureSense(*HearingSense);
+	PerceptionComponent->ConfigureSense(*DamageSense);
+	
+	PerceptionComponent->SetDominantSense(SightSense->GetSenseImplementation());
+
+	//여러개에 대한 감각
+	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdate);
+
+	//단일 감각에 대한 델리게이트
+	//PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdate);
+}
 
 void AC_AIController::RunAI()
 {
@@ -37,28 +63,159 @@ void AC_AIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowi
 
 	if (Result.Code == EPathFollowingResult::Success)
 	{
-		if (IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn()))
+		IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+		check(AIPawn);
+		
+		if (AC_PatrolRoute* PatrolRoute = Cast<AC_PatrolRoute>(AIPawn->GetPatrolRoute()))
 		{
-			if (AC_PatrolRoute* PatrolRoute = Cast<AC_PatrolRoute>(AIPawn->GetPatrolRoute()))
-			{
-				PatrolRoute->IncrementIndex();
-			}
+			PatrolRoute->IncrementIndex();
 		}
 	}
+}
+
+FC_EnemyTableRow* AC_AIController::GetEnemyData()
+{
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	check(AIPawn);
+	
+	FC_EnemyTableRow* EnemyTableRow = AIPawn->GetEnemyData();
+	ensure(EnemyTableRow);
+
+	return EnemyTableRow;
+}
+
+void AC_AIController::OnPerceptionUpdate(const TArray<AActor*>& UpdatedActors)
+{
+	for (AActor* UpdatedActor : UpdatedActors)
+	{
+		if (GetAIStimulus(UpdatedActor, EC_AISenseType::Sight).WasSuccessfullySensed())
+		{
+			HandleSensedSight(UpdatedActor);
+			break;
+		}
+
+		FAIStimulus Stimulus = GetAIStimulus(UpdatedActor, EC_AISenseType::Hearing);
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			//자극이 발생한 위치
+			HandleSensedHearing(UpdatedActor, Stimulus.StimulusLocation);
+			break;
+		}
+		
+		if (GetAIStimulus(UpdatedActor, EC_AISenseType::Damage).WasSuccessfullySensed())
+		{
+			HandleSensedDamage(UpdatedActor);
+			break;
+		}
+	}
+}
+
+void AC_AIController::SetupSenseConfig()
+{
+	const FC_EnemyTableRow* EnemyTableRow = GetEnemyData();
+	ensure(EnemyTableRow);
+	
+	SightSense->SightRadius = EnemyTableRow->SightRadius;
+	SightSense->LoseSightRadius = EnemyTableRow->LoseSightRadius;
+	SightSense->PeripheralVisionAngleDegrees = EnemyTableRow->PeripheralVisionAngleDegrees;
+	SightSense->SetMaxAge(5.f);
+	SightSense->DetectionByAffiliation.bDetectEnemies = true;
+	
+	HearingSense->HearingRange = 1500.f;
+	HearingSense->DetectionByAffiliation.bDetectEnemies = true;
+	HearingSense->SetMaxAge(5.f);
+
+	//생성자에서 ConfigureSense 해주지 않으면 문제 발생해서 굳이 2번 처리 해주는것
+	PerceptionComponent->ConfigureSense(*SightSense);
+	PerceptionComponent->ConfigureSense(*HearingSense);
+}
+
+FAIStimulus AC_AIController::GetAIStimulus(AActor* Actor, EC_AISenseType AIPerceptionSense)
+{
+	FActorPerceptionBlueprintInfo ActorPerceptionBlueprintInfo;
+	FAIStimulus ResultStimulus;
+
+	GetPerceptionComponent()->GetActorsPerception(Actor, ActorPerceptionBlueprintInfo);
+
+	TSubclassOf<UAISense> QuerySenseClass;
+	switch (AIPerceptionSense)
+	{
+	case EC_AISenseType::Sight:
+		QuerySenseClass = UAISense_Sight::StaticClass();
+		break;
+	case EC_AISenseType::Hearing:
+		QuerySenseClass = UAISense_Hearing::StaticClass();
+		break;
+	case EC_AISenseType::Damage:
+		QuerySenseClass = UAISense_Damage::StaticClass();
+		break;
+	default:
+		break;
+	}
+
+	TSubclassOf<UAISense> LastSensedStimulusClass;
+
+	for (const FAIStimulus& AIStimulus : ActorPerceptionBlueprintInfo.LastSensedStimuli)
+	{
+		LastSensedStimulusClass = UAIPerceptionSystem::GetSenseClassForStimulus(this, AIStimulus);
+		
+		if (QuerySenseClass == LastSensedStimulusClass)
+		{
+			ResultStimulus = AIStimulus;
+			return ResultStimulus;
+		}
+	}
+	
+	return ResultStimulus;
+}
+
+void AC_AIController::HandleSensedSight(AActor* InActor)
+{
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	ensure(AIPawn);
+	
+	AIPawn->ChangeState(EC_EnemyStateType::Battle);
+	GetBlackboardComponent()->SetValueAsEnum(TEXT("State"), static_cast<uint8>(EC_EnemyStateType::Battle));
+	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);
+}
+
+void AC_AIController::HandleSensedHearing(AActor* InActor, FVector InLocation)
+{
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	ensure(AIPawn);
+	
+	AIPawn->ChangeState(EC_EnemyStateType::Investigating);
+	GetBlackboardComponent()->SetValueAsVector(TEXT("InvestigatingPos"), InLocation);
+}
+
+void AC_AIController::HandleSensedDamage(AActor* InActor)
+{
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	ensure(AIPawn);
+
+	AIPawn->ChangeState(EC_EnemyStateType::Battle);
+	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);
+}
+
+void AC_AIController::HandleLoseTarget(AActor* InActor)
+{
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	ensure(AIPawn);
+
+	AIPawn->ChangeState(EC_EnemyStateType::Patrol);
+	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
 }
 
 void AC_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	const FC_EnemyTableRow* EnemyTableRow = GetEnemyData();
+	ensure(EnemyTableRow);
+	
+	BBAsset = EnemyTableRow->BlackBoard;
+	BTAsset = EnemyTableRow->BehaviorTree;
 
-	if (AC_NonPlayableCharacter* NonPlayableCharacter = Cast<AC_NonPlayableCharacter>(GetPawn()))
-	{
-		if (const FC_EnemyTableRow* EnemyTableRow = FC_GameUtil::GetEnemyData(NonPlayableCharacter->CharacterType))
-		{
-			BBAsset = EnemyTableRow->BlackBoard;
-			BTAsset = EnemyTableRow->BehaviorTree;
-		}
-	}
-
+	SetupSenseConfig();
 	RunAI();
 }

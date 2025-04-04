@@ -1,8 +1,12 @@
 #include "C_PlayableCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GenericTeamAgentInterface.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 #include "ProjectC/UI/C_HUDWidget.h"
 
 AC_PlayableCharacter::AC_PlayableCharacter()
@@ -17,6 +21,10 @@ AC_PlayableCharacter::AC_PlayableCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 
+	StimulusSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus"));
+	StimulusSource->RegisterForSense(TSubclassOf<UAISense>(UAISense_Sight::StaticClass()));
+	StimulusSource->RegisterWithPerceptionSystem();
+	
 	// 카메라가 어태치된 부모의 회전값을 따라감. true 로 하면 입력값에 따라 회전해버림 .
 	// true 인 경우는 1인칭 게임일때
 	FollowCamera->bUsePawnControlRotation = false;
@@ -60,6 +68,8 @@ void AC_PlayableCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	SetGenericTeamId(FGenericTeamId(0));
 }
 
 void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -69,7 +79,7 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		
 		//Triggered는 키가 눌리고 있을때 반복적으로 호출됨.
 		//이게 싫다면 IA Usset 에서 언제 트리거 이벤트를 호출할지 결정해줘야 함 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
@@ -156,5 +166,13 @@ void AC_PlayableCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(-LookAxisVector.Y);
 	}
+}
+
+void AC_PlayableCharacter::Jump()
+{
+	Super::Jump();
+
+	MakeNoise(1, this, GetActorLocation());
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), JumpSound, GetActorLocation());
 }
 
