@@ -16,6 +16,8 @@
 
 AC_AIController::AC_AIController()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	UAIPerceptionComponent* AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 	SetPerceptionComponent(*AIPerceptionComponent);
 
@@ -29,7 +31,7 @@ AC_AIController::AC_AIController()
 	
 	PerceptionComponent->SetDominantSense(SightSense->GetSenseImplementation());
 
-	//여러개에 대한 감각
+	//감지되거나 감지되지 않은 즉시(expire와 상관 x)
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdate);
 
 	//단일 감각에 대한 델리게이트
@@ -125,9 +127,12 @@ void AC_AIController::SetupSenseConfig()
 	HearingSense->DetectionByAffiliation.bDetectEnemies = true;
 	HearingSense->SetMaxAge(5.f);
 
+	DamageSense->SetMaxAge(2.f);
+
 	//생성자에서 ConfigureSense 해주지 않으면 문제 발생해서 굳이 2번 처리 해주는것
 	PerceptionComponent->ConfigureSense(*SightSense);
 	PerceptionComponent->ConfigureSense(*HearingSense);
+	PerceptionComponent->ConfigureSense(*DamageSense);
 }
 
 FAIStimulus AC_AIController::GetAIStimulus(AActor* Actor, EC_AISenseType AIPerceptionSense)
@@ -183,6 +188,9 @@ void AC_AIController::HandleSensedHearing(AActor* InActor, FVector InLocation)
 {
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
+
+	if (AIPawn->GetState() == EC_EnemyStateType::Battle)
+		return;
 	
 	AIPawn->ChangeState(EC_EnemyStateType::Investigating);
 	GetBlackboardComponent()->SetValueAsVector(TEXT("InvestigatingPos"), InLocation);
@@ -218,4 +226,27 @@ void AC_AIController::OnPossess(APawn* InPawn)
 
 	SetupSenseConfig();
 	RunAI();
+}
+
+void AC_AIController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	AActor* CurrentActor = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
+	if (!CurrentActor)
+		return;
+
+	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
+	ensure(AIPawn);
+
+	FAIStimulus SightStimulus = GetAIStimulus(CurrentActor, EC_AISenseType::Sight);
+	FAIStimulus DamageStimulus = GetAIStimulus(CurrentActor, EC_AISenseType::Damage);
+
+	const bool bLostSight = !SightStimulus.WasSuccessfullySensed() && SightStimulus.IsExpired();
+	const bool bDamageExpired = DamageStimulus.IsExpired();
+
+	if (bLostSight && bDamageExpired)
+	{
+		HandleLoseTarget(CurrentActor);
+	}
 }
