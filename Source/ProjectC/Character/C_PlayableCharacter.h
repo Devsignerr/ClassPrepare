@@ -16,140 +16,81 @@
 #include "C_CharacterBase.h"
 #include "InputActionValue.h"
 #include "ProjectC/Interface/C_CharacterHUDInterface.h"
+#include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 #include "C_PlayableCharacter.generated.h"
 
 
+class UC_PlayerDataAsset;
+class UC_InputDataAsset;
+class UC_ActionComponent;
 class UC_LockOnComponent;
 class UAIPerceptionStimuliSourceComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDie);
-
 UCLASS(config=Game)
-class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface , public IGenericTeamAgentInterface
+class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface , public IGenericTeamAgentInterface , public IC_PlayerCharacterInterface
 {
 	GENERATED_BODY()
 
 public:
 	AC_PlayableCharacter();
-
+	virtual void PossessedBy(AController* NewController) override;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
-	virtual void Jump() override;
-	
-public:
-	virtual void PossessedBy(AController* NewController) override;
-	
-	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
-	virtual void Attack(const FInputActionValue& Value);
-
-	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
-	
-	UFUNCTION(BlueprintCallable)
-	void ComboAttackSave();
-
-	UFUNCTION(BlueprintCallable)
-	void ResetCombo();
-
-	FOnCharacterDie OnCharacterDie;
-
-	void LockOnMode(const FInputActionValue& Value);
-	virtual void SetLockOnMode(bool bEnable) override;
-
+	void Jump(const FInputActionValue& Value);
+	void Attack(const FInputActionValue& Value);
 	void Guard(const FInputActionValue& Value);
 	void Run(const FInputActionValue& Value);
 	void Roll(const FInputActionValue& Value);
+	void LockOn(const FInputActionValue& Value);
+
+public:
+	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
 	
 	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 public:
-	/** Camera boom positioning the camera behind the character */
+	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
+	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
+	virtual UC_PlayerDataAsset* GetPlayerData() const override { return PlayerData; }
+public:
+	//============= Component =========================================================================
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
 	
-	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimulusSource;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UC_LockOnComponent> LockOnComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_ActionComponent> ActionComponent;
 	
-	/** MappingContext */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_LockOnComponent> LockOnComponent;
+
+	//============= Input ===========================================================================
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
 
-	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JumpAction;
+	TObjectPtr<UC_InputDataAsset> InputData;
 
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
-
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	//===============================================================================================
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* AttackAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LockOnAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* GuardAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* RunAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* RollAction;
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector2D InputVector = FVector2D::ZeroVector;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsAttacking = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool SaveAttack = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsGuarding = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsRunning = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsRolling = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int AttackCount = 0;
-
-	bool bCanMove = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float MovementSpeed;
-
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> AttackMontages;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> RollMontage;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> JumpSound;
-
+	TObjectPtr<UC_PlayerDataAsset> PlayerData;
+	
 	UPROPERTY()
 	FGenericTeamId GenericTeamId = 0;
 };

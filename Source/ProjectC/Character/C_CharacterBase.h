@@ -37,16 +37,10 @@ public:
 	virtual void SetupLockOnWidget(UC_UserWidget* InUserWidget) override;
 	virtual void OnLocked(bool bLocked) override;
 	
-	virtual void SetLockOnMode(bool bEnable);
-	bool IsLockOnMode() { return bLockOnMode; }
-	
 public:
 	UPROPERTY(EditAnywhere) 
 	EC_CharacterType CharacterType;
 	
-	UPROPERTY(BlueprintReadOnly)
-	bool bLockOnMode = false;
-
 	FOnCharacterLocked OnCharacterLocked;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

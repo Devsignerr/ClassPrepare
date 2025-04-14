@@ -46,3 +46,29 @@ enum class EC_AISenseType : uint8
 	Damage,
 	Num
 };
+
+UENUM(BlueprintType)
+enum class EC_LockCauseType : uint8
+{
+	None,
+	Move,
+	Jump,
+	Attack,
+	Run,
+	Roll,
+	Guard,
+	Num,
+};
+
+UENUM(BlueprintType)
+enum class EC_ActionType : uint8
+{
+	None,
+	Move,
+	Jump,
+	Attack,
+	Run,
+	Roll,
+	Guard,
+	Num,
+};

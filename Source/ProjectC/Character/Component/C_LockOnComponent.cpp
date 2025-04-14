@@ -2,8 +2,6 @@
 
 #include "GameFramework/Character.h"
 #include "ProjectC/Interface/C_CharacterWidgetInterface.h"
-#include "ProjectC/Subsystem/C_UISubsystem.h"
-#include "ProjectC/UI/C_LockOnWidget.h"
 
 UC_LockOnComponent::UC_LockOnComponent()
 {
@@ -11,14 +9,9 @@ UC_LockOnComponent::UC_LockOnComponent()
 	TargetDetectAngle = 90.f;
 }
 
-void UC_LockOnComponent::BeginPlay()
+void UC_LockOnComponent::LockOn()
 {
-	Super::BeginPlay();
-}
-
-void UC_LockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	SetLockOnMode(!IsLockOnMode());
 }
 
 APawn* UC_LockOnComponent::FindTarget()
@@ -73,9 +66,9 @@ void UC_LockOnComponent::LockTarget(APawn* InActor)
 	if (!InActor)
 		return;
 
-	Target = InActor;
+	LockedTarget = InActor;
 
-	if (IC_CharacterWidgetInterface* Character = Cast<IC_CharacterWidgetInterface>(Target))
+	if (IC_CharacterWidgetInterface* Character = Cast<IC_CharacterWidgetInterface>(LockedTarget))
 	{
 		Character->OnLocked(true);
 	}
@@ -83,10 +76,32 @@ void UC_LockOnComponent::LockTarget(APawn* InActor)
 
 void UC_LockOnComponent::ClearTarget()
 {
-	if (IC_CharacterWidgetInterface* Character = Cast<IC_CharacterWidgetInterface>(Target))
+	if (IC_CharacterWidgetInterface* Character = Cast<IC_CharacterWidgetInterface>(LockedTarget))
 	{
 		Character->OnLocked(false);
 	}
 	
-	Target = nullptr;
+	LockedTarget = nullptr;
+}
+
+void UC_LockOnComponent::SetLockOnMode(bool bEnable)
+{
+	bLockOnMode = bEnable;
+	
+	if (bEnable)
+	{
+		if (APawn* Target = FindTarget())
+		{
+			LockTarget(Target);
+		}
+		else
+		{
+			bLockOnMode = false;
+		}
+	}
+
+	if (!bLockOnMode)
+	{
+		ClearTarget();
+	}
 }

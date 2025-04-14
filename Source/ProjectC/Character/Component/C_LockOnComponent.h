@@ -18,21 +18,25 @@ public:
 	// Sets default values for this component's properties
 	UC_LockOnComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+public:
+	void LockOn();
 
 	APawn* FindTarget();
 	void LockTarget(APawn* InActor);
 	void ClearTarget();
+	APawn* GetLockTarget() const { return LockedTarget; }
 
+	virtual void SetLockOnMode(bool bEnable);
+	bool IsLockOnMode() const { return bLockOnMode; }
+
+private:
 	UPROPERTY()
-	TObjectPtr<APawn> Target = nullptr;
+	TObjectPtr<APawn> LockedTarget = nullptr;
 
 	float TargetDetectRadius = 0.f;
 	float TargetDetectAngle = 0.f;
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	bool bLockOnMode = false;
 };

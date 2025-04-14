@@ -8,7 +8,6 @@
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
-#include "Perception/AISense_Damage.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
 #include "ProjectC/UI/C_LockOnWidget.h"
 
@@ -58,8 +57,6 @@ AC_CharacterBase::AC_CharacterBase()
 void AC_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
 }
 
 void AC_CharacterBase::PostInitializeComponents()
@@ -72,11 +69,6 @@ void AC_CharacterBase::PostInitializeComponents()
 void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
 {
 	
-}
-
-void AC_CharacterBase::SetLockOnMode(bool bEnable)
-{
-	bLockOnMode = bEnable;
 }
 
 void AC_CharacterBase::AttackTrace(bool bStart, FName TraceBoneName)
