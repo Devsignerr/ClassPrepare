@@ -65,6 +65,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetCombo();
+
+	void RotateToControlRotation();
+
+	void OnGuardSuccess(AActor* DamageCauser);
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

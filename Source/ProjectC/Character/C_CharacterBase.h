@@ -27,7 +27,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
 	
-	virtual void AttackTrace(bool bStart, FName TraceBoneName) override;
+	virtual void AttackTrace(bool bStart, FName TraceStartBoneName, FName TraceEndBoneName) override;
+	virtual void AttackTraceWithWeapon(bool bStart) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
@@ -36,6 +37,8 @@ public:
 	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) override;
 	virtual void SetupLockOnWidget(UC_UserWidget* InUserWidget) override;
 	virtual void OnLocked(bool bLocked) override;
+
+	virtual bool HasWeapon() override;
 	
 public:
 	UPROPERTY(EditAnywhere) 
@@ -51,5 +54,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_WidgetComponent> WidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> WeaponStaticComponent;
 };
 

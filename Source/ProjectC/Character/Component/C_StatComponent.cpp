@@ -3,7 +3,9 @@
 
 #include "C_StatComponent.h"
 
+#include "C_ActionComponent.h"
 #include "ProjectC/Character/C_CharacterBase.h"
+#include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 UC_StatComponent::UC_StatComponent()
@@ -48,8 +50,23 @@ void UC_StatComponent::HealHp(float InHealAmount)
 	OnHpChanged.Broadcast(CurrentHp, MaxHp);
 }
 
-float UC_StatComponent::ApplyDamage(float InDamage)
+float UC_StatComponent::ApplyDamage(float InDamage, AActor* DamageCauser)
 {
+	if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+	{
+		UC_ActionComponent* ActionComponent = Interface->GetActionComponent();
+		check(ActionComponent);
+		
+		if (ActionComponent->IsRolling)
+			return 0.f;
+
+		if (ActionComponent->IsGuarding)
+		{
+			ActionComponent->OnGuardSuccess(DamageCauser);
+			return 0.f;
+		}
+	}
+	
 	const float PrevHp = CurrentHp;
 	const float ActualDamage = FMath::Clamp<float>(InDamage, 0, InDamage);
 

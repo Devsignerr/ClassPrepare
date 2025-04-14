@@ -79,7 +79,6 @@ struct FC_EnemyTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AutoSuccessRangeFromLastSeenLocation = 0.f;
 	
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> AttackAnim = nullptr;
 
@@ -94,4 +93,31 @@ struct FC_EnemyTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> Right180TurnAnim = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FC_WeaponTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 WeaponId = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UStaticMesh> WeaponMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Damage = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName TraceStartSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName TraceEndSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector RelativePos = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator RelativeRot = FRotator::ZeroRotator;
 };

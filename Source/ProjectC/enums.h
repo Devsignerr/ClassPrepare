@@ -15,6 +15,7 @@ enum class EC_DataTableType : int32
 	None,
 	CharacterStat,
 	Enemy,
+	Weapon,
 	Num
 };
 

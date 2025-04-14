@@ -38,7 +38,7 @@ public:
 	float GetMaxHp() const { return MaxHp; }
 	
 	void HealHp(float InHealAmount);
-	float ApplyDamage(float InDamage);
+	float ApplyDamage(float InDamage, AActor* DamageCauser);
 
 public:
 	void SetHp(float NewHp);

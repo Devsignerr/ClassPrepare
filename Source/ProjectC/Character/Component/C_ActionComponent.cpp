@@ -146,20 +146,63 @@ void UC_ActionComponent::Attack(bool IsPressed)
 		{
 			AttackCount = 0;
 		}
-
-		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-		check(AnimInstance);
-
+		
 		if (AttackMontages.IsValidIndex(AttackCount - 1))
 		{
 			OwnerCharacter->PlayAnimMontage(AttackMontages[AttackCount - 1]);
-			FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnMontageEnd);
-			AnimInstance->Montage_SetEndDelegate(EndDelegate);
 		}
+
+		RotateToControlRotation();
 
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Move);
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Jump);
 	}
+}
+
+void UC_ActionComponent::ComboAttackSave()
+{
+	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
+	check(PlayerData);
+
+	TArray<UAnimMontage*>& AttackMontages = PlayerData->AttackMontages;
+	
+	if (SaveAttack)
+	{
+		SaveAttack = false;
+		AttackCount++;
+		
+		if (AttackCount > AttackMontages.Num())
+		{
+			AttackCount = 0;
+		}
+
+		if (AttackMontages.IsValidIndex(AttackCount - 1))
+			OwnerCharacter->PlayAnimMontage(AttackMontages[AttackCount - 1]);
+
+		RotateToControlRotation();
+	}
+	else
+	{
+		ForceReleaseLock(EC_LockCauseType::Attack);
+	}
+}
+
+void UC_ActionComponent::ResetCombo()
+{
+	AttackCount = 0;
+	SaveAttack = false;
+	IsAttacking = false;
+	ForceReleaseLock(EC_LockCauseType::Attack);
+}
+
+void UC_ActionComponent::RotateToControlRotation()
+{
+	const APlayerController* PlayerController = CastChecked<APlayerController>(OwnerCharacter->GetController());
+	FRotator ControlRotation = PlayerController->GetControlRotation();
+	ControlRotation.Pitch = 0.f;
+
+	OwnerCharacter->SetActorRotation(ControlRotation);
 }
 
 void UC_ActionComponent::Guard(bool bPressed)
@@ -306,37 +349,11 @@ void UC_ActionComponent::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 	}
 }
 
-void UC_ActionComponent::ComboAttackSave()
+void UC_ActionComponent::OnGuardSuccess(AActor* DamageCauser)
 {
-	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
-	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
-	check(PlayerData);
+	FVector OwnerLocation = OwnerCharacter->GetActorLocation();
+	FVector DamageCauserLocation = DamageCauser->GetActorLocation();
 
-	TArray<UAnimMontage*>& AttackMontages = PlayerData->AttackMontages;
-	
-	if (SaveAttack)
-	{
-		SaveAttack = false;
-		AttackCount++;
-		
-		if (AttackCount > AttackMontages.Num())
-		{
-			AttackCount = 0;
-		}
-
-		if (AttackMontages.IsValidIndex(AttackCount - 1))
-			OwnerCharacter->PlayAnimMontage(AttackMontages[AttackCount - 1]);
-	}
-	else
-	{
-		ForceReleaseLock(EC_LockCauseType::Attack);
-	}
-}
-
-void UC_ActionComponent::ResetCombo()
-{
-	AttackCount = 0;
-	SaveAttack = false;
-	IsAttacking = false;
-	ForceReleaseLock(EC_LockCauseType::Attack);
+	FVector ForceDir = (OwnerLocation - DamageCauserLocation).GetSafeNormal2D();
+	OwnerCharacter->GetCharacterMovement()->AddForce(ForceDir * 100.f);
 }

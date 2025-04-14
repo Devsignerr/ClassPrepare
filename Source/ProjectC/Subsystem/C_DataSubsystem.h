@@ -28,4 +28,7 @@ private:
 
 	UPROPERTY(config)
 	FSoftObjectPath Enemy_DataTablePath;
+
+	UPROPERTY(config)
+	FSoftObjectPath Weapon_DataTablePath;
 };

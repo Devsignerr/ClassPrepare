@@ -48,6 +48,10 @@ void AC_PlayableCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	//TODO : TestEquip
+	check(BattleComponent);
+	BattleComponent->EquipWeapon(0);
 }
 
 void AC_PlayableCharacter::PossessedBy(AController* NewController)
@@ -61,7 +65,7 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(InputData->JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Jump);
+		EnhancedInputComponent->BindAction(InputData->JumpAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Jump);
 		EnhancedInputComponent->BindAction(InputData->JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputData->MoveAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Move);
 		EnhancedInputComponent->BindAction(InputData->LookAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Look);

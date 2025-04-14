@@ -57,6 +57,8 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 public:
+	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const override { return WeaponStaticComponent; }
+	virtual UC_ActionComponent* GetActionComponent() const override { return ActionComponent; }
 	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
 	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
 	virtual UC_PlayerDataAsset* GetPlayerData() const override { return PlayerData; }

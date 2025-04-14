@@ -39,6 +39,9 @@ AC_CharacterBase::AC_CharacterBase()
 	
 	BattleComponent = CreateDefaultSubobject<UC_BattleComponent>(TEXT("BattleComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
+	WeaponStaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponStaticComponent"));
+	WeaponStaticComponent->SetupAttachment(GetMesh());
+	
 	WidgetComponent = CreateDefaultSubobject<UC_WidgetComponent>(TEXT("WidgetComponent"));
 	WidgetComponent->SetupAttachment(GetMesh());
 	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
@@ -71,15 +74,22 @@ void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const
 	
 }
 
-void AC_CharacterBase::AttackTrace(bool bStart, FName TraceBoneName)
+void AC_CharacterBase::AttackTrace(bool bStart, FName TraceStartBoneName, FName TraceEndBoneName)
 {
-	if (BattleComponent)
-	{
-		if (bStart)
-			BattleComponent->StartTrace(TraceBoneName);
-		else
-			BattleComponent->EndTrace();
-	}
+	check(BattleComponent);
+	
+	if (bStart)
+		BattleComponent->StartTrace(TraceStartBoneName, TraceEndBoneName);
+	else
+		BattleComponent->EndTrace();
+}
+
+void AC_CharacterBase::AttackTraceWithWeapon(bool bStart)
+{
+	if (bStart)
+		BattleComponent->StartTraceWithWeapon();
+	else
+		BattleComponent->EndTrace();
 }
 
 void AC_CharacterBase::SetupCharacterWidget(UC_UserWidget* InUserWidget)
@@ -104,9 +114,14 @@ void AC_CharacterBase::OnLocked(bool bLocked)
 	OnCharacterLocked.Broadcast(bLocked);
 }
 
+bool AC_CharacterBase::HasWeapon()
+{
+	check(BattleComponent);
+	return BattleComponent->HasWeapon();
+}
+
 float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
-	StatComponent->ApplyDamage(DamageAmount);
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	const float Damage = StatComponent->ApplyDamage(DamageAmount, DamageCauser);
+	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }

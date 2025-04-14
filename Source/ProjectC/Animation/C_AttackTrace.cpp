@@ -13,7 +13,14 @@ void UC_AttackTrace::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	{
 		if (IC_AnimationAttackInterface* AttackPawn = Cast<IC_AnimationAttackInterface>(MeshComp->GetOwner()))
 		{
-			AttackPawn->AttackTrace(bStart, TraceBoneName);
+			if (AttackPawn->HasWeapon())
+			{
+				AttackPawn->AttackTraceWithWeapon(bStart);
+			}
+			else
+			{
+				AttackPawn->AttackTrace(bStart, TraceStartBoneName, TraceEndBoneName);
+			}
 		}
 	}
 }

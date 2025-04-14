@@ -8,6 +8,8 @@
 #include "C_BattleComponent.generated.h"
 
 
+struct FC_WeaponTableRow;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTC_API UC_BattleComponent : public UActorComponent
 {
@@ -22,24 +24,33 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void StartTrace(FName InTraceBoneName);
+	void StartTraceWithWeapon();
+	void StartTrace(FName InTraceStartBoneName, FName InTraceEndBoneName);
 	void EndTrace();
 
 	void SpawnEffect(EEffectType InEffectType, FVector InHitLocation);
 
+	void EquipWeapon(uint8 InWeaponId);
+	void UnEquipWeapon();
+	bool HasWeapon();
+
 public:
 	//============================ Trace ============================
 	bool bTracing = false;
-	FName TraceBoneName;
+	
+	FName TraceStartBoneName;
+	FName TraceEndBoneName;
 
-	FVector PrevLocation = FVector::ZeroVector;
-
+	FVector PrevStartBoneLocation = FVector::ZeroVector;
+	FVector PrevEndBoneLocation = FVector::ZeroVector;
+	
 	float TraceInterval = 0.f;
 	float TraceElapsedTime = 0.f;
 	
 	TArray<TWeakObjectPtr<AActor>> DamagedActor;
+	
+	FC_WeaponTableRow* WeaponTableRow = nullptr;
 	//===============================================================
 };

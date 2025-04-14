@@ -5,6 +5,7 @@
 #include "ProjectC/enums.h"
 #include "ProjectC/Subsystem/C_DataSubsystem.h"
 
+struct FC_WeaponTableRow;
 struct FC_EnemyTableRow;
 struct FC_CharacterStatTableRow;
 
@@ -13,7 +14,10 @@ class PROJECTC_API FC_GameUtil
 public:
 	static FC_CharacterStatTableRow* GetCharacterStatData(EC_CharacterType CharacterType);
 	static FC_EnemyTableRow* GetEnemyData(EC_CharacterType EnemyType);
+	static FC_WeaponTableRow* GetWeaponData(uint8 WeaponId);
 
+	static void CameraShake();
+	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);
 };

@@ -19,6 +19,9 @@ public:
 	float MovementSpeed_Run;
 
 	UPROPERTY(EditAnywhere)
+	FName WeaponSocketName;
+
+	UPROPERTY(EditAnywhere)
 	TArray<UAnimMontage*> AttackMontages;
 
 	UPROPERTY(EditAnywhere)

@@ -2,6 +2,7 @@
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
 #include "ProjectC/ProjectC.h"
+#include "ProjectC/Cosmetic/C_CameraShake.h"
 #include "ProjectC/Data/C_TableRows.h"
 
 FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType CharacterType)
@@ -32,4 +33,27 @@ FC_EnemyTableRow* FC_GameUtil::GetEnemyData(EC_CharacterType EnemyType)
 	
 	UE_LOG(LogProjectC, Error, TEXT("EnemyData is Invalid"));
 	return nullptr;
+}
+
+FC_WeaponTableRow* FC_GameUtil::GetWeaponData(uint8 WeaponId)
+{
+	TArray<FC_WeaponTableRow*> EnemyTableRows = GetAllRows<FC_WeaponTableRow>(EC_DataTableType::Weapon);
+	if (FC_WeaponTableRow** FoundRow = EnemyTableRows.FindByPredicate([WeaponId](const FC_WeaponTableRow* Row)
+	{
+		return Row->WeaponId == WeaponId;
+	}))
+	{
+		return *FoundRow;
+	}
+	
+	UE_LOG(LogProjectC, Error, TEXT("WeaponData is Invalid"));
+	return nullptr;
+}
+
+void FC_GameUtil::CameraShake()
+{
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GEngine->GetCurrentPlayWorld(), 0))
+	{
+		PlayerController->ClientStartCameraShake(UC_CameraShake::StaticClass());
+	}
 }
