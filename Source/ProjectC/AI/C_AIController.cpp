@@ -43,7 +43,7 @@ void AC_AIController::RunAI()
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardPtr))
 	{
-		Blackboard->SetValueAsVector(TEXT("HomePose"), GetPawn()->GetActorLocation());
+		Blackboard->SetValueAsVector(TEXT("HomePos"), GetPawn()->GetActorLocation());
 
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
@@ -255,7 +255,7 @@ void AC_AIController::Tick(float DeltaSeconds)
 	FAIStimulus DamageStimulus = GetAIStimulus(CurrentActor, EC_AISenseType::Damage);
 
 	const bool bLostSight = !SightStimulus.WasSuccessfullySensed() && SightStimulus.IsExpired();
-	const bool bDamageExpired = DamageStimulus.IsExpired();
+	const bool bDamageExpired = !DamageStimulus.IsValid() || DamageStimulus.IsExpired();
 
 	if (bLostSight && bDamageExpired)
 	{

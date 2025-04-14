@@ -28,18 +28,15 @@ EBTNodeResult::Type UBTTask_MoveAlongPatrolRoute::ExecuteTask(UBehaviorTreeCompo
 		return EBTNodeResult::Failed;
 
 	AC_PatrolRoute* PatrolRoute = Cast<AC_PatrolRoute>(AIPawn->GetPatrolRoute());
-	if (!PatrolRoute)
-		return EBTNodeResult::Failed;
-
-	FVector TargetLocation = PatrolRoute->GetLocationAtSplinePoint();
-	EPathFollowingRequestResult::Type PathFollowingRequestResult = AIController->MoveToLocation(TargetLocation, 1.f, false);
-	if (PathFollowingRequestResult == EPathFollowingRequestResult::RequestSuccessful)
+	if (PatrolRoute)
 	{
-		//UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Successful"));
+		FVector TargetLocation = PatrolRoute->GetLocationAtSplinePoint();
+		AIController->MoveToLocation(TargetLocation, 1.f, false);
 	}
 	else
 	{
-		//UE_LOG(LogProjectC, Warning, TEXT("MoveTo Request Failed or Already Moving"));
+		FVector TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(TEXT("HomePos"));
+		AIController->MoveToLocation(TargetLocation, 1.f, false);
 	}
 	
 	return EBTNodeResult::Succeeded;

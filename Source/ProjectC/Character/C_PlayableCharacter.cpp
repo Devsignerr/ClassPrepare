@@ -193,7 +193,7 @@ void AC_PlayableCharacter::Run(const FInputActionValue& Value)
 	{
 		IsRunning = false;
 		
-		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	}
 }
 
@@ -250,8 +250,11 @@ void AC_PlayableCharacter::Move(const FInputActionValue& Value)
 			 	// 5. 타겟 바라보기
 			 	FRotator LookAtRot = (TargetLocation - MyLocation).Rotation();
 			 	LookAtRot.Pitch = 0.f; // 평면 회전만
-			 	LookAtRot.Roll = 0.f;
-			 	SetActorRotation(LookAtRot);
+
+			 	const FRotator CurrentRot = GetActorRotation();
+			 	const FRotator NewRot = FMath::RInterpTo(CurrentRot, LookAtRot, GetWorld()->GetDeltaSeconds(), 10.f);
+			 	
+			 	SetActorRotation(NewRot);
 			 }
 		}
 	}
