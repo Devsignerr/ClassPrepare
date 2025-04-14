@@ -214,9 +214,21 @@ void AC_AIController::HandleLoseTarget(AActor* InActor)
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
 }
 
+void AC_AIController::SetGenericTeamId(const FGenericTeamId& InTeamID)
+{
+	Super::SetGenericTeamId(InTeamID);
+}
+
+FGenericTeamId AC_AIController::GetGenericTeamId() const
+{
+	return Super::GetGenericTeamId();
+}
+
 void AC_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	SetGenericTeamId(FGenericTeamId(1));
 	
 	const FC_EnemyTableRow* EnemyTableRow = GetEnemyData();
 	ensure(EnemyTableRow);

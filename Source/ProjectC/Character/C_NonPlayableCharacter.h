@@ -57,6 +57,9 @@ private:
 
 	EC_EnemyStateType EnemyState = EC_EnemyStateType::None;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_WidgetComponent> LockOnWidgetComponent;
+
 	bool IsTurning = false;
 
 	float TurnStartYaw = 0.f;

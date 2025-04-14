@@ -7,6 +7,7 @@
 #include "C_UISubsystem.generated.h"
 
 
+class UC_LockOnWidget;
 class UC_HUDWidget;
 
 UCLASS()
@@ -27,10 +28,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
 	TSubclassOf<UC_HUDWidget> HUDWidgetClass;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 	TObjectPtr<UC_HUDWidget> HUDWidget;
-	
 };
 
 template <typename T>

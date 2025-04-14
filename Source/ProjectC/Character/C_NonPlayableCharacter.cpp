@@ -11,6 +11,18 @@
 
 AC_NonPlayableCharacter::AC_NonPlayableCharacter()
 {
+	LockOnWidgetComponent = CreateDefaultSubobject<UC_WidgetComponent>(TEXT("LockOnWidgetComponent"));
+	LockOnWidgetComponent->SetupAttachment(GetMesh(), FName("Pelvis"));
+
+	//TODO 데이터 분리 필요
+	static ConstructorHelpers::FClassFinder<UUserWidget> LockOnWidgetRef(TEXT("/Game/UI/WBP_LockOn.WBP_LockOn_C"));
+	if (LockOnWidgetRef.Class)
+	{
+		LockOnWidgetComponent->SetWidgetClass(LockOnWidgetRef.Class);
+		LockOnWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		LockOnWidgetComponent->SetDrawSize(FVector2D(30.0f, 30.0f));
+		LockOnWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AC_NonPlayableCharacter::BeginPlay()
@@ -59,9 +71,6 @@ void AC_NonPlayableCharacter::Tick(float DeltaSeconds)
 void AC_NonPlayableCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	if (NewController->GetClass() == AC_AIController::StaticClass())
-		SetGenericTeamId(FGenericTeamId(1));
 }
 
 FC_EnemyTableRow* AC_NonPlayableCharacter::GetEnemyData()

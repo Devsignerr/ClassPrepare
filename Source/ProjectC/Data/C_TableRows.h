@@ -12,7 +12,7 @@ struct FC_CharacterStatTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	FC_CharacterStatTableRow() : MaxHp(0.0f), Attack(0.0f), MovementSpeed(0.0f) {}
+	FC_CharacterStatTableRow() : MaxHp(0.0f), Attack(0.0f){}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
 	EC_CharacterType CharacterType;
@@ -23,16 +23,12 @@ struct FC_CharacterStatTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float Attack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float MovementSpeed;
-
 	FC_CharacterStatTableRow operator+(const FC_CharacterStatTableRow& Other) const
 	{
 		FC_CharacterStatTableRow Result;
 		
 		Result.MaxHp = this->MaxHp + Other.MaxHp;
 		Result.Attack = this->Attack + Other.Attack;
-		Result.MovementSpeed = this->MovementSpeed + Other.MovementSpeed;
 
 		return Result;
 	}

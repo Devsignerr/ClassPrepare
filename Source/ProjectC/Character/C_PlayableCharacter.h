@@ -19,6 +19,7 @@
 #include "C_PlayableCharacter.generated.h"
 
 
+class UC_LockOnComponent;
 class UAIPerceptionStimuliSourceComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -26,7 +27,7 @@ class USpringArmComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDie);
 
 UCLASS(config=Game)
-class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface
+class AC_PlayableCharacter : public AC_CharacterBase , public IC_CharacterHUDInterface , public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -43,6 +44,8 @@ protected:
 	virtual void Jump() override;
 	
 public:
+	virtual void PossessedBy(AController* NewController) override;
+	
 	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
 	virtual void Attack(const FInputActionValue& Value);
 	
@@ -53,6 +56,15 @@ public:
 	void ResetCombo();
 
 	FOnCharacterDie OnCharacterDie;
+
+	void LockOnMode(const FInputActionValue& Value);
+	virtual void SetLockOnMode(bool bEnable) override;
+
+	void Guard(const FInputActionValue& Value);
+	void Run(const FInputActionValue& Value);
+	
+	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
 public:
 	/** Camera boom positioning the camera behind the character */
@@ -66,6 +78,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimulusSource;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_LockOnComponent> LockOnComponent;
+	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
@@ -85,6 +100,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* LockOnAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* GuardAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RunAction;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D InputVector = FVector2D::ZeroVector;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool IsAttacking = false;
 
@@ -92,12 +119,24 @@ public:
 	bool SaveAttack = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsGuarding = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsRunning = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int AttackCount = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float MovementSpeed;
 
 	UPROPERTY(EditAnywhere)
 	TArray<UAnimMontage*> AttackMontages;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> JumpSound;
+
+	UPROPERTY()
+	FGenericTeamId GenericTeamId = 0;
 };
 

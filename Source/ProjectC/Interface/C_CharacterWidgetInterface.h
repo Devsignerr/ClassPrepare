@@ -23,4 +23,7 @@ class PROJECTC_API IC_CharacterWidgetInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) = 0;
+	virtual void SetupLockOnWidget(class UC_UserWidget* InUserWidget) = 0;
+
+	virtual void OnLocked(bool bLocked) = 0;
 };

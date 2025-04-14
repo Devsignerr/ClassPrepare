@@ -3,6 +3,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "GenericTeamAgentInterface.h"
 #include "Camera/CameraComponent.h"
+#include "Component/C_LockOnComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -24,6 +26,8 @@ AC_PlayableCharacter::AC_PlayableCharacter()
 	StimulusSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus"));
 	StimulusSource->RegisterForSense(TSubclassOf<UAISense>(UAISense_Sight::StaticClass()));
 	StimulusSource->RegisterWithPerceptionSystem();
+
+	LockOnComponent = CreateDefaultSubobject<UC_LockOnComponent>(TEXT("LockOnComponent")); 
 	
 	// 카메라가 어태치된 부모의 회전값을 따라감. true 로 하면 입력값에 따라 회전해버림 .
 	// true 인 경우는 1인칭 게임일때
@@ -68,8 +72,6 @@ void AC_PlayableCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
-	SetGenericTeamId(FGenericTeamId(0));
 }
 
 void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -88,9 +90,13 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Look);
 
+		//Guard Action
+		EnhancedInputComponent->BindAction(GuardAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Guard);
+
 		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Attack);
-
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::LockOnMode);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Run);
 	}
 }
 
@@ -127,6 +133,80 @@ void AC_PlayableCharacter::ResetCombo()
 	IsAttacking = false;
 }
 
+void AC_PlayableCharacter::LockOnMode(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+
+	SetLockOnMode(!IsLockOnMode());
+}
+
+void AC_PlayableCharacter::SetLockOnMode(bool bEnable)
+{
+	if (bEnable)
+	{
+		if (APawn* Target = LockOnComponent->FindTarget())
+		{
+			LockOnComponent->LockTarget(Target);
+		}
+		else
+		{
+			bEnable = false;
+		}
+	}
+
+	if (!bEnable)
+	{
+		LockOnComponent->ClearTarget();
+	}
+
+	Super::SetLockOnMode(bEnable);
+}
+
+void AC_PlayableCharacter::Guard(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+
+	if (IsPressed && !IsGuarding)
+	{
+		IsGuarding = true;
+	}
+	else if (!IsPressed && IsGuarding)
+	{
+		IsGuarding = false;
+	}
+}
+
+void AC_PlayableCharacter::Run(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+
+	if (IsPressed && !IsRunning)
+	{
+		IsRunning = true;
+
+		GetCharacterMovement()->MaxWalkSpeed = 800.f;
+		
+	}
+	else if (!IsPressed && IsRunning)
+	{
+		IsRunning = false;
+		
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	}
+}
+
+void AC_PlayableCharacter::SetGenericTeamId(const FGenericTeamId& InTeamID)
+{
+	GenericTeamId = InTeamID;
+}
+
+FGenericTeamId AC_PlayableCharacter::GetGenericTeamId() const
+{
+	return GenericTeamId;
+}
+
 void AC_PlayableCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -134,24 +214,46 @@ void AC_PlayableCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// 이동방향을 결정하기 위해 컨트롤러의 회전값을 알아냄
-		// FRotationMatrix는 회전(Rotation)을 3x3 방향 벡터 행렬로 바꿔주는 클래스
-		// 이 회전값 기준으로 좌표축을 만들자는 의미
-		// X축 방향 벡터를 뽑아냅니다.
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		InputVector = MovementVector;
 		
-		// float3x3 RotationMatrix(float3 vAxis, float fAngle) float 3x3 을 반환한다는것을 알수 있음
-		// X의 경우 회전 행렬의 첫 번째 행을 벡터로 만들어서 반환하는 거고,
-		// 즉, 현재 회전값에서의 X축 방향(= Forward Vector) 을 의미함
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		if (!bLockOnMode || IsRunning)
+		{
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+			// add movement 
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+		}
+		else
+		{
+			 if (AActor* TargetActor = LockOnComponent->Target)
+			 {
+			 	const FVector MyLocation = GetActorLocation();
+			 	const FVector TargetLocation = TargetActor->GetActorLocation();
+
+			 	const FVector ToTarget = (TargetLocation - MyLocation).GetSafeNormal();
+
+			 	// 2. 궤도 이동 방향 계산
+			 	const FVector OrbitRight = FVector::CrossProduct(FVector::UpVector, ToTarget); // 좌우
+			 	const FVector OrbitForward = ToTarget;                                         // 앞뒤
+
+			 	// 3. 최종 이동 방향
+			 	FVector MoveDir = OrbitRight * MovementVector.X + OrbitForward * MovementVector.Y;
+			 	MoveDir.Normalize();
+
+			 	// 4. 이동
+			 	AddMovementInput(MoveDir);
+
+			 	// 5. 타겟 바라보기
+			 	FRotator LookAtRot = (TargetLocation - MyLocation).Rotation();
+			 	LookAtRot.Pitch = 0.f; // 평면 회전만
+			 	LookAtRot.Roll = 0.f;
+			 	SetActorRotation(LookAtRot);
+			 }
+		}
 	}
 }
 
@@ -174,5 +276,12 @@ void AC_PlayableCharacter::Jump()
 
 	MakeNoise(1, this, GetActorLocation());
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), JumpSound, GetActorLocation());
+}
+
+void AC_PlayableCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	SetGenericTeamId(FGenericTeamId(0));
 }
 

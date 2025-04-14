@@ -1,6 +1,7 @@
 
 #include "C_UISubsystem.h"
 #include "../UI/C_HUDWidget.h"
+#include "ProjectC/UI/C_LockOnWidget.h"
 
 UC_UISubsystem::UC_UISubsystem()
 {

@@ -10,6 +10,7 @@
 #include "Component/C_WidgetComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
+#include "ProjectC/UI/C_LockOnWidget.h"
 
 AC_CharacterBase::AC_CharacterBase()
 {
@@ -33,9 +34,9 @@ AC_CharacterBase::AC_CharacterBase()
 	// Braking Deceleration Walking	멈출 때 얼마나 빨리 감속할지 결정	기본값: 2048 → 줄이면 미끄러짐
 	// Ground Friction	지면 마찰력. 작을수록 더 오래 미끄러짐	기본값: 8 → 줄이면 미끄러짐 강화
 	// Braking Friction Factor	브레이킹 중 마찰력 계수. 0이면 브레이크 안 걸리는 느낌	기본값: 1 → 0~0.3 추천
-	GetCharacterMovement()->BrakingDecelerationWalking = 500.f;
-	GetCharacterMovement()->GroundFriction = 2.f;
-	GetCharacterMovement()->BrakingFrictionFactor = 0.2f;
+	//GetCharacterMovement()->BrakingDecelerationWalking = 500.f;
+	//GetCharacterMovement()->GroundFriction = 2.f;
+	//GetCharacterMovement()->BrakingFrictionFactor = 0.2f;
 	
 	BattleComponent = CreateDefaultSubobject<UC_BattleComponent>(TEXT("BattleComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
@@ -70,18 +71,12 @@ void AC_CharacterBase::PostInitializeComponents()
 
 void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
 {
-	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
-	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+	
 }
 
-void AC_CharacterBase::SetGenericTeamId(const FGenericTeamId& TeamID)
+void AC_CharacterBase::SetLockOnMode(bool bEnable)
 {
-	GenericTeamId = TeamID.GetId();
-}
-
-FGenericTeamId AC_CharacterBase::GetGenericTeamId() const
-{
-	return GenericTeamId;
+	bLockOnMode = bEnable;
 }
 
 void AC_CharacterBase::AttackTrace(bool bStart, FName TraceBoneName)
@@ -102,6 +97,19 @@ void AC_CharacterBase::SetupCharacterWidget(UC_UserWidget* InUserWidget)
 		HpBarWidget->UpdateHpBar(StatComponent->GetCurrentHp(), StatComponent->GetMaxHp());
 		StatComponent->OnHpChanged.AddUObject(HpBarWidget, &UC_HpBarWidget::UpdateHpBar);
 	}
+}
+
+void AC_CharacterBase::SetupLockOnWidget(UC_UserWidget* InUserWidget)
+{
+	if (UC_LockOnWidget* LockOnWidget = Cast<UC_LockOnWidget>(InUserWidget))
+	{
+		OnCharacterLocked.AddDynamic(LockOnWidget, &UC_LockOnWidget::ToggleActivation);
+	}
+}
+
+void AC_CharacterBase::OnLocked(bool bLocked)
+{
+	OnCharacterLocked.Broadcast(bLocked);
 }
 
 float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)

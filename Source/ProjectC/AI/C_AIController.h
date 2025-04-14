@@ -40,6 +40,11 @@ public:
 	void HandleSensedDamage(AActor* InActor);
 	
 	void HandleLoseTarget(AActor* InActor);
+	
+	virtual void SetGenericTeamId(const FGenericTeamId& InTeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	
+
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;

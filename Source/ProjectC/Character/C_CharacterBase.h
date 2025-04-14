@@ -13,9 +13,10 @@
 #include "ProjectC/Interface/C_CharacterWidgetInterface.h"
 #include "C_CharacterBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterLocked, bool, bLocked);
 
 UCLASS(config=Game)
-class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_AnimationAttackInterface , public IC_CharacterWidgetInterface, public IGenericTeamAgentInterface
+class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_AnimationAttackInterface , public IC_CharacterWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -26,23 +27,27 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
 	
-protected:
 	virtual void AttackTrace(bool bStart, FName TraceBoneName) override;
-	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
 	void ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat);
 
-	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
-	virtual FGenericTeamId GetGenericTeamId() const override;
+	virtual void SetupCharacterWidget(class UC_UserWidget* InUserWidget) override;
+	virtual void SetupLockOnWidget(UC_UserWidget* InUserWidget) override;
+	virtual void OnLocked(bool bLocked) override;
+	
+	virtual void SetLockOnMode(bool bEnable);
+	bool IsLockOnMode() { return bLockOnMode; }
 	
 public:
 	UPROPERTY(EditAnywhere) 
 	EC_CharacterType CharacterType;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bLockOnMode = false;
 
-	UPROPERTY()
-	FGenericTeamId GenericTeamId = 0;
+	FOnCharacterLocked OnCharacterLocked;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_BattleComponent> BattleComponent;
