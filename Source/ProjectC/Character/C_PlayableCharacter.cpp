@@ -40,6 +40,9 @@ void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 	if (!IsPressed)
 		return;
 
+	if (IsRolling)
+		return;
+
 	if (IsAttacking)
 	{
 		SaveAttack = true;
@@ -56,6 +59,17 @@ void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 
 		if (AttackMontages.IsValidIndex(AttackCount - 1))
 			PlayAnimMontage(AttackMontages[AttackCount - 1]);
+
+		bCanMove = false;
+	}
+}
+
+void AC_PlayableCharacter::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == RollMontage)
+	{
+		IsRolling = false;
+		bCanMove = true;
 	}
 }
 
@@ -97,6 +111,7 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Attack);
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::LockOnMode);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Run);
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Roll);
 	}
 }
 
@@ -124,6 +139,10 @@ void AC_PlayableCharacter::ComboAttackSave()
 		if (AttackMontages.IsValidIndex(AttackCount - 1))
 			PlayAnimMontage(AttackMontages[AttackCount - 1]);
 	}
+	else
+	{
+		bCanMove = true;
+	}
 }
 
 void AC_PlayableCharacter::ResetCombo()
@@ -131,6 +150,7 @@ void AC_PlayableCharacter::ResetCombo()
 	AttackCount = 0;
 	SaveAttack = false;
 	IsAttacking = false;
+	bCanMove = true;
 }
 
 void AC_PlayableCharacter::LockOnMode(const FInputActionValue& Value)
@@ -197,6 +217,41 @@ void AC_PlayableCharacter::Run(const FInputActionValue& Value)
 	}
 }
 
+void AC_PlayableCharacter::Roll(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+
+	if (IsPressed && !IsRolling)
+	{
+		bCanMove = false;
+		IsRolling = true;
+
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		// add movement
+
+		FVector RollDir = FVector::ZeroVector;
+		RollDir += ForwardDirection * InputVector.Y;
+		RollDir += RightDirection * InputVector.X;
+
+		SetActorRotation(RollDir.Rotation());
+		
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			AnimInstance->StopAllMontages(0.1f);
+			
+			PlayAnimMontage(RollMontage);
+			FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnMontageEnd);
+			AnimInstance->Montage_SetEndDelegate(EndDelegate);
+		}
+
+		BattleComponent->EndTrace();
+	}
+}
+
 void AC_PlayableCharacter::SetGenericTeamId(const FGenericTeamId& InTeamID)
 {
 	GenericTeamId = InTeamID;
@@ -209,11 +264,12 @@ FGenericTeamId AC_PlayableCharacter::GetGenericTeamId() const
 
 void AC_PlayableCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	if (!bCanMove)
+		return;
+	
 	if (Controller != nullptr)
 	{
+		FVector2D MovementVector = Value.Get<FVector2D>();
 		InputVector = MovementVector;
 		
 		if (!bLockOnMode || IsRunning)
@@ -257,6 +313,15 @@ void AC_PlayableCharacter::Move(const FInputActionValue& Value)
 			 	SetActorRotation(NewRot);
 			 }
 		}
+		
+		if (IsAttacking)
+		{
+			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->StopAllMontages(0.1f);
+				ResetCombo();
+			}
+		}
 	}
 }
 
@@ -275,6 +340,9 @@ void AC_PlayableCharacter::Look(const FInputActionValue& Value)
 
 void AC_PlayableCharacter::Jump()
 {
+	if (!bCanMove)
+		return;
+	
 	Super::Jump();
 
 	MakeNoise(1, this, GetActorLocation());

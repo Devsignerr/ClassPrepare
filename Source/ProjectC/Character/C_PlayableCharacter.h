@@ -48,6 +48,8 @@ public:
 	
 	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
 	virtual void Attack(const FInputActionValue& Value);
+
+	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 	
 	UFUNCTION(BlueprintCallable)
 	void ComboAttackSave();
@@ -62,6 +64,7 @@ public:
 
 	void Guard(const FInputActionValue& Value);
 	void Run(const FInputActionValue& Value);
+	void Roll(const FInputActionValue& Value);
 	
 	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
@@ -109,6 +112,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RunAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RollAction;
+
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D InputVector = FVector2D::ZeroVector;
 
@@ -125,13 +131,21 @@ public:
 	bool IsRunning = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsRolling = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int AttackCount = 0;
+
+	bool bCanMove = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MovementSpeed;
 
 	UPROPERTY(EditAnywhere)
 	TArray<UAnimMontage*> AttackMontages;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> RollMontage;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> JumpSound;
