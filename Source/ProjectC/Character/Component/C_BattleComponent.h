@@ -32,6 +32,8 @@ public:
 
 	void SpawnEffect(EEffectType InEffectType, FVector InHitLocation);
 
+	void SwapWeapon();
+	
 	void EquipWeapon(uint8 InWeaponId);
 	void UnEquipWeapon();
 	bool HasWeapon();
@@ -51,6 +53,10 @@ public:
 	
 	TArray<TWeakObjectPtr<AActor>> DamagedActor;
 	
+	//========================= Weapon ==============================
+
 	FC_WeaponTableRow* WeaponTableRow = nullptr;
-	//===============================================================
+
+	int32 CurWeaponIdx = 0;
+	TArray<uint8> Weapons; 
 };

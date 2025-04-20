@@ -49,6 +49,7 @@ protected:
 	void Run(const FInputActionValue& Value);
 	void Roll(const FInputActionValue& Value);
 	void LockOn(const FInputActionValue& Value);
+	void SwapWeapon(const FInputActionValue& Value);
 
 public:
 	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;

@@ -21,6 +21,9 @@ UC_BattleComponent::UC_BattleComponent()
 void UC_BattleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Weapons.Add(0);
+	Weapons.Add(1);
 }
 
 void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -118,7 +121,7 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 		}
 
 		// DebugDraw
-		DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
+		//DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
 	}
 
 	// Prev 갱신
@@ -184,9 +187,30 @@ void UC_BattleComponent::SpawnEffect(EEffectType InEffectType, FVector InHitLoca
 	}
 }
 
+void UC_BattleComponent::SwapWeapon()
+{
+	CurWeaponIdx++;
+
+	const int32 MaxWeaponIdx = Weapons.Num();
+
+	if (CurWeaponIdx >= MaxWeaponIdx)
+		CurWeaponIdx = 0;
+
+	const uint8 CurWeaponId = Weapons[CurWeaponIdx];
+	
+	UnEquipWeapon();
+	EquipWeapon(CurWeaponId);
+}
+
 void UC_BattleComponent::EquipWeapon(uint8 InWeaponId)
 {
 	WeaponTableRow = FC_GameUtil::GetWeaponData(InWeaponId);
+	if (!WeaponTableRow)
+	{
+		UnEquipWeapon();
+		return;
+	}
+	
 	FName WeaponSocketName = NAME_None;
 	
 	if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))

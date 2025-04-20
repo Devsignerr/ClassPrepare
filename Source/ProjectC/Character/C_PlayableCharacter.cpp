@@ -74,6 +74,7 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		EnhancedInputComponent->BindAction(InputData->LockOnAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::LockOn);
 		EnhancedInputComponent->BindAction(InputData->RunAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Run);
 		EnhancedInputComponent->BindAction(InputData->RollAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Roll);
+		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::SwapWeapon);
 	}
 }
 
@@ -146,6 +147,16 @@ void AC_PlayableCharacter::LockOn(const FInputActionValue& Value)
 
 	check(LockOnComponent);
 	LockOnComponent->LockOn();
+}
+
+void AC_PlayableCharacter::SwapWeapon(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+	
+	check(BattleComponent);
+	BattleComponent->SwapWeapon();
 }
 
 void AC_PlayableCharacter::SetupHUDWidget(UC_HUDWidget* InHUDWidget)
