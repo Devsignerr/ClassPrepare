@@ -10,40 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fa33dd8d-b0d1-4a74-9e7c-32549a875fa7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/Data/Camera/AimCameraData.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Content/Data/Camera/NormalCameraData.uasset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_CameraDataAsset.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/SkillObject/C_SkillObject.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/SkillObject/C_SkillObject.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_01.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_01.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Character/Player/BS_Player.uasset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Data/Player/DA_PlayerData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Player/DA_PlayerData.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Data/Weapon.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Weapon.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EssentialMagicAnim.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EssentialSwordShield.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectC.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectC.sln" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/enums.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/enums.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +182,8 @@
       <workItem from="1749309996596" duration="5137000" />
       <workItem from="1749345465818" duration="5143000" />
       <workItem from="1749455580954" duration="674000" />
-      <workItem from="1749517461252" duration="13361000" />
+      <workItem from="1749517461252" duration="14255000" />
+      <workItem from="1749545979458" duration="1337000" />
     </task>
     <servers />
   </component>

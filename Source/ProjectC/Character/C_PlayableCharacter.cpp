@@ -138,8 +138,8 @@ void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)
 	}
 	else if (!IsPressed && ActionComponent->IsGuarding)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Walk;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Jog;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
 
