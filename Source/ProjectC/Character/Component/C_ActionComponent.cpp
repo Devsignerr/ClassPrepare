@@ -1,13 +1,15 @@
 #include "C_ActionComponent.h"
 #include "C_BattleComponent.h"
 #include "C_LockOnComponent.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "ProjectC/Character/C_PlayableCharacter.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
+#include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 
 UC_ActionComponent::UC_ActionComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UC_ActionComponent::BeginPlay()
@@ -21,6 +23,17 @@ void UC_ActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (IsGuarding && !OwnerCharacter->GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero())
+	{
+		FRotator LookAtRot = OwnerCharacter->GetBaseAimRotation();
+		LookAtRot.Pitch = 0.f; // 평면 회전만
+
+		const FRotator CurrentRot = OwnerCharacter->GetActorRotation();
+		const FRotator NewRot = FMath::RInterpTo(CurrentRot, LookAtRot, GetWorld()->GetDeltaSeconds(), 10.f);
+			 	
+		OwnerCharacter->SetActorRotation(NewRot);
+	}
 }
 
 void UC_ActionComponent::Move(FVector2D MovementVector)
@@ -207,21 +220,33 @@ void UC_ActionComponent::RotateToControlRotation()
 
 void UC_ActionComponent::Guard(bool bPressed)
 {
+	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
+	check(PlayerData);
+	
 	if (bPressed && !IsGuarding)
 	{
 		if (!CanAction(EC_ActionType::Guard))
 			return;
 		
 		IsGuarding = true;
+
+		AddLock(EC_LockCauseType::Guard, EC_ActionType::Run);
 	}
 	else if (!bPressed && IsGuarding)
 	{
 		IsGuarding = false;
+
+		ForceReleaseLock(EC_LockCauseType::Guard);
 	}
 }
 
 void UC_ActionComponent::Run(bool bPressed)
 {
+	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
+	check(PlayerData);
+	
 	if (bPressed && !IsRunning)
 	{
 		if (!CanAction(EC_ActionType::Run))
@@ -229,13 +254,13 @@ void UC_ActionComponent::Run(bool bPressed)
 		
 		IsRunning = true;
 
-		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = 800.f;
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Sprint;
 	}
 	else if (!bPressed && IsRunning)
 	{
 		IsRunning = false;
 		
-		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = 500.f;
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Jog;
 	}
 }
 

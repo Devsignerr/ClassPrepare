@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "C_PlayerCharacterInterface.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
 class UC_ActionComponent;
 class UC_BattleComponent;
 class UC_PlayerDataAsset;
@@ -23,6 +25,8 @@ class PROJECTC_API IC_PlayerCharacterInterface
 
 public:
 	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const = 0;
+	virtual USpringArmComponent* GetSpringArmComponent() const = 0;
+	virtual UCameraComponent* GetCameraComponent() const = 0;
 	virtual UC_ActionComponent* GetActionComponent() const = 0;
 	virtual UC_LockOnComponent* GetLockOnComponent() const = 0;
 	virtual UC_BattleComponent* GetBattleComponent() const = 0;

@@ -50,6 +50,22 @@ FC_WeaponTableRow* FC_GameUtil::GetWeaponData(uint8 WeaponId)
 	return nullptr;
 }
 
+UC_CameraDataAsset* FC_GameUtil::GetCameraData(EC_CameraType CameraType)
+{
+	if (GEngine)
+	{
+		if (UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(GEngine->GetCurrentPlayWorld()))
+		{
+			if (UC_DataSubsystem* DataSubsystem = GameInstance->GetSubsystem<UC_DataSubsystem>())
+			{
+				return *DataSubsystem->CameraData.Find(CameraType);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void FC_GameUtil::CameraShake()
 {
 	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GEngine->GetCurrentPlayWorld(), 0))

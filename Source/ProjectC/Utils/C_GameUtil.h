@@ -15,6 +15,7 @@ public:
 	static FC_CharacterStatTableRow* GetCharacterStatData(EC_CharacterType CharacterType);
 	static FC_EnemyTableRow* GetEnemyData(EC_CharacterType EnemyType);
 	static FC_WeaponTableRow* GetWeaponData(uint8 WeaponId);
+	static UC_CameraDataAsset* GetCameraData(EC_CameraType CameraType);
 
 	static void CameraShake();
 	

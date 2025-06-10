@@ -4,11 +4,14 @@
 #include "GenericTeamAgentInterface.h"
 #include "Camera/CameraComponent.h"
 #include "Component/C_ActionComponent.h"
+#include "Component/C_AimComponent.h"
 #include "Component/C_LockOnComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "ProjectC/Data/C_InputDataAsset.h"
+#include "ProjectC/Data/C_PlayerDataAsset.h"
 #include "ProjectC/UI/C_HUDWidget.h"
 
 AC_PlayableCharacter::AC_PlayableCharacter()
@@ -16,19 +19,18 @@ AC_PlayableCharacter::AC_PlayableCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f;
+	CameraBoom->bUsePawnControlRotation = true;
 
-	//컨트롤러의 입력에 따라 회전함
-	CameraBoom->bUsePawnControlRotation = true; 
-	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	
 	StimulusSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus"));
 	StimulusSource->RegisterForSense(TSubclassOf<UAISense>(UAISense_Sight::StaticClass()));
 	StimulusSource->RegisterWithPerceptionSystem();
 
 	LockOnComponent = CreateDefaultSubobject<UC_LockOnComponent>(TEXT("LockOnComponent"));
 	ActionComponent = CreateDefaultSubobject<UC_ActionComponent>(TEXT("ActionComponent"));
+	AimComponent = CreateDefaultSubobject<UC_AimComponent>(TEXT("AimComponent"));
 	
 	// 카메라가 어태치된 부모의 회전값을 따라감. true 로 하면 입력값에 따라 회전해버림 .
 	// true 인 경우는 1인칭 게임일때
@@ -93,9 +95,13 @@ void AC_PlayableCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		//컨트롤러 회전값 입력
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(-LookAxisVector.Y);
+		
+		if (!LockOnComponent->IsLockOnMode())
+		{
+			//컨트롤러 회전값 입력
+			AddControllerYawInput(LookAxisVector.X);
+			AddControllerPitchInput(-LookAxisVector.Y);
+		}
 	}
 }
 
@@ -110,9 +116,49 @@ void AC_PlayableCharacter::Jump(const FInputActionValue& Value)
 void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 {
 	const bool IsPressed = Value[0] != 0.f;
-	
-	check(ActionComponent);
-	ActionComponent->Attack(IsPressed);
+
+	if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && ActionComponent->IsGuarding)
+	{
+		check(BattleComponent)
+		BattleComponent->FireProjectile();
+	}
+	else
+	{
+		check(ActionComponent);
+		ActionComponent->Attack(IsPressed);
+	}
+}
+
+void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)
+{
+	if (IsPressed && !ActionComponent->IsGuarding)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Walk;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	else if (!IsPressed && ActionComponent->IsGuarding)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Walk;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+}
+
+void AC_PlayableCharacter::AdjustCamera(bool bIsPressed)
+{
+	if (bIsPressed && !ActionComponent->IsGuarding)
+	{
+		if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && AimComponent->CurrentCameraType != EC_CameraType::Aim)
+		{
+			AimComponent->SwitchCamera(EC_CameraType::Aim);
+		}
+	}
+	else if (!bIsPressed && ActionComponent->IsGuarding)
+	{
+		if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && AimComponent->CurrentCameraType != EC_CameraType::Normal)
+		{
+			AimComponent->SwitchCamera(EC_CameraType::Normal);
+		}
+	}
 }
 
 void AC_PlayableCharacter::Guard(const FInputActionValue& Value)
@@ -120,6 +166,10 @@ void AC_PlayableCharacter::Guard(const FInputActionValue& Value)
 	const bool IsPressed = Value[0] != 0.f;
 	
 	check(ActionComponent);
+	
+	AdjustMovement(IsPressed);
+	AdjustCamera(IsPressed);
+
 	ActionComponent->Guard(IsPressed);
 }
 
@@ -144,7 +194,7 @@ void AC_PlayableCharacter::LockOn(const FInputActionValue& Value)
 	const bool IsPressed = Value[0] != 0.f;
 	if (!IsPressed)
 		return;
-
+	
 	check(LockOnComponent);
 	LockOnComponent->LockOn();
 }

@@ -14,10 +14,13 @@ class PROJECTC_API UC_PlayerDataAsset : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MovementSpeed_Walk;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float MovementSpeed_Jog;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float MovementSpeed_Run;
-
+	float MovementSpeed_Sprint;
+	
 	UPROPERTY(EditAnywhere)
 	FName WeaponSocketName;
 

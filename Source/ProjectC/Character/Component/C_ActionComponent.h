@@ -7,6 +7,8 @@
 #include "ProjectC/enums.h"
 #include "C_ActionComponent.generated.h"
 
+class UC_CameraDataAsset;
+
 USTRUCT(BlueprintType)
 struct FC_LockData
 {
@@ -46,7 +48,7 @@ public:
 	void Guard(bool bPressed);
 	void Run(bool bPressed);
 	void Roll(bool bPressed);
-
+	
 	bool CanAction(EC_ActionType InActionType);
 
 	bool IsLocked(EC_ActionType InLockType);

@@ -2,6 +2,7 @@
 #include "C_DataSubsystem.h"
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
+#include "ProjectC/Data/C_CameraDataAsset.h"
 
 UC_DataSubsystem::UC_DataSubsystem()
 {
@@ -26,6 +27,24 @@ void UC_DataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			{
 				DataTableMap.Add(Element.Key, Table);
 			}
+		}
+	}
+	
+	const FSoftObjectPath NormalCameraAssetObject(NormalCameraDataPath);
+	if (NormalCameraAssetObject.IsValid())
+	{
+		if (UC_CameraDataAsset* DataAsset = Cast<UC_CameraDataAsset>(NormalCameraAssetObject.TryLoad()))
+		{
+			CameraData.Add(EC_CameraType::Normal, DataAsset);
+		}
+	}
+
+	const FSoftObjectPath AimCameraAssetObject(AimCameraDataPath);
+	if (AimCameraAssetObject.IsValid())
+	{
+		if (UC_CameraDataAsset* DataAsset = Cast<UC_CameraDataAsset>(AimCameraAssetObject.TryLoad()))
+		{
+			CameraData.Add(EC_CameraType::Aim, DataAsset);
 		}
 	}
 }

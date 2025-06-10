@@ -6,8 +6,10 @@
 #include "Particles/ParticleSystem.h"
 #include "ProjectC/ProjectC.h"
 #include "ProjectC/Character/C_CharacterBase.h"
+#include "ProjectC/Character/C_PlayableCharacter.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
+#include "ProjectC/SkillObject/C_SkillObject.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 UC_BattleComponent::UC_BattleComponent()
@@ -21,6 +23,8 @@ UC_BattleComponent::UC_BattleComponent()
 void UC_BattleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 
 	Weapons.Add(0);
 	Weapons.Add(1);
@@ -121,7 +125,7 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 		}
 
 		// DebugDraw
-		//DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
+		DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
 	}
 
 	// Prev 갱신
@@ -197,6 +201,8 @@ void UC_BattleComponent::SwapWeapon()
 		CurWeaponIdx = 0;
 
 	const uint8 CurWeaponId = Weapons[CurWeaponIdx];
+
+	CharacterStanceType = static_cast<EC_CharacterStanceType>(CurWeaponIdx);
 	
 	UnEquipWeapon();
 	EquipWeapon(CurWeaponId);
@@ -258,5 +264,30 @@ bool UC_BattleComponent::HasWeapon()
 		return true;
 
 	return false;
+}
+
+void UC_BattleComponent::FireProjectile()
+{
+	if (CharacterStanceType == EC_CharacterStanceType::Staff)
+	{
+		const APlayerController* PlayerController = CastChecked<APlayerController>(OwnerCharacter->GetController());
+
+		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+		check(SkeletalMeshComponent);
+	
+		FVector Location = SkeletalMeshComponent->GetSocketLocation(TEXT("hand_l"));
+		FRotator Rotation = PlayerController->GetControlRotation();
+
+		FTransform Transform;
+		Transform.SetLocation(Location);
+		Transform.SetRotation(Rotation.Quaternion());
+
+		AC_PlayableCharacter* PlayableCharacter = Cast<AC_PlayableCharacter>(OwnerCharacter);
+		check(PlayableCharacter);
+	
+		AC_SkillObject* SkillObject = GetWorld()->SpawnActorDeferred<AC_SkillObject>(PlayableCharacter->ProjectileClass, Transform, GetOwner(), nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		SkillObject->OwnerCharacter = OwnerCharacter;
+		SkillObject->FinishSpawning(Transform);
+	}
 }
 

@@ -73,3 +73,27 @@ enum class EC_ActionType : uint8
 	Guard,
 	Num,
 };
+
+UENUM(BlueprintType)
+enum class EPC_SkillObjectType : uint8
+{
+	None,
+	Projectile,
+	Num,
+};
+
+UENUM(BlueprintType)
+enum class EC_CharacterStanceType : uint8
+{
+	Sword = 0,
+	Staff = 1,
+};
+
+UENUM(BlueprintType)
+enum class EC_CameraType : uint8
+{
+	None,
+	Normal,
+	Aim,
+	Num
+};

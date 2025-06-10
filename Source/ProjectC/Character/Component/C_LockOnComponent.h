@@ -17,6 +17,7 @@ class PROJECTC_API UC_LockOnComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UC_LockOnComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	void LockOn();

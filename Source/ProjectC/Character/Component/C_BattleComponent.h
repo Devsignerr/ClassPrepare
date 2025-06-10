@@ -38,6 +38,8 @@ public:
 	void UnEquipWeapon();
 	bool HasWeapon();
 
+	void FireProjectile();
+
 public:
 	//============================ Trace ============================
 	bool bTracing = false;
@@ -55,7 +57,13 @@ public:
 	
 	//========================= Weapon ==============================
 
+	UPROPERTY()
+	ACharacter* OwnerCharacter = nullptr;
+
 	FC_WeaponTableRow* WeaponTableRow = nullptr;
+
+	UPROPERTY(BlueprintReadOnly)
+	EC_CharacterStanceType CharacterStanceType = EC_CharacterStanceType::Sword;
 
 	int32 CurWeaponIdx = 0;
 	TArray<uint8> Weapons; 

@@ -20,6 +20,7 @@
 #include "C_PlayableCharacter.generated.h"
 
 
+class UC_AimComponent;
 class UC_PlayerDataAsset;
 class UC_InputDataAsset;
 class UC_ActionComponent;
@@ -58,7 +59,13 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 public:
+	void AdjustMovement(bool IsPressed);
+	void AdjustCamera(bool bIsPressed);
+
+public:
 	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const override { return WeaponStaticComponent; }
+	virtual USpringArmComponent* GetSpringArmComponent() const override { return CameraBoom; }
+	virtual UCameraComponent* GetCameraComponent() const override { return FollowCamera; }
 	virtual UC_ActionComponent* GetActionComponent() const override { return ActionComponent; }
 	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
 	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
@@ -81,6 +88,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_LockOnComponent> LockOnComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_AimComponent> AimComponent;
+
 	//============= Input ===========================================================================
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -96,5 +106,8 @@ public:
 	
 	UPROPERTY()
 	FGenericTeamId GenericTeamId = 0;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
 };
 
