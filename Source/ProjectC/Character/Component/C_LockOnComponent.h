@@ -25,14 +25,13 @@ public:
 	APawn* FindTarget();
 	void LockTarget(APawn* InActor);
 	void ClearTarget();
-	APawn* GetLockTarget() const { return LockedTarget; }
+	APawn* GetLockTarget() const { return LockedTarget.Get(); }
 
 	virtual void SetLockOnMode(bool bEnable);
 	bool IsLockOnMode() const { return bLockOnMode; }
 
 private:
-	UPROPERTY()
-	TObjectPtr<APawn> LockedTarget = nullptr;
+	TWeakObjectPtr<APawn> LockedTarget = nullptr;
 
 	float TargetDetectRadius = 0.f;
 	float TargetDetectAngle = 0.f;

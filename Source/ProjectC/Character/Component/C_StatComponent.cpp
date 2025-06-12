@@ -60,7 +60,7 @@ float UC_StatComponent::ApplyDamage(float InDamage, AActor* DamageCauser)
 		if (ActionComponent->IsRolling)
 			return 0.f;
 
-		if (ActionComponent->IsGuarding)
+		if (ActionComponent->IsInSpecialAction)
 		{
 			ActionComponent->OnGuardSuccess(DamageCauser);
 			return 0.f;

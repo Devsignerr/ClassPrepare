@@ -5,6 +5,7 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
+#include "NiagaraSystem.h"
 #include "C_TableRows.generated.h"
 
 USTRUCT(BlueprintType)
@@ -120,4 +121,71 @@ struct FC_WeaponTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator RelativeRot = FRotator::ZeroRotator;
+};
+
+USTRUCT(BlueprintType)
+struct FC_SkillTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	uint32 DataId = 0;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> SkillAnim;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* SkillActivateFx;
+
+	UPROPERTY(EditAnywhere)
+	TArray<uint32> ExecIds;
+};
+
+USTRUCT(BlueprintType)
+struct FC_ExecTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	uint32 DataId = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float DelayTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float Duration = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	EC_ExecType ExecType;
+
+	UPROPERTY(EditAnywhere)
+	uint32 ExecPropertyId;
+};
+
+USTRUCT(BlueprintType)
+struct FC_ExecPropertyTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	uint32 DataId = 0;
+
+	UPROPERTY(EditAnywhere)
+	uint32 SkillObjectId = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FC_SkillObjectTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	uint32 DataId = 0;
+
+	UPROPERTY(EditAnywhere)
+	EC_SkillObjectType SkillObjectType = EC_SkillObjectType::None;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> SkillObjectActor;
+	
 };

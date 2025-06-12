@@ -56,9 +56,7 @@ public:
 	TArray<TWeakObjectPtr<AActor>> DamagedActor;
 	
 	//========================= Weapon ==============================
-
-	UPROPERTY()
-	ACharacter* OwnerCharacter = nullptr;
+	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 
 	FC_WeaponTableRow* WeaponTableRow = nullptr;
 

@@ -6,12 +6,15 @@
 #include "UObject/Interface.h"
 #include "C_PlayerCharacterInterface.generated.h"
 
+class UC_SkillComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UC_ActionComponent;
 class UC_BattleComponent;
 class UC_PlayerDataAsset;
 class UC_LockOnComponent;
+
+DECLARE_MULTICAST_DELEGATE(FOnLandDelegate)
 
 UINTERFACE(MinimalAPI)
 class UC_PlayerCharacterInterface : public UInterface
@@ -30,5 +33,8 @@ public:
 	virtual UC_ActionComponent* GetActionComponent() const = 0;
 	virtual UC_LockOnComponent* GetLockOnComponent() const = 0;
 	virtual UC_BattleComponent* GetBattleComponent() const = 0;
+	virtual UC_SkillComponent* GetSkillComponent() const = 0;
 	virtual UC_PlayerDataAsset* GetPlayerData() const = 0;
+
+	virtual FOnLandDelegate* GetOnLandedDelegate() = 0;
 };

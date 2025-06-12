@@ -286,7 +286,7 @@ void UC_BattleComponent::FireProjectile()
 		check(PlayableCharacter);
 	
 		AC_SkillObject* SkillObject = GetWorld()->SpawnActorDeferred<AC_SkillObject>(PlayableCharacter->ProjectileClass, Transform, GetOwner(), nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		SkillObject->OwnerCharacter = OwnerCharacter;
+		SkillObject->OwnerCharacter = OwnerCharacter.Get();
 		SkillObject->FinishSpawning(Transform);
 	}
 }

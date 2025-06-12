@@ -1,7 +1,9 @@
 #include "C_AimComponent.h"
 
 #include "Camera/CameraComponent.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "ProjectC/Data/C_CameraDataAsset.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 #include "ProjectC/Utils/C_GameUtil.h"
@@ -16,7 +18,8 @@ UC_AimComponent::UC_AimComponent()
 void UC_AimComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 	CurrentCameraType = EC_CameraType::Normal;
 
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
@@ -67,6 +70,26 @@ void UC_AimComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			bCameraBlending = false;	
 		}
 	}
+
+	if (CurrentCameraType == EC_CameraType::Aim)
+	{
+		CalcAimOffset(DeltaTime);
+	}
+}
+
+void UC_AimComponent::CalcAimOffset(float DeltaTime)
+{
+	check(OwnerCharacter.Get());
+
+	FRotator ControlRotation = OwnerCharacter->GetControlRotation();
+	FRotator ActorRotation = OwnerCharacter->GetActorRotation();
+
+	FRotator NormalizedDeltaRotation = UKismetMathLibrary::NormalizedDeltaRotator(ControlRotation, ActorRotation);
+
+	float NewPitch = FMath::FInterpTo(AimOffsetRotation.Pitch, NormalizedDeltaRotation.Pitch, DeltaTime, 30.f);
+	float NewYaw = FMath::FInterpTo(AimOffsetRotation.Yaw, NormalizedDeltaRotation.Yaw, DeltaTime, 30.f);
+	
+	AimOffsetRotation = FRotator(NewPitch, NewYaw, 0.f);
 }
 
 void UC_AimComponent::SwitchCamera(EC_CameraType CameraType)

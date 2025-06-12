@@ -23,9 +23,15 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void CalcAimOffset(float DeltaTime);
 
 	void SwitchCamera(EC_CameraType CameraType);
 
+	UPROPERTY(BlueprintReadOnly)
+	FRotator AimOffsetRotation = FRotator::ZeroRotator;
+
 	EC_CameraType CurrentCameraType = EC_CameraType::Normal;
 	bool bCameraBlending = false;
+	
+	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 };

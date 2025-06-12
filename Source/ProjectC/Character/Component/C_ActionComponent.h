@@ -24,7 +24,7 @@ struct FC_LockData
 	FC_LockData(EC_LockCauseType InCause, EC_ActionType InType) : LockCauseType(InCause), LockType(InType) {}
 };
 
-//Attack, Roll, Guard, Run 등 특수액션 상태관리 
+//Attack, Roll, SpecialAction, Run 등 특수액션 상태관리 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTC_API UC_ActionComponent : public UActorComponent
 {
@@ -45,7 +45,7 @@ public:
 	void Move(FVector2D MovementVector);
 	void Jump(bool IsPressed);
 	void Attack(bool IsPressed);
-	void Guard(bool bPressed);
+	void SpecialAction(bool bPressed);
 	void Run(bool bPressed);
 	void Roll(bool bPressed);
 	
@@ -59,9 +59,7 @@ public:
 
 	void ProcessFreeMove();
 	void ProcessLockOnMove();
-	
-	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
-	
+
 	UFUNCTION(BlueprintCallable)
 	void ComboAttackSave();
 
@@ -71,28 +69,30 @@ public:
 	void RotateToControlRotation();
 
 	void OnGuardSuccess(AActor* DamageCauser);
+	void OnLanded();
+	
+	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsAttacking = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool SaveAttack = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsGuarding = false;
+	bool IsInSpecialAction = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool IsRunning = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool IsRolling = false;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsAttacking = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool SaveAttack = false;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int AttackCount = 0;
-
-	UPROPERTY()
-	TObjectPtr<ACharacter> OwnerCharacter = nullptr;
+	
+	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 	
 	TArray<FC_LockData> LockData;
 

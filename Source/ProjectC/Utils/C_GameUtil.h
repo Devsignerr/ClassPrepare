@@ -5,6 +5,8 @@
 #include "ProjectC/enums.h"
 #include "ProjectC/Subsystem/C_DataSubsystem.h"
 
+struct FC_SkillObjectTableRow;
+struct FC_SkillTableRow;
 struct FC_WeaponTableRow;
 struct FC_EnemyTableRow;
 struct FC_CharacterStatTableRow;
@@ -16,6 +18,8 @@ public:
 	static FC_EnemyTableRow* GetEnemyData(EC_CharacterType EnemyType);
 	static FC_WeaponTableRow* GetWeaponData(uint8 WeaponId);
 	static UC_CameraDataAsset* GetCameraData(EC_CameraType CameraType);
+	static FC_SkillTableRow* GetSkillData(uint32 SkillId);
+	static FC_SkillObjectTableRow* GetSkillObjectData(uint32 SkillObjectId);
 
 	static void CameraShake();
 	

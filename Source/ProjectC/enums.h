@@ -16,6 +16,8 @@ enum class EC_DataTableType : int32
 	CharacterStat,
 	Enemy,
 	Weapon,
+	Skill,
+	SkillObject,
 	Num
 };
 
@@ -57,7 +59,7 @@ enum class EC_LockCauseType : uint8
 	Attack,
 	Run,
 	Roll,
-	Guard,
+	SpecialAction,
 	Num,
 };
 
@@ -70,12 +72,12 @@ enum class EC_ActionType : uint8
 	Attack,
 	Run,
 	Roll,
-	Guard,
+	SpecialAction,
 	Num,
 };
 
 UENUM(BlueprintType)
-enum class EPC_SkillObjectType : uint8
+enum class EC_SkillObjectType : uint8
 {
 	None,
 	Projectile,
@@ -95,5 +97,26 @@ enum class EC_CameraType : uint8
 	None,
 	Normal,
 	Aim,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_SkillSlotType : uint8
+{
+	None,
+	LeftMouse,
+	Num_1,
+	Num_2,
+	Num_3,
+	Num_4,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_ExecType : uint8
+{
+	None,
+	NormalAttack,
+	Projectile,
 	Num
 };

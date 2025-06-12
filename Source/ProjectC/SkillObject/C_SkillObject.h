@@ -36,7 +36,7 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	EPC_SkillObjectType SkillObjectType = EPC_SkillObjectType::None;
+	EC_SkillObjectType SkillObjectType = EC_SkillObjectType::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComponent = nullptr;

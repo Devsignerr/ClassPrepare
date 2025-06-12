@@ -20,6 +20,7 @@
 #include "C_PlayableCharacter.generated.h"
 
 
+class UC_SkillComponent;
 class UC_AimComponent;
 class UC_PlayerDataAsset;
 class UC_InputDataAsset;
@@ -46,7 +47,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
-	void Guard(const FInputActionValue& Value);
+	void SpecialAction(const FInputActionValue& Value);
 	void Run(const FInputActionValue& Value);
 	void Roll(const FInputActionValue& Value);
 	void LockOn(const FInputActionValue& Value);
@@ -63,14 +64,24 @@ public:
 	void AdjustCamera(bool bIsPressed);
 
 public:
+	UFUNCTION()
+	void OnLand(FHitResult& Result);
+
+public:
 	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const override { return WeaponStaticComponent; }
 	virtual USpringArmComponent* GetSpringArmComponent() const override { return CameraBoom; }
 	virtual UCameraComponent* GetCameraComponent() const override { return FollowCamera; }
 	virtual UC_ActionComponent* GetActionComponent() const override { return ActionComponent; }
 	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
 	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
+	virtual UC_SkillComponent* GetSkillComponent() const override { return SkillComponent; }
 	virtual UC_PlayerDataAsset* GetPlayerData() const override { return PlayerData; }
+
+	virtual FOnLandDelegate* GetOnLandedDelegate() override { return &OnLandedDelegate; }
+	
 public:
+	FOnLandDelegate OnLandedDelegate;
+	
 	//============= Component =========================================================================
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -90,6 +101,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_AimComponent> AimComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_SkillComponent> SkillComponent;
 
 	//============= Input ===========================================================================
 	

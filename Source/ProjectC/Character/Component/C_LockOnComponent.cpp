@@ -28,7 +28,7 @@ void UC_LockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		APlayerController* PlayerController = Cast<APlayerController>(Owner->GetController());
 		check(PlayerController);
 
-		if (LockedTarget)
+		if (LockedTarget.Get())
 		{
 			const FVector LockTargetLocation = LockedTarget->GetActorLocation();
 			const FVector OwnerLocation = GetOwner()->GetActorLocation();

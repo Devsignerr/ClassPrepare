@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "ProjectC/enums.h"
 #include "C_PlayerDataAsset.generated.h"
 
 UCLASS()
@@ -32,4 +33,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> JumpSound;
+
+	UPROPERTY(EditAnywhere)
+	TMap<EC_SkillSlotType, uint32> SkillIds;
 };

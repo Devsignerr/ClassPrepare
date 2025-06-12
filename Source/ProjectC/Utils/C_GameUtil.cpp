@@ -66,6 +66,36 @@ UC_CameraDataAsset* FC_GameUtil::GetCameraData(EC_CameraType CameraType)
 	return nullptr;
 }
 
+FC_SkillTableRow* FC_GameUtil::GetSkillData(uint32 SkillId)
+{
+	TArray<FC_SkillTableRow*> EnemyTableRows = GetAllRows<FC_SkillTableRow>(EC_DataTableType::Skill);
+	if (FC_SkillTableRow** FoundRow = EnemyTableRows.FindByPredicate([SkillId](const FC_SkillTableRow* Row)
+	{
+		return Row->DataId == SkillId;
+	}))
+	{
+		return *FoundRow;
+	}
+	
+	UE_LOG(LogProjectC, Error, TEXT("SkillData is Invalid"));
+	return nullptr;
+}
+
+FC_SkillObjectTableRow* FC_GameUtil::GetSkillObjectData(uint32 SkillObjectId)
+{
+	TArray<FC_SkillObjectTableRow*> EnemyTableRows = GetAllRows<FC_SkillObjectTableRow>(EC_DataTableType::SkillObject);
+	if (FC_SkillObjectTableRow** FoundRow = EnemyTableRows.FindByPredicate([SkillObjectId](const FC_SkillObjectTableRow* Row)
+	{
+		return Row->DataId == SkillObjectId;
+	}))
+	{
+		return *FoundRow;
+	}
+	
+	UE_LOG(LogProjectC, Error, TEXT("SkillObjectData is Invalid"));
+	return nullptr;
+}
+
 void FC_GameUtil::CameraShake()
 {
 	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GEngine->GetCurrentPlayWorld(), 0))

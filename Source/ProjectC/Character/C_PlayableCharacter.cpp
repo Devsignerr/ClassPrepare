@@ -6,6 +6,7 @@
 #include "Component/C_ActionComponent.h"
 #include "Component/C_AimComponent.h"
 #include "Component/C_LockOnComponent.h"
+#include "Component/C_SkillComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -31,6 +32,7 @@ AC_PlayableCharacter::AC_PlayableCharacter()
 	LockOnComponent = CreateDefaultSubobject<UC_LockOnComponent>(TEXT("LockOnComponent"));
 	ActionComponent = CreateDefaultSubobject<UC_ActionComponent>(TEXT("ActionComponent"));
 	AimComponent = CreateDefaultSubobject<UC_AimComponent>(TEXT("AimComponent"));
+	SkillComponent = CreateDefaultSubobject<UC_SkillComponent>(TEXT("SkillComponent"));
 	
 	// 카메라가 어태치된 부모의 회전값을 따라감. true 로 하면 입력값에 따라 회전해버림 .
 	// true 인 경우는 1인칭 게임일때
@@ -50,6 +52,9 @@ void AC_PlayableCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	if (!LandedDelegate.IsAlreadyBound(this, &ThisClass::OnLanded))
+		LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
 
 	//TODO : TestEquip
 	check(BattleComponent);
@@ -71,7 +76,7 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		EnhancedInputComponent->BindAction(InputData->JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(InputData->MoveAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Move);
 		EnhancedInputComponent->BindAction(InputData->LookAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Look);
-		EnhancedInputComponent->BindAction(InputData->GuardAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Guard);
+		EnhancedInputComponent->BindAction(InputData->RightClickAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::SpecialAction);
 		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Attack);
 		EnhancedInputComponent->BindAction(InputData->LockOnAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::LockOn);
 		EnhancedInputComponent->BindAction(InputData->RunAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Run);
@@ -117,7 +122,7 @@ void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 {
 	const bool IsPressed = Value[0] != 0.f;
 
-	if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && ActionComponent->IsGuarding)
+	if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && ActionComponent->IsInSpecialAction)
 	{
 		check(BattleComponent)
 		BattleComponent->FireProjectile();
@@ -131,12 +136,12 @@ void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 
 void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)
 {
-	if (IsPressed && !ActionComponent->IsGuarding)
+	if (IsPressed && !ActionComponent->IsInSpecialAction)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Walk;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 	}
-	else if (!IsPressed && ActionComponent->IsGuarding)
+	else if (!IsPressed && ActionComponent->IsInSpecialAction)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Jog;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -145,14 +150,14 @@ void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)
 
 void AC_PlayableCharacter::AdjustCamera(bool bIsPressed)
 {
-	if (bIsPressed && !ActionComponent->IsGuarding)
+	if (bIsPressed && !ActionComponent->IsInSpecialAction)
 	{
 		if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && AimComponent->CurrentCameraType != EC_CameraType::Aim)
 		{
 			AimComponent->SwitchCamera(EC_CameraType::Aim);
 		}
 	}
-	else if (!bIsPressed && ActionComponent->IsGuarding)
+	else if (!bIsPressed && ActionComponent->IsInSpecialAction)
 	{
 		if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && AimComponent->CurrentCameraType != EC_CameraType::Normal)
 		{
@@ -161,7 +166,12 @@ void AC_PlayableCharacter::AdjustCamera(bool bIsPressed)
 	}
 }
 
-void AC_PlayableCharacter::Guard(const FInputActionValue& Value)
+void AC_PlayableCharacter::OnLand(FHitResult& Result)
+{
+	OnLandedDelegate.Broadcast();
+}
+
+void AC_PlayableCharacter::SpecialAction(const FInputActionValue& Value)
 {
 	const bool IsPressed = Value[0] != 0.f;
 	
@@ -170,7 +180,7 @@ void AC_PlayableCharacter::Guard(const FInputActionValue& Value)
 	AdjustMovement(IsPressed);
 	AdjustCamera(IsPressed);
 
-	ActionComponent->Guard(IsPressed);
+	ActionComponent->SpecialAction(IsPressed);
 }
 
 void AC_PlayableCharacter::Run(const FInputActionValue& Value)

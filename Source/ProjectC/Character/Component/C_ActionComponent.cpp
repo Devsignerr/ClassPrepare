@@ -1,6 +1,7 @@
 #include "C_ActionComponent.h"
 #include "C_BattleComponent.h"
 #include "C_LockOnComponent.h"
+#include "C_SkillComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,6 +18,10 @@ void UC_ActionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
+	IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(OwnerCharacter);
+
+	if (!Interface->GetOnLandedDelegate()->IsBoundToObject(this))
+		Interface->GetOnLandedDelegate()->AddUObject(this, &ThisClass::OnLanded);
 }
 
 void UC_ActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -24,7 +29,7 @@ void UC_ActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsGuarding && !OwnerCharacter->GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero())
+	if (IsInSpecialAction && !OwnerCharacter->GetCharacterMovement()->GetCurrentAcceleration().IsNearlyZero())
 	{
 		FRotator LookAtRot = OwnerCharacter->GetBaseAimRotation();
 		LookAtRot.Pitch = 0.f; // 평면 회전만
@@ -44,6 +49,9 @@ void UC_ActionComponent::Move(FVector2D MovementVector)
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
 	const UC_LockOnComponent* LockOnComponent = Interface->GetLockOnComponent();
 	check(LockOnComponent);
+
+	UC_SkillComponent* SkillComponent = Interface->GetSkillComponent();
+	check(SkillComponent);
 	
 	InputVector = MovementVector;
 	
@@ -128,8 +136,10 @@ void UC_ActionComponent::Jump(bool IsPressed)
 	const UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
 
-	OwnerCharacter->MakeNoise(1, OwnerCharacter, OwnerCharacter->GetActorLocation());
+	OwnerCharacter->MakeNoise(1, OwnerCharacter.Get(), OwnerCharacter->GetActorLocation());
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), PlayerData->JumpSound, OwnerCharacter->GetActorLocation());
+
+	//AddLock(EC_LockCauseType::Jump, EC_ActionType::Attack);
 }
 
 void UC_ActionComponent::Attack(bool IsPressed)
@@ -143,7 +153,7 @@ void UC_ActionComponent::Attack(bool IsPressed)
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
-
+	
 	TArray<UAnimMontage*>& AttackMontages = PlayerData->AttackMontages;
 
 	if (IsAttacking)
@@ -170,6 +180,21 @@ void UC_ActionComponent::Attack(bool IsPressed)
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Move);
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Jump);
 	}
+}
+
+
+void UC_ActionComponent::OnGuardSuccess(AActor* DamageCauser)
+{
+	FVector OwnerLocation = OwnerCharacter->GetActorLocation();
+	FVector DamageCauserLocation = DamageCauser->GetActorLocation();
+
+	FVector ForceDir = (OwnerLocation - DamageCauserLocation).GetSafeNormal2D();
+	OwnerCharacter->GetCharacterMovement()->AddForce(ForceDir * 100.f);
+}
+
+void UC_ActionComponent::OnLanded()
+{
+	//ForceReleaseLock(EC_LockCauseType::Jump);
 }
 
 void UC_ActionComponent::ComboAttackSave()
@@ -218,26 +243,26 @@ void UC_ActionComponent::RotateToControlRotation()
 	OwnerCharacter->SetActorRotation(ControlRotation);
 }
 
-void UC_ActionComponent::Guard(bool bPressed)
+void UC_ActionComponent::SpecialAction(bool bPressed)
 {
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
 	
-	if (bPressed && !IsGuarding)
+	if (bPressed && !IsInSpecialAction)
 	{
-		if (!CanAction(EC_ActionType::Guard))
+		if (!CanAction(EC_ActionType::SpecialAction))
 			return;
 		
-		IsGuarding = true;
+		IsInSpecialAction = true;
 
-		AddLock(EC_LockCauseType::Guard, EC_ActionType::Run);
+		AddLock(EC_LockCauseType::SpecialAction, EC_ActionType::Run);
 	}
-	else if (!bPressed && IsGuarding)
+	else if (!bPressed && IsInSpecialAction)
 	{
-		IsGuarding = false;
+		IsInSpecialAction = false;
 
-		ForceReleaseLock(EC_LockCauseType::Guard);
+		ForceReleaseLock(EC_LockCauseType::SpecialAction);
 	}
 }
 
@@ -282,7 +307,7 @@ void UC_ActionComponent::Roll(bool bPressed)
 		AddLock(EC_LockCauseType::Roll, EC_ActionType::Move);
 		AddLock(EC_LockCauseType::Roll, EC_ActionType::Attack);
 		AddLock(EC_LockCauseType::Roll, EC_ActionType::Jump);
-		AddLock(EC_LockCauseType::Roll, EC_ActionType::Guard);
+		AddLock(EC_LockCauseType::Roll, EC_ActionType::SpecialAction);
 		
 		IsRolling = true;
 
@@ -372,13 +397,4 @@ void UC_ActionComponent::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 		ForceReleaseLock(EC_LockCauseType::Roll);
 		ForceReleaseLock(EC_LockCauseType::Attack);
 	}
-}
-
-void UC_ActionComponent::OnGuardSuccess(AActor* DamageCauser)
-{
-	FVector OwnerLocation = OwnerCharacter->GetActorLocation();
-	FVector DamageCauserLocation = DamageCauser->GetActorLocation();
-
-	FVector ForceDir = (OwnerLocation - DamageCauserLocation).GetSafeNormal2D();
-	OwnerCharacter->GetCharacterMovement()->AddForce(ForceDir * 100.f);
 }
