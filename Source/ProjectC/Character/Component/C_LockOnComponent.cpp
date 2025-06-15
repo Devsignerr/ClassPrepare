@@ -35,8 +35,8 @@ void UC_LockOnComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 			const FRotator CurrentRot = PlayerController->GetControlRotation();
 			const FRotator TargetRot = (LockTargetLocation - OwnerLocation).Rotation();
-
-			const FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, 10.f);
+			
+			const FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, 2.f);
 			
 			PlayerController->SetControlRotation(NewRot);
 		}

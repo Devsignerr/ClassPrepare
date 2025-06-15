@@ -32,9 +32,11 @@ void UC_AimComponent::BeginPlay()
 	const FVector TargetOffset = FC_GameUtil::GetCameraData(CurrentCameraType)->SocketOffset;
 	const FRotator TargetArmRotation = FC_GameUtil::GetCameraData(CurrentCameraType)->CameraRot;
 	const float TargetArmLength = FC_GameUtil::GetCameraData(CurrentCameraType)->TargetArmLength;
-
+	const float TargetFOV = FC_GameUtil::GetCameraData(CurrentCameraType)->CameraFov;
+	
 	SpringArmComponent->SocketOffset = TargetOffset;
 	CameraComponent->SetRelativeRotation(TargetArmRotation);
+	CameraComponent->FieldOfView = TargetFOV;
 	SpringArmComponent->TargetArmLength = TargetArmLength;
 }
 
@@ -55,14 +57,16 @@ void UC_AimComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		const FVector TargetOffset = FC_GameUtil::GetCameraData(CurrentCameraType)->SocketOffset;
 		const FRotator TargetArmRotation = FC_GameUtil::GetCameraData(CurrentCameraType)->CameraRot;
 		const float TargetArmLength = FC_GameUtil::GetCameraData(CurrentCameraType)->TargetArmLength;
-		
+		const float TargetFOV = FC_GameUtil::GetCameraData(CurrentCameraType)->CameraFov;
 		// 보간 처리
 		const FVector NewOffset = FMath::VInterpTo(SpringArmComponent->SocketOffset, TargetOffset, DeltaTime, 30.f);
 		const FRotator NewRot = FMath::RInterpTo(SpringArmComponent->GetRelativeRotation(), TargetArmRotation, DeltaTime, 30.f);
 		const float NewLen = FMath::FInterpTo(SpringArmComponent->TargetArmLength, TargetArmLength, DeltaTime, 30.f);
-
+		const float NewFOV = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFOV, DeltaTime, 30.f);
+		
 		SpringArmComponent->SocketOffset = NewOffset;
 		CameraComponent->SetRelativeRotation(NewRot);
+		CameraComponent->FieldOfView = NewFOV;
 		SpringArmComponent->TargetArmLength = NewLen;
 		
 		if ((TargetOffset - NewOffset).Length() <= 0.1f)

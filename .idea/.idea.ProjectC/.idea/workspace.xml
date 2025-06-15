@@ -10,32 +10,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efac3ec1-be0b-469a-8078-4fed9690fc7c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/ProjectC/v17/.suo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Camera/AimCameraData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Camera/AimCameraData.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Data/Input/DA_InputData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Input/DA_InputData.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Input/Actions/IA_Guard.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Player/DA_PlayerData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Player/DA_PlayerData.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Input/IMC_Default.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Input/IMC_Default.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_LockOnComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_InputDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_InputDataAsset.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/SkillObject/C_SkillObject.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/SkillObject/C_SkillObject.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Subsystem/C_DataSubsystem.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" afterDir="false" />
@@ -51,38 +41,58 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://E:/UnrealEngine/UE_5.3/Engine/Plugins/Runtime/GeometryProcessing/Source/GeometryAlgorithms/Private/ThirdParty/clipper/clipper.h" root0="SKIP_HIGHLIGHTING" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2yPEh7xECm6AVRgYUqtTmwFepE0" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "C++ Project.ProjectC.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;C++ Project.ProjectC.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\saint\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\saint\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\saint\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\saint\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\saint\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\saint\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="C++ Project.ProjectC">
     <configuration name="ProjectC" type="CppProject" factoryName="C++ Project">
       <configuration_1>
@@ -190,7 +200,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1749727924867</updated>
-      <workItem from="1749727927215" duration="1333000" />
+      <workItem from="1749727927215" duration="10471000" />
+      <workItem from="1749780751882" duration="7971000" />
+      <workItem from="1749952778628" duration="9818000" />
     </task>
     <servers />
   </component>

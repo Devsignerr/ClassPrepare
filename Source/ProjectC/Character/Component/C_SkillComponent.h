@@ -6,6 +6,35 @@
 #include "Components/ActorComponent.h"
 #include "C_SkillComponent.generated.h"
 
+struct FC_ExecData;
+
+struct FC_ExecInfo
+{
+	FC_ExecData* ExecData = nullptr;
+
+	bool bAnimStarted = false;
+	bool bExecStarted = false;
+
+	float AnimStartTime = 0.f;
+	float ExecStartTime = 0.f;
+	float EndTime = 0.f;
+};
+
+struct FC_SkillInfo
+{
+	uint32 SkillDataId = 0;
+
+	float LifeTime = 0.f;
+	float ElapsedTime = 0.f;
+	
+	TArray<TWeakObjectPtr<AActor>> Targets;
+	
+	FVector SkillStartPos = FVector::ZeroVector;
+	FRotator SkillStartRot = FRotator::ZeroRotator;
+
+	TArray<FC_ExecInfo> ExecInfos;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTC_API UC_SkillComponent : public UActorComponent
 {
@@ -19,18 +48,25 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+	void Tick_PlaySkill(float DeltaTime);
+	
 public:
-	void RequestPlaySkill(int32 SkillId);
-	bool CanPlaySkill(int32 SkillId);
-	void PlaySkill(int32 SkillId);
+	void RequestPlaySkill(uint32 SkillId);
+	void FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor>>& Targets);
+	bool CanPlaySkill(uint32 SkillId);
+	void PlaySkill(FC_SkillInfo& SkillInfo);
 
-	void ProcessComboAttack();
-	void ProcessProjectile();
-	void ProcessActiveSkill();
+	void InitSkillInfo(uint32 SkillId, TArray<TWeakObjectPtr<AActor>> Targets, FC_SkillInfo& SkillInfo);
+	void CalcSkillTime(uint32 SKillId, float& SkillLifeTime, TArray<FC_ExecInfo>& ExecInfos);
+
+	void ProcessNoneTargetSkill(float DeltaTime, FC_SkillInfo& SkillInfo);
+	void ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot);
 
 public:
 	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 	
+	TArray<FC_SkillInfo> CurrentPlayingSkillInfos;
+	TArray<FC_SkillInfo> CoolDownSkillInfos;
 	
+	TArray<uint32> CoolDownSkillId;
 };

@@ -82,6 +82,8 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		EnhancedInputComponent->BindAction(InputData->RunAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Run);
 		EnhancedInputComponent->BindAction(InputData->RollAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Roll);
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::SwapWeapon);
+		
+		EnhancedInputComponent->BindAction(InputData->Num1Action, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Num_1);
 	}
 }
 
@@ -100,7 +102,6 @@ void AC_PlayableCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		
 		if (!LockOnComponent->IsLockOnMode())
 		{
 			//컨트롤러 회전값 입력
@@ -217,6 +218,16 @@ void AC_PlayableCharacter::SwapWeapon(const FInputActionValue& Value)
 	
 	check(BattleComponent);
 	BattleComponent->SwapWeapon();
+}
+
+void AC_PlayableCharacter::Num_1(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+	
+	check(SkillComponent);
+	SkillComponent->RequestPlaySkill(*PlayerData->SkillIds.Find(EC_SkillSlotType::Num_1));
 }
 
 void AC_PlayableCharacter::SetupHUDWidget(UC_HUDWidget* InHUDWidget)

@@ -18,6 +18,7 @@ void UC_DataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Enemy, Enemy_DataTablePath));
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Weapon, Weapon_DataTablePath));
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Skill, Skill_DataTablePath));
+	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Exec, Exec_DataTablePath));
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::SkillObject, SkillObject_DataTablePath));
 	
 	for (const auto& Element : LoadList)

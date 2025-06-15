@@ -6,7 +6,20 @@
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
 #include "NiagaraSystem.h"
+#include "ProjectC/Character/Component/C_SkillComponent.h"
 #include "C_TableRows.generated.h"
+
+USTRUCT(BlueprintType)
+struct FC_ExecData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	float DelayTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	uint32 ExecDataId = 0;
+};
 
 USTRUCT(BlueprintType)
 struct FC_CharacterStatTableRow : public FTableRowBase
@@ -132,13 +145,19 @@ struct FC_SkillTableRow : public FTableRowBase
 	uint32 DataId = 0;
 
 	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> SkillAnim;
+	float CoolTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float SkillRange = 0.f;
+	
+	UPROPERTY(EditAnywhere)
+	EC_SkillTargetingType SkillTargetingType = EC_SkillTargetingType::None;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* SkillActivateFx;
-
+	
 	UPROPERTY(EditAnywhere)
-	TArray<uint32> ExecIds;
+	TArray<FC_ExecData> ExecDatas;
 };
 
 USTRUCT(BlueprintType)
@@ -148,30 +167,24 @@ struct FC_ExecTableRow : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere)
 	uint32 DataId = 0;
-	
-	UPROPERTY(EditAnywhere)
-	float DelayTime = 0.f;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> SkillAnim;
+	
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
 
 	UPROPERTY(EditAnywhere)
-	EC_ExecType ExecType;
+	EC_ExecType ExecType = EC_ExecType::None;
 
 	UPROPERTY(EditAnywhere)
-	uint32 ExecPropertyId;
-};
-
-USTRUCT(BlueprintType)
-struct FC_ExecPropertyTableRow : public FTableRowBase
-{
-	GENERATED_BODY()
+	float ExecProperty_0 = 0;
 	
 	UPROPERTY(EditAnywhere)
-	uint32 DataId = 0;
+	float ExecProperty_1 = 0;
 
 	UPROPERTY(EditAnywhere)
-	uint32 SkillObjectId = 0;
+	float ExecProperty_2 = 0;
 };
 
 USTRUCT(BlueprintType)

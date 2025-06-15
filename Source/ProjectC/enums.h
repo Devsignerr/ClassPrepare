@@ -17,6 +17,7 @@ enum class EC_DataTableType : int32
 	Enemy,
 	Weapon,
 	Skill,
+	Exec,
 	SkillObject,
 	Num
 };
@@ -80,7 +81,9 @@ UENUM(BlueprintType)
 enum class EC_SkillObjectType : uint8
 {
 	None,
-	Projectile,
+	Projectile_Normal,
+	Projectile_Homing,
+	Projectile_Bounce,
 	Num,
 };
 
@@ -101,10 +104,19 @@ enum class EC_CameraType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EC_SkillTargetingType : uint8
+{
+	None,
+	NoneTarget,
+	ChainAttack,
+	Multiple,
+	Num
+};
+
+UENUM(BlueprintType)
 enum class EC_SkillSlotType : uint8
 {
 	None,
-	LeftMouse,
 	Num_1,
 	Num_2,
 	Num_3,
@@ -116,7 +128,7 @@ UENUM(BlueprintType)
 enum class EC_ExecType : uint8
 {
 	None,
-	NormalAttack,
+	Dash,
 	Projectile,
 	Num
 };

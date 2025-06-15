@@ -81,6 +81,21 @@ FC_SkillTableRow* FC_GameUtil::GetSkillData(uint32 SkillId)
 	return nullptr;
 }
 
+FC_ExecTableRow* FC_GameUtil::GetExecData(uint32 ExecId)
+{
+	TArray<FC_ExecTableRow*> EnemyTableRows = GetAllRows<FC_ExecTableRow>(EC_DataTableType::Exec);
+	if (FC_ExecTableRow** FoundRow = EnemyTableRows.FindByPredicate([ExecId](const FC_ExecTableRow* Row)
+	{
+		return Row->DataId == ExecId;
+	}))
+	{
+		return *FoundRow;
+	}
+	
+	UE_LOG(LogProjectC, Error, TEXT("ExecData is Invalid"));
+	return nullptr;
+}
+
 FC_SkillObjectTableRow* FC_GameUtil::GetSkillObjectData(uint32 SkillObjectId)
 {
 	TArray<FC_SkillObjectTableRow*> EnemyTableRows = GetAllRows<FC_SkillObjectTableRow>(EC_DataTableType::SkillObject);

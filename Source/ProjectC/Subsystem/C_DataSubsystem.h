@@ -41,6 +41,9 @@ private:
 	FSoftObjectPath Skill_DataTablePath;
 
 	UPROPERTY(config)
+	FSoftObjectPath Exec_DataTablePath;
+
+	UPROPERTY(config)
 	FSoftObjectPath SkillObject_DataTablePath;
 
 	UPROPERTY(config)
