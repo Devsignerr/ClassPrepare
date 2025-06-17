@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ProjectC/enums.h"
 #include "C_SkillComponent.generated.h"
 
 struct FC_ExecData;
@@ -14,10 +15,20 @@ struct FC_ExecInfo
 
 	bool bAnimStarted = false;
 	bool bExecStarted = false;
+	bool bExecCollisionSpawned = false;
+	bool bExecFXSpawned = false;
+	bool bExecFinished = false;
+
+	float ElapsedTime = 0.f;
 
 	float AnimStartTime = 0.f;
 	float ExecStartTime = 0.f;
 	float EndTime = 0.f;
+
+	uint32 ExecSequence = 0;
+
+	FVector ExecStartPos = FVector::ZeroVector;
+	FRotator ExecStartRot = FRotator::ZeroRotator;
 };
 
 struct FC_SkillInfo
@@ -62,6 +73,13 @@ public:
 	void ProcessNoneTargetSkill(float DeltaTime, FC_SkillInfo& SkillInfo);
 	void ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot);
 
+	void ProcessChainAttackSkill(float DeltaTime, FC_SkillInfo& SkillInfo);
+	void ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot);
+
+	void SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot);
+
+	void OnStartExec(FC_ExecInfo& ExecInfo);
+	void OnEndExec(FC_ExecInfo& ExecInfo);
 public:
 	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 	

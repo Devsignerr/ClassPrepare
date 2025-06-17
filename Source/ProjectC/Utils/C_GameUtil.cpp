@@ -4,6 +4,7 @@
 #include "ProjectC/ProjectC.h"
 #include "ProjectC/Cosmetic/C_CameraShake.h"
 #include "ProjectC/Data/C_TableRows.h"
+#include "NiagaraFunctionLibrary.h"
 
 FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType CharacterType)
 {
@@ -117,4 +118,14 @@ void FC_GameUtil::CameraShake()
 	{
 		PlayerController->ClientStartCameraShake(UC_CameraShake::StaticClass());
 	}
+}
+
+void FC_GameUtil::SpawnEffectAtLocation(UObject* WorldContextObj, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(WorldContextObj, NiagaraSystem, Location, Rotation);
+}
+
+void FC_GameUtil::SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(WorldContextObj, ParticleSystem, Location, Rotation);
 }

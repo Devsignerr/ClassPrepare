@@ -119,13 +119,13 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 					FDamageEvent DamageEvent;
 					HitActor->TakeDamage(Damage, DamageEvent, ClassCharacter->GetController(), ClassCharacter);
 
-					SpawnEffect(EEffectType::Hit, HitResult.ImpactPoint);
+					//FC_GameUtil::SpawnEffectAtLocation(GetWorld(), )
 				}
 			}
 		}
 
 		// DebugDraw
-		DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
+		//DrawDebugLine(World, Line.Key, Line.Value, FColor::Red, false, 3.f, 0, 1.f);
 	}
 
 	// Prev 갱신
@@ -170,25 +170,6 @@ void UC_BattleComponent::EndTrace()
 	DamagedActor.Empty();
 	bTracing = false;
 	TraceElapsedTime = 0.f;
-}
-
-void UC_BattleComponent::SpawnEffect(EEffectType InEffectType, FVector InHitLocation)
-{
-	const UWorld* CurrentWorld = GetWorld();
-	if (!CurrentWorld)
-		return;
-	
-	if (InEffectType == EEffectType::Hit)
-	{
-		//이번만 예외로 적용 후 데이터 분리
-		UParticleSystem* LoadedParticle = Cast<UParticleSystem>(
-		StaticLoadObject(UParticleSystem::StaticClass(), nullptr, TEXT("/Game/ParagonKallari/FX/Particles/Kallari/Abilities/Primary/FX/P_Kallari_Melee_SucessfulImpact.P_Kallari_Melee_SucessfulImpact")));
-
-		if (LoadedParticle)
-			UGameplayStatics::SpawnEmitterAtLocation(CurrentWorld, LoadedParticle, InHitLocation, FRotator::ZeroRotator);
-
-		FC_GameUtil::CameraShake();
-	}
 }
 
 void UC_BattleComponent::SwapWeapon()

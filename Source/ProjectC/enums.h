@@ -1,15 +1,6 @@
 #pragma once
 
 UENUM()
-enum class EEffectType : int32
-{
-	None,
-	Hit,
-	Attack,
-	Num
-};
-
-UENUM()
 enum class EC_DataTableType : int32
 {
 	None,
@@ -129,6 +120,17 @@ enum class EC_ExecType : uint8
 {
 	None,
 	Dash,
+	DashToTarget,
 	Projectile,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_ExecCollisionType : uint8
+{
+	None,
+	Box,
+	Sphere,
+	Capsule,
 	Num
 };

@@ -39,6 +39,9 @@ public:
 	virtual void OnLocked(bool bLocked) override;
 
 	virtual bool HasWeapon() override;
+
+	virtual UStaticMeshComponent* GetStaticMeshComponent() override;
+	virtual TPair<FName, FName> GetWeaponTraceNames() override;
 	
 public:
 	UPROPERTY(EditAnywhere) 

@@ -170,12 +170,33 @@ struct FC_ExecTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> SkillAnim;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ExecFX_Niagara = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* HitFX_Niagara = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ExecFX_Cascade = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* HitFX_Cascade = nullptr;
 	
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
 
 	UPROPERTY(EditAnywhere)
+	float Damage = 0.f;
+
+	UPROPERTY(EditAnywhere)
 	EC_ExecType ExecType = EC_ExecType::None;
+
+	UPROPERTY(EditAnywhere)
+	EC_ExecCollisionType ExecCollisionType = EC_ExecCollisionType::None;
+
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* ExecCurve = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float ExecProperty_0 = 0;
@@ -185,6 +206,15 @@ struct FC_ExecTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float ExecProperty_2 = 0;
+
+	UPROPERTY(EditAnywhere)
+	float ExecCollisionProperty_0 = 0;
+
+	UPROPERTY(EditAnywhere)
+	float ExecCollisionProperty_1 = 0;
+
+	UPROPERTY(EditAnywhere)
+	float ExecCollisionProperty_2 = 0;
 };
 
 USTRUCT(BlueprintType)

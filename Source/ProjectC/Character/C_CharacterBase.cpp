@@ -120,6 +120,16 @@ bool AC_CharacterBase::HasWeapon()
 	return BattleComponent->HasWeapon();
 }
 
+UStaticMeshComponent* AC_CharacterBase::GetStaticMeshComponent()
+{
+	return WeaponStaticComponent;
+}
+
+TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames()
+{
+	return {BattleComponent->TraceStartBoneName, BattleComponent->TraceEndBoneName};
+}
+
 float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
 	const float Damage = StatComponent->ApplyDamage(DamageAmount, DamageCauser);

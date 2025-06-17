@@ -19,5 +19,5 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actor")
-	TObjectPtr<AActor> OwningActor;
+	TWeakObjectPtr<AActor> OwningActor;
 };

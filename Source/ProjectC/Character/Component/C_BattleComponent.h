@@ -29,9 +29,7 @@ public:
 	void StartTraceWithWeapon();
 	void StartTrace(FName InTraceStartBoneName, FName InTraceEndBoneName);
 	void EndTrace();
-
-	void SpawnEffect(EEffectType InEffectType, FVector InHitLocation);
-
+	
 	void SwapWeapon();
 	
 	void EquipWeapon(uint8 InWeaponId);

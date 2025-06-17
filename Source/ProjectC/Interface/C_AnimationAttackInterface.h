@@ -25,4 +25,6 @@ public:
 	virtual bool HasWeapon() = 0;
 	virtual void AttackTrace(bool bStart, FName TraceStartBoneName, FName TraceEndBoneName) = 0;
 	virtual void AttackTraceWithWeapon(bool bStart) = 0;
+	virtual UStaticMeshComponent* GetStaticMeshComponent() = 0;
+	virtual TPair<FName, FName> GetWeaponTraceNames() = 0;
 };

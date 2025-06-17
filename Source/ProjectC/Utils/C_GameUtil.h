@@ -5,6 +5,7 @@
 #include "ProjectC/enums.h"
 #include "ProjectC/Subsystem/C_DataSubsystem.h"
 
+class UNiagaraSystem;
 struct FC_ExecTableRow;
 struct FC_SkillObjectTableRow;
 struct FC_SkillTableRow;
@@ -24,6 +25,8 @@ public:
 	static FC_SkillObjectTableRow* GetSkillObjectData(uint32 SkillObjectId);
 
 	static void CameraShake();
+	static void SpawnEffectAtLocation(UObject* WorldContextObj, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation);
+	static void SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation);
 	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);
