@@ -84,6 +84,9 @@ void AC_PlayableCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::SwapWeapon);
 		
 		EnhancedInputComponent->BindAction(InputData->Num1Action, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Num_1);
+		EnhancedInputComponent->BindAction(InputData->Num2Action, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Num_2);
+		EnhancedInputComponent->BindAction(InputData->Num3Action, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Num_3);
+		EnhancedInputComponent->BindAction(InputData->Num4Action, ETriggerEvent::Triggered, this, &AC_PlayableCharacter::Num_4);
 	}
 }
 
@@ -227,7 +230,53 @@ void AC_PlayableCharacter::Num_1(const FInputActionValue& Value)
 		return;
 	
 	check(SkillComponent);
-	SkillComponent->RequestPlaySkill(*PlayerData->SkillIds.Find(EC_SkillSlotType::Num_1));
+
+	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
+	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_1);
+	
+	SkillComponent->RequestPlaySkill(SkillId);
+}
+
+void AC_PlayableCharacter::Num_2(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+	
+	check(SkillComponent);
+
+	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
+	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_2);
+	
+	SkillComponent->RequestPlaySkill(SkillId);
+}
+
+void AC_PlayableCharacter::Num_3(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+	
+	check(SkillComponent);
+
+	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
+	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_3);
+	
+	SkillComponent->RequestPlaySkill(SkillId);
+}
+
+void AC_PlayableCharacter::Num_4(const FInputActionValue& Value)
+{
+	const bool IsPressed = Value[0] != 0.f;
+	if (!IsPressed)
+		return;
+	
+	check(SkillComponent);
+
+	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
+	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_4);
+	
+	SkillComponent->RequestPlaySkill(SkillId);
 }
 
 void AC_PlayableCharacter::SetupHUDWidget(UC_HUDWidget* InHUDWidget)

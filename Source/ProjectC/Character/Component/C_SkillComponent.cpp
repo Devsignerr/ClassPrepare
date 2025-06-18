@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Utils/C_GameUtil.h"
+#include "ProjectC/SkillObject/C_SkillObject.h"
 
 UC_SkillComponent::UC_SkillComponent()
 {
@@ -38,17 +39,12 @@ void UC_SkillComponent::Tick_PlaySkill(float DeltaTime)
 		if (SkillInfo.ElapsedTime > SkillInfo.LifeTime)
 		{
 			SkillToCoolDown.Add(SkillInfo);
+			OnEndExec(SkillInfo, SkillInfo.ExecInfos.Last());
+			
 			continue;
 		}
 
-		if (SkillTableRow->SkillTargetingType == EC_SkillTargetingType::NoneTarget)
-		{
-			ProcessNoneTargetSkill(DeltaTime, SkillInfo);
-		}
-		else if (SkillTableRow->SkillTargetingType == EC_SkillTargetingType::ChainAttack)
-		{
-			ProcessChainAttackSkill(DeltaTime, SkillInfo);
-		}
+		ProcessSkill(DeltaTime, SkillInfo);
 	}
 
 	for (FC_SkillInfo& SkillInfo : SkillToCoolDown)
@@ -144,17 +140,23 @@ void UC_SkillComponent::CalcSkillTime(uint32 SKillId, float& SkillLifeTime, TArr
 	}
 }
 
-void UC_SkillComponent::ProcessNoneTargetSkill(float DeltaTime, FC_SkillInfo& SkillInfo)
+void UC_SkillComponent::ProcessSkill(float DeltaTime, FC_SkillInfo& SkillInfo)
 {
 	float ElapsedTime = SkillInfo.ElapsedTime; 
 	
 	for (FC_ExecInfo& ExecInfo : SkillInfo.ExecInfos)
 	{
+		if (ExecInfo.bExecFinished)
+			continue;
+
+		FC_SkillTableRow* SkillTableRow = FC_GameUtil::GetSkillData(SkillInfo.SkillDataId);
+		check(SkillTableRow);
+		
+		FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
+		check(ExecTableRow);
+		
 		if (ElapsedTime >= ExecInfo.AnimStartTime && !ExecInfo.bAnimStarted)
 		{
-			FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
-			check(ExecTableRow);
-
 			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 			check(AnimInstance);
 
@@ -166,14 +168,26 @@ void UC_SkillComponent::ProcessNoneTargetSkill(float DeltaTime, FC_SkillInfo& Sk
 
 		if (ElapsedTime >= ExecInfo.ExecStartTime && ElapsedTime < ExecInfo.EndTime)
 		{
+			ExecInfo.ElapsedTime += DeltaTime;
+			
 			if (!ExecInfo.bExecStarted)
 			{
-				ExecInfo.ExecStartPos = OwnerCharacter->GetActorLocation();
-				ExecInfo.ExecStartRot = OwnerCharacter->GetActorRotation();
+				ExecInfo.bExecStarted = true;
+				OnStartExec(SkillInfo, ExecInfo);
 			}
-			
-			ExecInfo.bExecStarted = true;
-			ProcessNoneTargetExec(DeltaTime, ExecInfo, SkillInfo.SkillStartPos, SkillInfo.SkillStartRot);
+
+			if (SkillTableRow->SkillTargetingType == EC_SkillTargetingType::ChainAttack)
+				ProcessChainAttackExec(DeltaTime, SkillInfo, ExecInfo, SkillInfo.SkillStartPos, SkillInfo.SkillStartRot);
+			else if (SkillTableRow->SkillTargetingType == EC_SkillTargetingType::NoneTarget)
+				ProcessNoneTargetExec(DeltaTime, ExecInfo, SkillInfo.SkillStartPos, SkillInfo.SkillStartRot);
+			else if (SkillTableRow->SkillTargetingType == EC_SkillTargetingType::Multiple)
+				ProcessMultipleExec(DeltaTime, SkillInfo, ExecInfo, SkillInfo.SkillStartPos, SkillInfo.SkillStartRot);
+		}
+
+		if (ExecInfo.EndTime <= ElapsedTime)
+		{
+			ExecInfo.bExecFinished = true;
+			OnEndExec(SkillInfo, ExecInfo);
 		}
 	}
 }
@@ -182,8 +196,6 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
-	
-	ExecInfo.ElapsedTime += DeltaTime;
 	
 	if (ExecTableRow->ExecType == EC_ExecType::Dash)
 	{
@@ -202,47 +214,24 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 		{
 			OwnerCharacter->SetActorLocation(CurrentPos);
 		}
-	}
-}
 
-void UC_SkillComponent::ProcessChainAttackSkill(float DeltaTime, FC_SkillInfo& SkillInfo)
-{
-	float ElapsedTime = SkillInfo.ElapsedTime; 
-	
-	for (FC_ExecInfo& ExecInfo : SkillInfo.ExecInfos)
-	{
-		if (ExecInfo.bExecFinished)
-			continue;
-		
-		FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
-		check(ExecTableRow);
-		
-		if (ElapsedTime >= ExecInfo.AnimStartTime && !ExecInfo.bAnimStarted)
+		if (CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
 		{
-			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-			check(AnimInstance);
+			ExecInfo.bExecCollisionSpawned = true;
 
-			ExecInfo.bAnimStarted = true;
-
-			AnimInstance->StopAllMontages(0.1f);
-			AnimInstance->Montage_Play(ExecTableRow->SkillAnim);
-		}
-
-		if (ElapsedTime >= ExecInfo.ExecStartTime && ElapsedTime < ExecInfo.EndTime)
-		{
-			if (!ExecInfo.bExecStarted)
-			{
-				ExecInfo.bExecStarted = true;
-				OnStartExec(ExecInfo);
-			}
+			FVector ExecCollisionPos = ExecInfo.ExecStartPos + ExecInfo.ExecStartRot.Vector() * DashRange / 2.f;
+			FRotator ExecCollisionRot = ExecInfo.ExecStartRot;
 			
-			ProcessChainAttackExec(DeltaTime, SkillInfo, ExecInfo, SkillInfo.SkillStartPos, SkillInfo.SkillStartRot);
-		}
-
-		if (ExecInfo.EndTime < ElapsedTime)
-		{
-			ExecInfo.bExecFinished = true;
-			OnEndExec(ExecInfo);
+			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
+			if (CollisionType == EC_ExecCollisionType::Box)
+			{
+				float BoxHeight = ExecTableRow->ExecCollisionProperty_0;
+				float BoxWidth = ExecTableRow->ExecCollisionProperty_1;
+				float BoxLength = DashRange / 2.f;
+				
+				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
+				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+			}
 		}
 	}
 }
@@ -251,8 +240,6 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
-	
-	ExecInfo.ElapsedTime += DeltaTime;
 
 	TArray<TWeakObjectPtr<AActor>>& Targets = SkillInfo.Targets;
 
@@ -287,13 +274,6 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 		{
 			OwnerCharacter->SetActorLocation(CurrentPos);
 		}
-
-		if (!ExecInfo.bExecFXSpawned)
-		{
-			ExecInfo.bExecFXSpawned = true;
-			FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara, ExecInfo.ExecStartPos, ToTargetDir.Rotation());
-			FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade, ExecInfo.ExecStartPos, ToTargetDir.Rotation());
-		}
 		
 		if (CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
 		{
@@ -316,6 +296,50 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 	}
 }
 
+void UC_SkillComponent::ProcessMultipleExec(float DeltaTime, FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot)
+{
+	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
+	check(ExecTableRow);
+	
+	if (ExecTableRow->ExecType == EC_ExecType::Projectile)
+	{
+		if (!ExecInfo.bExecCollisionSpawned)
+		{
+			ExecInfo.bExecCollisionSpawned = true;
+			
+			FC_SkillObjectTableRow* SkillObjectTableRow = FC_GameUtil::GetSkillObjectData(ExecTableRow->ExecProperty_0);
+			check(SkillObjectTableRow);
+
+			UClass* SkillObjectClass = SkillObjectTableRow->SkillObjectActor;
+			check(SkillObjectClass);
+
+			TArray<TWeakObjectPtr<AActor>>& Targets = SkillInfo.Targets;
+
+			for (TWeakObjectPtr<AActor> Actor : Targets)
+			{
+				if (ExecTableRow->ExecType == EC_ExecType::Projectile)
+				{
+					FVector TargetLocation = Actor->GetActorLocation();
+			
+					USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+					check(SkeletalMeshComponent);
+	
+					FVector Location = SkeletalMeshComponent->GetSocketLocation(TEXT("hand_l"));
+					FRotator Rotation = (TargetLocation - Location).Rotation();
+
+					FTransform Transform;
+					Transform.SetLocation(Location);
+					Transform.SetRotation(Rotation.Quaternion());
+
+					AC_SkillObject* SkillObject = GetWorld()->SpawnActorDeferred<AC_SkillObject>(SkillObjectClass, Transform, GetOwner(), nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					SkillObject->OwnerCharacter = OwnerCharacter.Get();
+					SkillObject->FinishSpawning(Transform);
+				}
+			}
+		}
+	}
+}
+
 void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot)
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
@@ -324,7 +348,7 @@ void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShap
 	UWorld* World = GetWorld();
 	check(World);
 
-	//DrawDebugBox(World, Pos, CollisionShape.GetExtent(), Rot.Quaternion(), FColor::Red, false, 3.f);
+	DrawDebugBox(World, Pos, CollisionShape.GetExtent(), Rot.Quaternion(), FColor::Red, false, 3.f);
 		
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams QueryParams;
@@ -347,17 +371,23 @@ void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShap
 	}
 }
 
-void UC_SkillComponent::OnStartExec(FC_ExecInfo& ExecInfo)
+void UC_SkillComponent::OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo)
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
 	
 	ExecInfo.ExecStartPos = OwnerCharacter->GetActorLocation();
 	ExecInfo.ExecStartRot = OwnerCharacter->GetActorRotation();
+	
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_Start, ExecInfo.ExecStartPos, FRotator::ZeroRotator);
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_Start, ExecInfo.ExecStartPos, FRotator::ZeroRotator);
 }
 
-void UC_SkillComponent::OnEndExec(FC_ExecInfo& ExecInfo)
+void UC_SkillComponent::OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo)
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
+	
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_End, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_End, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
 }

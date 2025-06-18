@@ -7,6 +7,15 @@
 #include "ProjectC/enums.h"
 #include "C_PlayerDataAsset.generated.h"
 
+USTRUCT(BlueprintType)
+struct FC_SkillSlotData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TMap<EC_SkillSlotType, uint32> SkillIds;
+};
+
 UCLASS()
 class PROJECTC_API UC_PlayerDataAsset : public UDataAsset
 {
@@ -35,5 +44,5 @@ public:
 	TObjectPtr<USoundBase> JumpSound;
 
 	UPROPERTY(EditAnywhere)
-	TMap<EC_SkillSlotType, uint32> SkillIds;
+	TMap<EC_CharacterStanceType, FC_SkillSlotData> SkillSlotDatas;
 };

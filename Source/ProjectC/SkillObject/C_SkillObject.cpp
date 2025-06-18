@@ -3,6 +3,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 AC_SkillObject::AC_SkillObject()
@@ -19,6 +21,12 @@ AC_SkillObject::AC_SkillObject()
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(RootComponent);
+
+	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComponent"));
+	ParticleComponent->SetupAttachment(RootComponent);
 	
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(RootComponent); 
@@ -40,31 +48,36 @@ void AC_SkillObject::BeginPlay()
 
 	if (BounceCount > 0)
 		ProjectileMovementComponent->bShouldBounce = true;
-	
-	PlaySound(true);
 }
 
-void AC_SkillObject::PlaySound(bool bSpawn)
+void AC_SkillObject::PlaySound()
 {
-	FVector ActorLocation = GetActorLocation();
-
-	if (bSpawn)
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SpawnSound, ActorLocation);
-	else
-	{
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeSpawnSound, ActorLocation);
-	}
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeSpawnSound, GetActorLocation());
 }
 
-void AC_SkillObject::PlayFX(bool bSpawn, FVector InHitLocation)
+void AC_SkillObject::PlayFX(FVector InHitLocation)
 {
-	UParticleSystem* LoadedParticle = Cast<UParticleSystem>(
-		StaticLoadObject(UParticleSystem::StaticClass(), nullptr, TEXT("/Game/ParagonKallari/FX/Particles/Kallari/Abilities/Primary/FX/P_Kallari_Melee_SucessfulImpact.P_Kallari_Melee_SucessfulImpact")));
-
-	if (LoadedParticle)
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadedParticle, InHitLocation, FRotator::ZeroRotator);
-
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DespawnFX, GetActorLocation(), GetActorRotation());
 	FC_GameUtil::CameraShake();
+}
+
+void AC_SkillObject::ProcessDestroy()
+{
+	TriggerCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Collision_Environment->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ProjectileMovementComponent->Deactivate();
+	StaticMeshComponent->SetVisibility(false);
+
+	PlaySound();
+	PlayFX(GetActorLocation());
+
+	NiagaraComponent->SetBoolParameter(TEXT("Destroyed"), true);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+	{
+		Destroy();
+	}), 1.f, false);
 }
 
 void AC_SkillObject::Tick(float DeltaTime)
@@ -74,17 +87,13 @@ void AC_SkillObject::Tick(float DeltaTime)
 	ElapsedTime += DeltaTime;
 	if (ElapsedTime > LifeTime)
 	{
-		PlaySound(false);
-		PlayFX(false, GetActorLocation());
-		Destroy();
+		ProcessDestroy();
 	}
 }
 
 void AC_SkillObject::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	PlaySound(false);
-	PlayFX(false, SweepResult.Location);
-	Destroy();
+	ProcessDestroy();
 }
 
 void AC_SkillObject::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -100,8 +109,6 @@ void AC_SkillObject::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* O
 	}
 	else if (BounceCount == 0)
 	{
-		PlaySound(false);
-		PlayFX(false, Hit.Location);
-		Destroy();
+		ProcessDestroy();
 	}
 }

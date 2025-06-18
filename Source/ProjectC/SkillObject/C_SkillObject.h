@@ -6,7 +6,9 @@
 #include "ProjectC/enums.h"
 #include "C_SkillObject.generated.h"
 
+class UNiagaraSystem;
 class USphereComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class PROJECTC_API AC_SkillObject : public AActor
@@ -31,8 +33,10 @@ public:
 	UFUNCTION()
 	void OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
-	void PlaySound(bool bSpawn);
-	void PlayFX(bool bSpawn, FVector InHitLocation);
+	void PlaySound();
+	void PlayFX(FVector InHitLocation);
+
+	void ProcessDestroy();
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -40,6 +44,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComponent = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* NiagaraComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystemComponent* ParticleComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USphereComponent* Collision_Environment = nullptr;
@@ -54,10 +64,10 @@ public:
 	ACharacter* OwnerCharacter = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> SpawnSound;
+	TObjectPtr<USoundBase> DeSpawnSound;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> DeSpawnSound;
+	TObjectPtr<UNiagaraSystem> DespawnFX;
 	
 	UPROPERTY(EditAnywhere)
 	float LifeTime = 0.f;

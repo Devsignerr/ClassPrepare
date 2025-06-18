@@ -170,16 +170,22 @@ struct FC_ExecTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> SkillAnim;
+	
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ExecFX_Niagara_Start = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ExecFX_Cascade_Start = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* ExecFX_Niagara = nullptr;
+	UNiagaraSystem* ExecFX_Niagara_End = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ExecFX_Cascade_End = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* HitFX_Niagara = nullptr;
-
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* ExecFX_Cascade = nullptr;
-
+	
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* HitFX_Cascade = nullptr;
 	

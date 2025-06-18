@@ -54,6 +54,9 @@ protected:
 	void SwapWeapon(const FInputActionValue& Value);
 
 	void Num_1(const FInputActionValue& Value);
+	void Num_2(const FInputActionValue& Value);
+	void Num_3(const FInputActionValue& Value);
+	void Num_4(const FInputActionValue& Value);
 
 public:
 	virtual void SetupHUDWidget(class UC_HUDWidget* InHUDWidget) override;
