@@ -1,11 +1,13 @@
 #include "C_ActionComponent.h"
 #include "C_BattleComponent.h"
+#include "C_CrowdControlComponent.h"
 #include "C_LockOnComponent.h"
 #include "C_SkillComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
+#include "..\..\Interface\C_CharacterInterface.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 
 UC_ActionComponent::UC_ActionComponent()
@@ -339,6 +341,15 @@ bool UC_ActionComponent::CanAction(EC_ActionType InActionType)
 	if (!IsLocked(InActionType))
 		return false;
 
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(OwnerCharacter);
+	check(CharacterInterface);
+
+	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+	check(CrowdControlComponent);
+
+	if (CrowdControlComponent->IsCrowdControlled())
+		return false;
+	
 	return true;
 }
 

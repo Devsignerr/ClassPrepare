@@ -1,10 +1,13 @@
 
 #include "C_SkillComponent.h"
 
+#include "C_CrowdControlComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/Data/C_TableRows.h"
+#include "..\..\Interface\C_CharacterInterface.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 #include "ProjectC/SkillObject/C_SkillObject.h"
 
@@ -34,17 +37,14 @@ void UC_SkillComponent::Tick_PlaySkill(float DeltaTime)
 	{
 		FC_SkillTableRow* SkillTableRow = FC_GameUtil::GetSkillData(SkillInfo.SkillDataId);
 		check(SkillTableRow);
-
+		
+		ProcessSkill(DeltaTime, SkillInfo);
 		SkillInfo.ElapsedTime += DeltaTime;
+
 		if (SkillInfo.ElapsedTime > SkillInfo.LifeTime)
 		{
 			SkillToCoolDown.Add(SkillInfo);
-			OnEndExec(SkillInfo, SkillInfo.ExecInfos.Last());
-			
-			continue;
 		}
-
-		ProcessSkill(DeltaTime, SkillInfo);
 	}
 
 	for (FC_SkillInfo& SkillInfo : SkillToCoolDown)
@@ -166,7 +166,7 @@ void UC_SkillComponent::ProcessSkill(float DeltaTime, FC_SkillInfo& SkillInfo)
 			AnimInstance->Montage_Play(ExecTableRow->SkillAnim);
 		}
 
-		if (ElapsedTime >= ExecInfo.ExecStartTime && ElapsedTime < ExecInfo.EndTime)
+		if (ElapsedTime >= ExecInfo.ExecStartTime && ElapsedTime <= ExecInfo.EndTime)
 		{
 			ExecInfo.ElapsedTime += DeltaTime;
 			
@@ -230,6 +230,48 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 				float BoxLength = DashRange / 2.f;
 				
 				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
+				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+			}
+		}
+	}
+	else if (ExecTableRow->ExecType == EC_ExecType::Pushback)
+	{
+		if (!ExecInfo.bExecCollisionSpawned)
+		{
+			ExecInfo.bExecCollisionSpawned = true;
+			
+			float CrowdControlId = ExecTableRow->ExecProperty_0;
+			FVector ExecCollisionPos = ExecInfo.ExecStartPos;
+			FRotator ExecCollisionRot = ExecInfo.ExecStartRot;
+			float SphereRadius = ExecTableRow->ExecCollisionProperty_0;
+			FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SphereRadius);
+		
+			UWorld* World = GetWorld();
+			check(World);
+
+			//DrawDebugSphere(World, ExecCollisionPos, SphereRadius, 10, FColor::Red, false, 3.f);
+		
+			TArray<FOverlapResult> OverlapResults;
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(OwnerCharacter.Get());
+		
+			if (World->OverlapMultiByChannel(OverlapResults, ExecCollisionPos, ExecCollisionRot.Quaternion(), ECC_Pawn, CollisionShape, QueryParams))
+			{
+				for (FOverlapResult& Result : OverlapResults)
+				{
+					if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Result.GetActor()))
+					{
+						UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+						check(CrowdControlComponent);
+
+						CrowdControlComponent->RequestPlayCC(CrowdControlId, GetOwner());
+					}
+				}
+			}
+
+			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
+			if (CollisionType == EC_ExecCollisionType::Sphere)
+			{
 				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
@@ -348,7 +390,7 @@ void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShap
 	UWorld* World = GetWorld();
 	check(World);
 
-	DrawDebugBox(World, Pos, CollisionShape.GetExtent(), Rot.Quaternion(), FColor::Red, false, 3.f);
+	//DrawDebugBox(World, Pos, CollisionShape.GetExtent(), Rot.Quaternion(), FColor::Red, false, 3.f);
 		
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams QueryParams;

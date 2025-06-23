@@ -112,6 +112,21 @@ FC_SkillObjectTableRow* FC_GameUtil::GetSkillObjectData(uint32 SkillObjectId)
 	return nullptr;
 }
 
+FC_CrowdControlTableRow* FC_GameUtil::GetCrowdControlData(uint32 CrowdControlId)
+{
+	TArray<FC_CrowdControlTableRow*> EnemyTableRows = GetAllRows<FC_CrowdControlTableRow>(EC_DataTableType::CrowdControl);
+	if (FC_CrowdControlTableRow** FoundRow = EnemyTableRows.FindByPredicate([CrowdControlId](const FC_CrowdControlTableRow* Row)
+	{
+		return Row->DataId == CrowdControlId;
+	}))
+	{
+		return *FoundRow;
+	}
+	
+	UE_LOG(LogProjectC, Error, TEXT("CrowdControlIData is Invalid"));
+	return nullptr;
+}
+
 void FC_GameUtil::CameraShake()
 {
 	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GEngine->GetCurrentPlayWorld(), 0))
@@ -128,4 +143,9 @@ void FC_GameUtil::SpawnEffectAtLocation(UObject* WorldContextObj, UNiagaraSystem
 void FC_GameUtil::SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(WorldContextObj, ParticleSystem, Location, Rotation);
+}
+
+UNiagaraComponent* FC_GameUtil::SpawnEffectAttached(UNiagaraSystem* NiagaraSystem, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy)
+{
+	return UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystem, AttachToComponent, AttachPointName, Location, Rotation, LocationType, bAutoDestroy);
 }

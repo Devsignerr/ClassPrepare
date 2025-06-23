@@ -11,7 +11,7 @@ void UC_AttackTrace::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 
 	if (MeshComp)
 	{
-		if (IC_AnimationAttackInterface* AttackPawn = Cast<IC_AnimationAttackInterface>(MeshComp->GetOwner()))
+		if (IC_CharacterInterface* AttackPawn = Cast<IC_CharacterInterface>(MeshComp->GetOwner()))
 		{
 			if (AttackPawn->HasWeapon())
 			{

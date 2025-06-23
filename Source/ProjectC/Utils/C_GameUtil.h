@@ -5,6 +5,8 @@
 #include "ProjectC/enums.h"
 #include "ProjectC/Subsystem/C_DataSubsystem.h"
 
+class UNiagaraComponent;
+struct FC_CrowdControlTableRow;
 class UNiagaraSystem;
 struct FC_ExecTableRow;
 struct FC_SkillObjectTableRow;
@@ -23,10 +25,13 @@ public:
 	static FC_SkillTableRow* GetSkillData(uint32 SkillId);
 	static FC_ExecTableRow* GetExecData(uint32 ExecId);
 	static FC_SkillObjectTableRow* GetSkillObjectData(uint32 SkillObjectId);
+	static FC_CrowdControlTableRow* GetCrowdControlData(uint32 CrowdControlId);
 
 	static void CameraShake();
 	static void SpawnEffectAtLocation(UObject* WorldContextObj, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation);
 	static void SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation);
+
+	static UNiagaraComponent* SpawnEffectAttached(UNiagaraSystem* NiagaraSystem, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy);
 	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);

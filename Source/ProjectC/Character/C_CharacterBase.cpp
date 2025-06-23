@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "Component/C_BattleComponent.h"
+#include "Component\C_CrowdControlComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
@@ -38,6 +39,7 @@ AC_CharacterBase::AC_CharacterBase()
 	//GetCharacterMovement()->BrakingFrictionFactor = 0.2f;
 	
 	BattleComponent = CreateDefaultSubobject<UC_BattleComponent>(TEXT("BattleComponent"));
+	CrowdControlComponent = CreateDefaultSubobject<UC_CrowdControlComponent>(TEXT("CrowdControlComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
 	WeaponStaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponStaticComponent"));
 	WeaponStaticComponent->SetupAttachment(GetMesh());
@@ -60,6 +62,14 @@ AC_CharacterBase::AC_CharacterBase()
 void AC_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(CrowdControlComponent);
+
+	if (!CrowdControlComponent->OnStartCCDelegate.IsAlreadyBound(this, &ThisClass::OnStartCrowdControl))
+		CrowdControlComponent->OnStartCCDelegate.AddDynamic(this, &ThisClass::OnStartCrowdControl);
+
+	if (!CrowdControlComponent->OnEndCCDelegate.IsAlreadyBound(this, &ThisClass::OnEndCrowdControl))
+		CrowdControlComponent->OnEndCCDelegate.AddDynamic(this, &ThisClass::OnEndCrowdControl); 
 }
 
 void AC_CharacterBase::PostInitializeComponents()
@@ -120,14 +130,17 @@ bool AC_CharacterBase::HasWeapon()
 	return BattleComponent->HasWeapon();
 }
 
-UStaticMeshComponent* AC_CharacterBase::GetStaticMeshComponent()
-{
-	return WeaponStaticComponent;
-}
-
 TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames()
 {
 	return {BattleComponent->TraceStartBoneName, BattleComponent->TraceEndBoneName};
+}
+
+void AC_CharacterBase::OnStartCrowdControl(EC_CrowdControlType CrowdControlType)
+{
+}
+
+void AC_CharacterBase::OnEndCrowdControl(EC_CrowdControlType CrowdControlType)
+{
 }
 
 float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)

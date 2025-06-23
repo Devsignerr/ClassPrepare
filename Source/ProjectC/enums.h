@@ -10,6 +10,7 @@ enum class EC_DataTableType : int32
 	Skill,
 	Exec,
 	SkillObject,
+	CrowdControl,
 	Num
 };
 
@@ -29,6 +30,7 @@ enum class EC_EnemyStateType : uint8
 	Patrol = 1,
 	Battle = 2,
 	Investigating = 3,
+	CrowdControlled = 4,
 	Num = 3
 };
 
@@ -122,6 +124,7 @@ enum class EC_ExecType : uint8
 	Dash,
 	DashToTarget,
 	Projectile,
+	Pushback,
 	Num
 };
 
@@ -132,5 +135,15 @@ enum class EC_ExecCollisionType : uint8
 	Box,
 	Sphere,
 	Capsule,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_CrowdControlType : uint8
+{
+	None,
+	Pushback,
+	Stun,
+	Ragdoll,
 	Num
 };

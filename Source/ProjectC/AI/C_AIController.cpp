@@ -11,6 +11,7 @@
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "ProjectC/Character/C_NonPlayableCharacter.h"
+#include "ProjectC/Character/Component/C_CrowdControlComponent.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 
@@ -176,6 +177,9 @@ FAIStimulus AC_AIController::GetAIStimulus(AActor* Actor, EC_AISenseType AIPerce
 
 void AC_AIController::HandleSensedSight(AActor* InActor)
 {
+	if (AActor* CurrentTarget = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
+		return;
+	
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 	
@@ -200,6 +204,15 @@ void AC_AIController::HandleSensedDamage(AActor* InActor)
 {
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
+
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
+	ensure(CharacterInterface);
+
+	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+	check(CrowdControlComponent);
+
+	if (CrowdControlComponent->IsCrowdControlled())
+		return;
 
 	AIPawn->ChangeState(EC_EnemyStateType::Battle);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);

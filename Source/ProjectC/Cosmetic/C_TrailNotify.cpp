@@ -5,7 +5,7 @@
 
 #include "GameFramework/Character.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "ProjectC/Interface/C_AnimationAttackInterface.h"
+#include "..\Interface\C_CharacterInterface.h"
 
 
 void UC_TrailNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime,
@@ -15,7 +15,7 @@ void UC_TrailNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 
 	if (MeshComp)
 	{
-		if (IC_AnimationAttackInterface* AttackPawn = Cast<IC_AnimationAttackInterface>(MeshComp->GetOwner()))
+		if (IC_CharacterInterface* AttackPawn = Cast<IC_CharacterInterface>(MeshComp->GetOwner()))
 		{
 			if (bWeaponTrail && AttackPawn->HasWeapon())
 			{

@@ -3,20 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "Component/C_BattleComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
 #include "..\Data\C_TableRows.h"
-#include "ProjectC/Interface/C_AnimationAttackInterface.h"
+#include "..\Interface\C_CharacterInterface.h"
 #include "ProjectC/Interface/C_CharacterWidgetInterface.h"
 #include "C_CharacterBase.generated.h"
 
+class UC_CharacterDataAsset;
+class UC_CrowdControlComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterLocked, bool, bLocked);
 
 UCLASS(config=Game)
-class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_AnimationAttackInterface , public IC_CharacterWidgetInterface
+class PROJECTC_API AC_CharacterBase : public ACharacter , public IC_CharacterInterface , public IC_CharacterWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -40,8 +41,16 @@ public:
 
 	virtual bool HasWeapon() override;
 
-	virtual UStaticMeshComponent* GetStaticMeshComponent() override;
+	virtual UStaticMeshComponent* GetStaticMeshComponent() override { return WeaponStaticComponent; }
+	virtual UC_CrowdControlComponent* GetCrowdControlComponent() override { return CrowdControlComponent; }
 	virtual TPair<FName, FName> GetWeaponTraceNames() override;
+	virtual UC_CharacterDataAsset* GetCharacterDataAsset() override { return CharacterData; }
+
+	UFUNCTION()
+	virtual void OnStartCrowdControl(EC_CrowdControlType CrowdControlType);
+
+	UFUNCTION()
+	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType);
 	
 public:
 	UPROPERTY(EditAnywhere) 
@@ -53,6 +62,9 @@ public:
 	TObjectPtr<UC_BattleComponent> BattleComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_CrowdControlComponent> CrowdControlComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_StatComponent> StatComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -60,5 +72,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> WeaponStaticComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_CharacterDataAsset> CharacterData;
 };
 

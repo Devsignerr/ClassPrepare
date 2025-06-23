@@ -20,6 +20,7 @@ void UC_DataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Skill, Skill_DataTablePath));
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::Exec, Exec_DataTablePath));
 	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::SkillObject, SkillObject_DataTablePath));
+	LoadList.Add(TPair<EC_DataTableType, FSoftObjectPath>(EC_DataTableType::CrowdControl, CrowdControl_DataTablePath));
 	
 	for (const auto& Element : LoadList)
 	{

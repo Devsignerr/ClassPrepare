@@ -236,5 +236,34 @@ struct FC_SkillObjectTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> SkillObjectActor;
+};
+
+USTRUCT(BlueprintType)
+struct FC_CrowdControlTableRow : public FTableRowBase
+{
+	GENERATED_BODY()
 	
+	UPROPERTY(EditAnywhere)
+	uint32 DataId = 0;
+
+	UPROPERTY(EditAnywhere)
+	EC_CrowdControlType CrowdControlType = EC_CrowdControlType::None;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> CrowdControlFX = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> MaterialInterface = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	float Duration = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float Property_0 = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float Property_1 = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float Property_2 = 0.f;
 };

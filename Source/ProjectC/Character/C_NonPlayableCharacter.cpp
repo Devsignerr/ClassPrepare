@@ -92,7 +92,7 @@ void AC_NonPlayableCharacter::ResetState()
 void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
 {
 	EnemyState = StateType;
-
+	
 	if (EnemyState == EC_EnemyStateType::Patrol)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Walk;
@@ -202,4 +202,16 @@ float AC_NonPlayableCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 		GetActorLocation());
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void AC_NonPlayableCharacter::OnStartCrowdControl(EC_CrowdControlType CrowdControlType)
+{
+	Super::OnStartCrowdControl(CrowdControlType);
+	ChangeState(EC_EnemyStateType::CrowdControlled);
+}
+
+void AC_NonPlayableCharacter::OnEndCrowdControl(EC_CrowdControlType CrowdControlType)
+{
+	Super::OnEndCrowdControl(CrowdControlType);
+	ChangeState(EC_EnemyStateType::Battle);
 }

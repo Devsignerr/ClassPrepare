@@ -77,7 +77,7 @@ void AC_SkillObject::ProcessDestroy()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
 	{
 		Destroy();
-	}), 1.f, false);
+	}), 0.5f, false);
 }
 
 void AC_SkillObject::Tick(float DeltaTime)

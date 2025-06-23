@@ -36,6 +36,8 @@ protected:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	virtual void OnStartCrowdControl(EC_CrowdControlType CrowdControlType) override;
+	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType) override;
 public:
 	UFUNCTION(BlueprintCallable) 
 	virtual EC_EnemyStateType GetState() override;
