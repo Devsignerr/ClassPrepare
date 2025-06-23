@@ -31,4 +31,5 @@ public:
 	virtual TPair<FName, FName> GetWeaponTraceNames() = 0;
 
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() = 0;
+	virtual bool IsDead() = 0;
 };

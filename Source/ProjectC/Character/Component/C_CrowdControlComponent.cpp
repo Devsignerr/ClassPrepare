@@ -85,6 +85,12 @@ void UC_CrowdControlComponent::RequestPlayCC(uint32 CrowdControlId, AActor* Caus
 
 bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& CrowdControlInfo)
 {
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(OwnerCharacter);
+	check(CharacterInterface);
+
+	if (CharacterInterface->IsDead())
+		return false;
+	
 	return true;
 }
 
@@ -134,9 +140,8 @@ void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
 	{
 		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
-
 	}
-		
+	
 	if (UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset())
 	{
 		if (TObjectPtr<UAnimMontage> AnimMontage = CharacterDataAsset->KnockbackAnim)

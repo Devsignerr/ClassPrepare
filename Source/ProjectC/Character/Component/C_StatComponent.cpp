@@ -73,7 +73,7 @@ float UC_StatComponent::ApplyDamage(float InDamage, AActor* DamageCauser)
 	SetHp(PrevHp - ActualDamage);
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{
-		OnHpChanged.Broadcast(0, MaxHp);
+		OnDead.Broadcast();
 	}
 
 	return ActualDamage;

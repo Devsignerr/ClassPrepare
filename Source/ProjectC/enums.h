@@ -31,6 +31,7 @@ enum class EC_EnemyStateType : uint8
 	Battle = 2,
 	Investigating = 3,
 	CrowdControlled = 4,
+	Dead = 5,
 	Num = 3
 };
 

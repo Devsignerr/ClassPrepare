@@ -38,6 +38,8 @@ protected:
 
 	virtual void OnStartCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer) override;
 	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer) override;
+
+	virtual void OnDead() override;
 public:
 	UFUNCTION(BlueprintCallable) 
 	virtual EC_EnemyStateType GetState() override;

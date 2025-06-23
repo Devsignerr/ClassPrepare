@@ -8,6 +8,7 @@
 #include "C_StatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHpChangedDelegate, float /*CurrentHp*/, float /*MaxHp*/);
+DECLARE_MULTICAST_DELEGATE(FC_OnDeadDelegate);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FC_CharacterStatTableRow& /*BaseStat*/, const FC_CharacterStatTableRow& /*ModifierStat*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnC_leComponent) )
@@ -24,6 +25,7 @@ protected:
 
 public:
 	FOnHpChangedDelegate OnHpChanged;
+	FC_OnDeadDelegate OnDead;
 	FOnStatChangedDelegate OnStatChanged;
 	
 	void AddBaseStat(const FC_CharacterStatTableRow& InAddBaseStat);

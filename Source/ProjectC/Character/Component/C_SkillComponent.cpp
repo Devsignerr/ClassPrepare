@@ -106,6 +106,12 @@ void UC_SkillComponent::FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor
 	{
 		if (Enemy != GetOwner())
 		{
+			if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Enemy))
+			{
+				if (CharacterInterface->IsDead())
+					continue;
+			}
+			
 			if (FVector::Dist(OwnerCharacterPos, Enemy->GetActorLocation()) <= SkillRange)
 			{
 				Targets.Add(Enemy);
@@ -258,7 +264,13 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 			TArray<FOverlapResult> OverlapResults;
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(OwnerCharacter.Get());
-		
+
+			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
+			if (CollisionType == EC_ExecCollisionType::Sphere)
+			{
+				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+			}
+			
 			if (World->OverlapMultiByChannel(OverlapResults, ExecCollisionPos, ExecCollisionRot.Quaternion(), ECC_Pawn, CollisionShape, QueryParams))
 			{
 				for (FOverlapResult& Result : OverlapResults)
@@ -271,12 +283,6 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 						CrowdControlComponent->RequestPlayCC(CrowdControlId, GetOwner());
 					}
 				}
-			}
-
-			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
-			if (CollisionType == EC_ExecCollisionType::Sphere)
-			{
-				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
 	}

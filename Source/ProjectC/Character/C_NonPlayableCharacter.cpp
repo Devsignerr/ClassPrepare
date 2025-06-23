@@ -1,6 +1,7 @@
 
 #include "C_NonPlayableCharacter.h"
 
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Component/C_CrowdControlComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -49,7 +50,7 @@ void AC_NonPlayableCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (IsTurning)
+	if (IsTurning && EnemyState != EC_EnemyStateType::Dead)
 	{
 		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{
@@ -92,6 +93,9 @@ void AC_NonPlayableCharacter::ResetState()
 
 void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
 {
+	if (EnemyState == EC_EnemyStateType::Dead)
+		return;
+	
 	EnemyState = StateType;
 	
 	if (EnemyState == EC_EnemyStateType::Patrol)
@@ -225,4 +229,20 @@ void AC_NonPlayableCharacter::OnEndCrowdControl(EC_CrowdControlType CrowdControl
 		
 		ChangeState(EC_EnemyStateType::Battle);
 	}
+}
+
+void AC_NonPlayableCharacter::OnDead()
+{
+	Super::OnDead();
+
+	if (AAIController* AIContoller = Cast<AAIController>(GetController()))
+	{
+		UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(AIContoller->GetBrainComponent());
+		if (BTComponent)
+		{
+			BTComponent->StopTree();
+		}
+	}
+	
+	ChangeState(EC_EnemyStateType::Dead);
 }

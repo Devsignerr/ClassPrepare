@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ProjectC/Interface/C_CharacterInterface.h"
 #include "ProjectC/Interface/C_CharacterWidgetInterface.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 
@@ -79,6 +80,12 @@ APawn* UC_LockOnComponent::FindTarget()
 		APawn* ResultPawn = Cast<APawn>(Result.GetActor());
 		if (!ResultPawn)
 			continue;
+		
+		if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(ResultPawn))
+		{
+			if (CharacterInterface->IsDead())
+				continue;
+		}
 		
 		FVector ToTargetDir = (Result.GetActor()->GetActorLocation() - OwnerLocation).GetSafeNormal();
 		float OffsetAngle = FMath::RadiansToDegrees(FMath::Acos(ToTargetDir.Dot(CameraForward)));

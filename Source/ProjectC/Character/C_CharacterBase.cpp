@@ -9,6 +9,7 @@
 #include "Component\C_CrowdControlComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
+#include "ProjectC/Data/C_CharacterDataAsset.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
 #include "ProjectC/UI/C_LockOnWidget.h"
 
@@ -69,13 +70,15 @@ void AC_CharacterBase::BeginPlay()
 		CrowdControlComponent->OnStartCCDelegate.AddDynamic(this, &ThisClass::OnStartCrowdControl);
 
 	if (!CrowdControlComponent->OnEndCCDelegate.IsAlreadyBound(this, &ThisClass::OnEndCrowdControl))
-		CrowdControlComponent->OnEndCCDelegate.AddDynamic(this, &ThisClass::OnEndCrowdControl); 
+		CrowdControlComponent->OnEndCCDelegate.AddDynamic(this, &ThisClass::OnEndCrowdControl);
 }
 
 void AC_CharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	check(StatComponent);
+	StatComponent->OnDead.AddUObject(this, &ThisClass::OnDead);
 	StatComponent->OnStatChanged.AddUObject(this, &ThisClass::ApplyStat);
 }
 
@@ -128,6 +131,22 @@ bool AC_CharacterBase::HasWeapon()
 {
 	check(BattleComponent);
 	return BattleComponent->HasWeapon();
+}
+
+void AC_CharacterBase::OnDead()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	check(AnimInstance);
+
+	AnimInstance->StopAllMontages(0.f);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+bool AC_CharacterBase::IsDead()
+{
+	check(StatComponent);
+	return StatComponent->CurrentHp < KINDA_SMALL_NUMBER;
 }
 
 TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames()

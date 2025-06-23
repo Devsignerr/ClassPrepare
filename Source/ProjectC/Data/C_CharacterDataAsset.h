@@ -14,7 +14,4 @@ class PROJECTC_API UC_CharacterDataAsset : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> KnockbackAnim;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> DeathAnim;
 };

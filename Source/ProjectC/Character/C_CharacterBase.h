@@ -41,6 +41,9 @@ public:
 
 	virtual bool HasWeapon() override;
 
+	virtual void OnDead();
+	virtual bool IsDead() override;
+
 	virtual UStaticMeshComponent* GetStaticMeshComponent() override { return WeaponStaticComponent; }
 	virtual UC_CrowdControlComponent* GetCrowdControlComponent() override { return CrowdControlComponent; }
 	virtual TPair<FName, FName> GetWeaponTraceNames() override;
