@@ -29,33 +29,16 @@ void UC_CrowdControlComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UC_CrowdControlComponent::Tick_PlayCrowdControl(float DeltaTime)
 {
-	TArray<FC_CrowdControlInfo> InfoToRemove;
+	ProcessCC();
 	
-	for (FC_CrowdControlInfo& CrowdControlInfo : CrowdControlInfos)
+	CrowdControlInfo.ElapsedTime += DeltaTime;
+	if (CrowdControlInfo.bValid && CrowdControlInfo.ElapsedTime > CrowdControlInfo.LifeTime)
 	{
-		CrowdControlInfo.ElapsedTime += DeltaTime;
-		
-		ProcessCC(CrowdControlInfo);
-
-		if (CrowdControlInfo.ElapsedTime > CrowdControlInfo.LifeTime)
-		{
-			InfoToRemove.Add(CrowdControlInfo);
-		}
-	}
-
-	CrowdControlInfos.RemoveAll(
-[&](const FC_CrowdControlInfo& CrowdControl)
-	{
-		return CrowdControl.ElapsedTime > CrowdControl.LifeTime;
-	});
-
-	for (FC_CrowdControlInfo& CrowdControlInfo : InfoToRemove)
-	{
-		StopCC(CrowdControlInfo);
+		StopCC();
 	}
 }
 
-void UC_CrowdControlComponent::ProcessCC(FC_CrowdControlInfo& CrowdControlInfo)
+void UC_CrowdControlComponent::ProcessCC()
 {
 	
 }
@@ -65,25 +48,26 @@ void UC_CrowdControlComponent::RequestPlayCC(uint32 CrowdControlId, AActor* Caus
 	FC_CrowdControlTableRow* CrowdControlTableRow = FC_GameUtil::GetCrowdControlData(CrowdControlId);
 	check(CrowdControlTableRow);
 	
-	FC_CrowdControlInfo CrowdControlInfo;
-	CrowdControlInfo.LifeTime = CrowdControlTableRow->Duration;
-	CrowdControlInfo.ElapsedTime = 0.f;
-	CrowdControlInfo.CrowdControlType = CrowdControlTableRow->CrowdControlType;
-	CrowdControlInfo.CrowdControlDataId = CrowdControlTableRow->DataId;
-	CrowdControlInfo.Causer = Causer;
+	FC_CrowdControlInfo Info;
+	Info.LifeTime = CrowdControlTableRow->Duration;
+	Info.ElapsedTime = 0.f;
+	Info.CrowdControlType = CrowdControlTableRow->CrowdControlType;
+	Info.CrowdControlDataId = CrowdControlTableRow->DataId;
+	Info.Causer = Causer;
 
-	CrowdControlInfo.CauserPos = Causer->GetActorLocation();
-	CrowdControlInfo.CauserRot = Causer->GetActorRotation();
-	CrowdControlInfo.StartPos = OwnerCharacter->GetActorLocation();
-	CrowdControlInfo.StartRot = OwnerCharacter->GetActorRotation();
+	Info.CauserPos = Causer->GetActorLocation();
+	Info.CauserRot = Causer->GetActorRotation();
+	Info.StartPos = OwnerCharacter->GetActorLocation();
+	Info.StartRot = OwnerCharacter->GetActorRotation();
 	
-	if (!CanPlayCC(CrowdControlInfo))
+	if (!CanPlayCC(Info))
 		return;
 
-	PlayCC(CrowdControlInfo);	
+	StopCC();
+	PlayCC(Info);	
 }
 
-bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& CrowdControlInfo)
+bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& Info)
 {
 	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(OwnerCharacter);
 	check(CharacterInterface);
@@ -94,28 +78,37 @@ bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& CrowdControlInfo)
 	return true;
 }
 
-void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo& CrowdControlInfo)
+void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo Info)
 {
-	OnStartCC(CrowdControlInfo);
+	CrowdControlInfo = Info;
+	CrowdControlInfo.bValid = true;
 	
-	CrowdControlInfos.Add(CrowdControlInfo);
+	OnStartCC();
+	
 	OnStartCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
-void UC_CrowdControlComponent::StopCC(FC_CrowdControlInfo& CrowdControlInfo)
+void UC_CrowdControlComponent::StopCC()
 {
-	OnStopCC(CrowdControlInfo);
+	CrowdControlInfo.bValid = false;
+	
+	OnStopCC();
 	
 	OnEndCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
-void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
+void UC_CrowdControlComponent::OnStartCC()
 {
 	FC_CrowdControlTableRow* CrowdControlTableRow = FC_GameUtil::GetCrowdControlData(CrowdControlInfo.CrowdControlDataId);
 	check(CrowdControlTableRow);
 
 	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(OwnerCharacter);
 	check(CharacterInterface);
+
+	if (AAIController* AIController = Cast<AAIController>(OwnerCharacter->GetController()))
+	{
+		AIController->StopMovement();
+	}
 	
 	if (CrowdControlInfo.CrowdControlType == EC_CrowdControlType::Pushback)
 	{
@@ -124,19 +117,18 @@ void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
 
 		const FVector ForceDir = (StartPos - CauserPos).GetSafeNormal();
 		const float Power = CrowdControlTableRow->Property_0;
-
-		if (AAIController* AIController = Cast<AAIController>(OwnerCharacter->GetController()))
-		{
-			AIController->StopMovement();
-		}
-
+		
 		//DrawDebugLine(GetWorld(), StartPos, StartPos + (-ForceDir.GetSafeNormal2D()) * 200.f, FColor::Red, false, 3.f, 20);
 
 		OwnerCharacter->SetActorRotation((-ForceDir.GetSafeNormal2D()).Rotation());
 		OwnerCharacter->LaunchCharacter(ForceDir * Power, true, true);
 	}
+	else if (CrowdControlInfo.CrowdControlType == EC_CrowdControlType::Stun)
+	{
 	
-	if (TObjectPtr<UNiagaraSystem> NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
+	}
+	
+	if (UNiagaraSystem* NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
 	{
 		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
@@ -158,7 +150,7 @@ void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
 	}
 }
 
-void UC_CrowdControlComponent::OnStopCC(FC_CrowdControlInfo& CrowdControlInfo)
+void UC_CrowdControlComponent::OnStopCC()
 {
 	if (CrowdControlInfo.SpawnedFX && CrowdControlInfo.SpawnedFX->IsActive())
 		CrowdControlInfo.SpawnedFX->DestroyComponent();
@@ -166,5 +158,5 @@ void UC_CrowdControlComponent::OnStopCC(FC_CrowdControlInfo& CrowdControlInfo)
 
 bool UC_CrowdControlComponent::IsCrowdControlled()
 {
-	return !CrowdControlInfos.IsEmpty();
+	return CrowdControlInfo.bValid;
 }

@@ -221,6 +221,9 @@ struct FC_ExecTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float ExecCollisionProperty_2 = 0;
+
+	UPROPERTY(EditAnywhere)
+	float CrowdControlId = INDEX_NONE;
 };
 
 USTRUCT(BlueprintType)

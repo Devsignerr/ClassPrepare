@@ -250,7 +250,6 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 		{
 			ExecInfo.bExecCollisionSpawned = true;
 			
-			float CrowdControlId = ExecTableRow->ExecProperty_0;
 			FVector ExecCollisionPos = ExecInfo.ExecStartPos;
 			FRotator ExecCollisionRot = ExecInfo.ExecStartRot;
 			float SphereRadius = ExecTableRow->ExecCollisionProperty_0;
@@ -269,20 +268,6 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 			if (CollisionType == EC_ExecCollisionType::Sphere)
 			{
 				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
-			}
-			
-			if (World->OverlapMultiByChannel(OverlapResults, ExecCollisionPos, ExecCollisionRot.Quaternion(), ECC_Pawn, CollisionShape, QueryParams))
-			{
-				for (FOverlapResult& Result : OverlapResults)
-				{
-					if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Result.GetActor()))
-					{
-						UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
-						check(CrowdControlComponent);
-
-						CrowdControlComponent->RequestPlayCC(CrowdControlId, GetOwner());
-					}
-				}
 			}
 		}
 	}
@@ -418,6 +403,18 @@ void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShap
 				FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->HitFX_Niagara, FXLocation, FRotator::ZeroRotator);
 				FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->HitFX_Cascade, FXLocation, FRotator::ZeroRotator);
 				FC_GameUtil::CameraShake();
+
+				if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Result.GetActor()))
+				{
+					UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+					check(CrowdControlComponent);
+
+					const float CrowdControlId = ExecTableRow->CrowdControlId;
+					if (CrowdControlId > INDEX_NONE)
+					{
+						CrowdControlComponent->RequestPlayCC(CrowdControlId, GetOwner());
+					}
+				}
 			}
 		}
 	}

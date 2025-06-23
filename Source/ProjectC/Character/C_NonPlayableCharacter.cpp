@@ -243,6 +243,9 @@ void AC_NonPlayableCharacter::OnDead()
 			BTComponent->StopTree();
 		}
 	}
+
+	check(CrowdControlComponent);
+	CrowdControlComponent->StopCC();
 	
 	ChangeState(EC_EnemyStateType::Dead);
 }

@@ -26,6 +26,8 @@ struct FC_CrowdControlInfo
 
 	TObjectPtr<UNiagaraComponent> SpawnedFX = nullptr;
 	TWeakObjectPtr<AActor> Causer = nullptr;
+
+	bool bValid = false;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -46,15 +48,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void Tick_PlayCrowdControl(float DeltaTime);
 
-	void ProcessCC(FC_CrowdControlInfo& CrowdControlInfo);
+	void ProcessCC();
 	
 	void RequestPlayCC(uint32 CrowdControlId, AActor* Causer);
-	bool CanPlayCC(FC_CrowdControlInfo& CrowdControlInfo);
-	void PlayCC(FC_CrowdControlInfo& CrowdControlInfo);
-	void StopCC(FC_CrowdControlInfo& CrowdControlInfo);
+	bool CanPlayCC(FC_CrowdControlInfo& Info);
+	void PlayCC(FC_CrowdControlInfo Info);
+	void StopCC();
 
-	void OnStartCC(FC_CrowdControlInfo& CrowdControlInfo);
-	void OnStopCC(FC_CrowdControlInfo& CrowdControlInfo);
+	void OnStartCC();
+	void OnStopCC();
 
 	bool IsCrowdControlled();
 
@@ -62,6 +64,6 @@ public:
 	FC_OnStartCCDelegate OnStartCCDelegate;
 	FC_OnEndCCDelegate OnEndCCDelegate;
 
-	TArray<FC_CrowdControlInfo> CrowdControlInfos;
+	FC_CrowdControlInfo CrowdControlInfo;
 	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 };
