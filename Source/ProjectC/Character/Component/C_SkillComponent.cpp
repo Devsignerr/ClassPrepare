@@ -116,6 +116,10 @@ void UC_SkillComponent::FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor
 
 bool UC_SkillComponent::CanPlaySkill(uint32 SkillId)
 {
+	const FC_SkillTableRow* SkillTableRow = FC_GameUtil::GetSkillData(SkillId);
+	if (!SkillTableRow)
+		return false;
+	
 	return true;
 }
 

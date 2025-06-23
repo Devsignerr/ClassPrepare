@@ -2,6 +2,7 @@
 #include "C_NonPlayableCharacter.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Component/C_CrowdControlComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "ProjectC/ProjectC.h"
@@ -204,14 +205,24 @@ float AC_NonPlayableCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void AC_NonPlayableCharacter::OnStartCrowdControl(EC_CrowdControlType CrowdControlType)
+void AC_NonPlayableCharacter::OnStartCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
 {
-	Super::OnStartCrowdControl(CrowdControlType);
+	Super::OnStartCrowdControl(CrowdControlType, Causer);
 	ChangeState(EC_EnemyStateType::CrowdControlled);
 }
 
-void AC_NonPlayableCharacter::OnEndCrowdControl(EC_CrowdControlType CrowdControlType)
+void AC_NonPlayableCharacter::OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
 {
-	Super::OnEndCrowdControl(CrowdControlType);
-	ChangeState(EC_EnemyStateType::Battle);
+	Super::OnEndCrowdControl(CrowdControlType, Causer);
+
+	check(CrowdControlComponent);
+	if (!CrowdControlComponent->IsCrowdControlled())
+	{
+		if (AAIController* AIContoller = Cast<AAIController>(GetController()))
+		{
+			AIContoller->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Causer);
+		}
+		
+		ChangeState(EC_EnemyStateType::Battle);
+	}
 }

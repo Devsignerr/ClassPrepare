@@ -2,8 +2,8 @@
 
 #include "AIController.h"
 #include "NiagaraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/Data/C_CharacterDataAsset.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Interface/C_CharacterInterface.h"
@@ -43,16 +43,16 @@ void UC_CrowdControlComponent::Tick_PlayCrowdControl(float DeltaTime)
 		}
 	}
 
+	CrowdControlInfos.RemoveAll(
+[&](const FC_CrowdControlInfo& CrowdControl)
+	{
+		return CrowdControl.ElapsedTime > CrowdControl.LifeTime;
+	});
+
 	for (FC_CrowdControlInfo& CrowdControlInfo : InfoToRemove)
 	{
 		StopCC(CrowdControlInfo);
 	}
-
-	CrowdControlInfos.RemoveAll(
-	[&](const FC_CrowdControlInfo& CrowdControl)
-	{
-		return CrowdControl.ElapsedTime > CrowdControl.LifeTime;
-	});
 }
 
 void UC_CrowdControlComponent::ProcessCC(FC_CrowdControlInfo& CrowdControlInfo)
@@ -93,14 +93,14 @@ void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo& CrowdControlInfo)
 	OnStartCC(CrowdControlInfo);
 	
 	CrowdControlInfos.Add(CrowdControlInfo);
-	OnStartCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType);
+	OnStartCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
 void UC_CrowdControlComponent::StopCC(FC_CrowdControlInfo& CrowdControlInfo)
 {
 	OnStopCC(CrowdControlInfo);
 	
-	OnEndCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType);
+	OnEndCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
 void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
@@ -124,12 +124,19 @@ void UC_CrowdControlComponent::OnStartCC(FC_CrowdControlInfo& CrowdControlInfo)
 			AIController->StopMovement();
 		}
 
+		//DrawDebugLine(GetWorld(), StartPos, StartPos + (-ForceDir.GetSafeNormal2D()) * 200.f, FColor::Red, false, 3.f, 20);
+
+		OwnerCharacter->SetActorRotation((-ForceDir.GetSafeNormal2D()).Rotation());
 		OwnerCharacter->LaunchCharacter(ForceDir * Power, true, true);
 	}
 	
 	if (TObjectPtr<UNiagaraSystem> NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
-		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetMesh(), FName(TEXT("root")), FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+	{
+		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 
+	}
+		
 	if (UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset())
 	{
 		if (TObjectPtr<UAnimMontage> AnimMontage = CharacterDataAsset->KnockbackAnim)

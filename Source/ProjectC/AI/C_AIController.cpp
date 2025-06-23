@@ -89,6 +89,15 @@ FC_EnemyTableRow* AC_AIController::GetEnemyData()
 
 void AC_AIController::OnPerceptionUpdate(const TArray<AActor*>& UpdatedActors)
 {
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
+	ensure(CharacterInterface);
+
+	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+	check(CrowdControlComponent);
+
+	if (CrowdControlComponent->IsCrowdControlled())
+		return;
+	
 	for (AActor* UpdatedActor : UpdatedActors)
 	{
 		if (GetAIStimulus(UpdatedActor, EC_AISenseType::Sight).WasSuccessfullySensed())
@@ -177,9 +186,6 @@ FAIStimulus AC_AIController::GetAIStimulus(AActor* Actor, EC_AISenseType AIPerce
 
 void AC_AIController::HandleSensedSight(AActor* InActor)
 {
-	if (AActor* CurrentTarget = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TEXT("Target"))))
-		return;
-	
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 	
@@ -205,15 +211,6 @@ void AC_AIController::HandleSensedDamage(AActor* InActor)
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 
-	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
-	ensure(CharacterInterface);
-
-	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
-	check(CrowdControlComponent);
-
-	if (CrowdControlComponent->IsCrowdControlled())
-		return;
-
 	AIPawn->ChangeState(EC_EnemyStateType::Battle);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);
 }
@@ -222,6 +219,15 @@ void AC_AIController::HandleLoseTarget(AActor* InActor)
 {
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
+
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
+	ensure(CharacterInterface);
+
+	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
+	check(CrowdControlComponent);
+
+	if (CrowdControlComponent->IsCrowdControlled())
+		return;
 
 	AIPawn->ChangeState(EC_EnemyStateType::Patrol);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);

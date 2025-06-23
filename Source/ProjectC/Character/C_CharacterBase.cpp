@@ -135,11 +135,11 @@ TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames()
 	return {BattleComponent->TraceStartBoneName, BattleComponent->TraceEndBoneName};
 }
 
-void AC_CharacterBase::OnStartCrowdControl(EC_CrowdControlType CrowdControlType)
+void AC_CharacterBase::OnStartCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
 {
 }
 
-void AC_CharacterBase::OnEndCrowdControl(EC_CrowdControlType CrowdControlType)
+void AC_CharacterBase::OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
 {
 }
 

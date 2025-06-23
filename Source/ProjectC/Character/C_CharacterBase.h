@@ -47,10 +47,10 @@ public:
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() override { return CharacterData; }
 
 	UFUNCTION()
-	virtual void OnStartCrowdControl(EC_CrowdControlType CrowdControlType);
+	virtual void OnStartCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer);
 
 	UFUNCTION()
-	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType);
+	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer);
 	
 public:
 	UPROPERTY(EditAnywhere) 

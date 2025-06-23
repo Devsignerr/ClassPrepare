@@ -8,8 +8,8 @@
 #include "C_CrowdControlComponent.generated.h"
 
 class UNiagaraComponent;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FC_OnStartCCDelegate, EC_CrowdControlType, CrowdControlType);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FC_OnEndCCDelegate, EC_CrowdControlType, CrowdControlType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FC_OnStartCCDelegate, EC_CrowdControlType, CrowdControlType, AActor*, Causer);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FC_OnEndCCDelegate, EC_CrowdControlType, CrowdControlType, AActor*, Causer);
 
 struct FC_CrowdControlInfo
 {
