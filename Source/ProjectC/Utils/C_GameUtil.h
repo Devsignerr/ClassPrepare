@@ -5,6 +5,7 @@
 #include "ProjectC/enums.h"
 #include "ProjectC/Subsystem/C_DataSubsystem.h"
 
+class UC_PlayerDataAsset;
 class UNiagaraComponent;
 struct FC_CrowdControlTableRow;
 class UNiagaraSystem;
@@ -32,6 +33,8 @@ public:
 	static void SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation);
 
 	static UNiagaraComponent* SpawnEffectAttached(UNiagaraSystem* NiagaraSystem, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy);
+
+	static TArray<UAnimMontage*> GetComboAttackMontages(UC_PlayerDataAsset* PlayerDataAsset, EC_CharacterStanceType StanceType, bool bInSpecialAttack);
 	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);

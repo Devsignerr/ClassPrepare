@@ -131,7 +131,7 @@ void UC_CrowdControlComponent::OnStartCC()
 	if (UNiagaraSystem* NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
 	{
 		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
 	}
 	
 	if (UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset())
@@ -153,7 +153,7 @@ void UC_CrowdControlComponent::OnStartCC()
 void UC_CrowdControlComponent::OnStopCC()
 {
 	if (CrowdControlInfo.SpawnedFX && CrowdControlInfo.SpawnedFX->IsActive())
-		CrowdControlInfo.SpawnedFX->DestroyComponent();
+		CrowdControlInfo.SpawnedFX->Deactivate();
 }
 
 bool UC_CrowdControlComponent::IsCrowdControlled()

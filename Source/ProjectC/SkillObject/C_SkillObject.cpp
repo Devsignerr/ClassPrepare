@@ -5,6 +5,9 @@
 #include "Particles/ParticleSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Engine/DamageEvents.h"
+#include "GameFramework/Character.h"
+#include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 AC_SkillObject::AC_SkillObject()
@@ -93,6 +96,15 @@ void AC_SkillObject::Tick(float DeltaTime)
 
 void AC_SkillObject::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	FC_SkillObjectTableRow* SkillObjectTableRow = FC_GameUtil::GetSkillObjectData(SkillObjectId);
+	check(SkillObjectTableRow);
+	
+	if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))
+	{
+		FDamageEvent DamageEvent;
+		HitCharacter->TakeDamage(SkillObjectTableRow->Damage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter.Get());
+	}
+	
 	ProcessDestroy();
 }
 

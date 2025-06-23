@@ -14,6 +14,7 @@
 
 #include "CoreMinimal.h"
 #include "C_CharacterBase.h"
+#include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
 #include "ProjectC/Interface/C_CharacterHUDInterface.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
@@ -54,7 +55,7 @@ protected:
 	void SwapWeapon(const FInputActionValue& Value);
 
 	void Num_1(const FInputActionValue& Value);
-	void Num_2(const FInputActionValue& Value);
+	void Num_2(const FInputActionValue& Value); 
 	void Num_3(const FInputActionValue& Value);
 	void Num_4(const FInputActionValue& Value);
 
@@ -125,8 +126,5 @@ public:
 	
 	UPROPERTY()
 	FGenericTeamId GenericTeamId = 0;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ProjectileClass;
 };
 

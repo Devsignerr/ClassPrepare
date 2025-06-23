@@ -249,26 +249,6 @@ bool UC_BattleComponent::HasWeapon()
 
 void UC_BattleComponent::FireProjectile()
 {
-	if (CharacterStanceType == EC_CharacterStanceType::Staff)
-	{
-		const APlayerController* PlayerController = CastChecked<APlayerController>(OwnerCharacter->GetController());
-
-		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
-		check(SkeletalMeshComponent);
 	
-		FVector Location = SkeletalMeshComponent->GetSocketLocation(TEXT("hand_l"));
-		FRotator Rotation = PlayerController->GetControlRotation();
-
-		FTransform Transform;
-		Transform.SetLocation(Location);
-		Transform.SetRotation(Rotation.Quaternion());
-
-		AC_PlayableCharacter* PlayableCharacter = Cast<AC_PlayableCharacter>(OwnerCharacter);
-		check(PlayableCharacter);
-	
-		AC_SkillObject* SkillObject = GetWorld()->SpawnActorDeferred<AC_SkillObject>(PlayableCharacter->ProjectileClass, Transform, GetOwner(), nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-		SkillObject->OwnerCharacter = OwnerCharacter.Get();
-		SkillObject->FinishSpawning(Transform);
-	}
 }
 

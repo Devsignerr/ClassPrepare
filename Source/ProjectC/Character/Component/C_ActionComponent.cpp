@@ -9,6 +9,7 @@
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 #include "..\..\Interface\C_CharacterInterface.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
+#include "ProjectC/Utils/C_GameUtil.h"
 
 UC_ActionComponent::UC_ActionComponent()
 {
@@ -54,6 +55,9 @@ void UC_ActionComponent::Move(FVector2D MovementVector)
 
 	UC_SkillComponent* SkillComponent = Interface->GetSkillComponent();
 	check(SkillComponent);
+
+	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	check(BattleComponent);
 	
 	InputVector = MovementVector;
 	
@@ -66,7 +70,7 @@ void UC_ActionComponent::Move(FVector2D MovementVector)
 		ProcessLockOnMove();
 	}
 		
-	if (IsAttacking)
+	if (IsAttacking && BattleComponent->CharacterStanceType == EC_CharacterStanceType::Sword)
 	{
 		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
@@ -155,9 +159,14 @@ void UC_ActionComponent::Attack(bool IsPressed)
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
-	
-	TArray<UAnimMontage*>& AttackMontages = PlayerData->AttackMontages;
 
+	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	check(BattleComponent);
+
+	TArray<UAnimMontage*> Montages = FC_GameUtil::GetComboAttackMontages(PlayerData, BattleComponent->CharacterStanceType, IsInSpecialAction);
+	if (Montages.IsEmpty())
+		return;
+	
 	if (IsAttacking)
 	{
 		SaveAttack = true;
@@ -167,19 +176,21 @@ void UC_ActionComponent::Attack(bool IsPressed)
 		IsAttacking = true;
 		AttackCount++;
 		
-		if (AttackCount > AttackMontages.Num())
+		if (AttackCount > Montages.Num())
 		{
 			AttackCount = 0;
 		}
 		
-		if (AttackMontages.IsValidIndex(AttackCount - 1))
+		if (Montages.IsValidIndex(AttackCount - 1))
 		{
-			OwnerCharacter->PlayAnimMontage(AttackMontages[AttackCount - 1]);
+			OwnerCharacter->PlayAnimMontage(Montages[AttackCount - 1]);
 		}
 
 		RotateToControlRotation();
 
-		AddLock(EC_LockCauseType::Attack, EC_ActionType::Move);
+		if (EC_CharacterStanceType::Sword == BattleComponent->CharacterStanceType)
+			AddLock(EC_LockCauseType::Attack, EC_ActionType::Move);
+		
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Jump);
 	}
 }
@@ -205,20 +216,23 @@ void UC_ActionComponent::ComboAttackSave()
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
 
-	TArray<UAnimMontage*>& AttackMontages = PlayerData->AttackMontages;
+	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	check(BattleComponent);
+
+	TArray<UAnimMontage*> Montages = FC_GameUtil::GetComboAttackMontages(PlayerData, BattleComponent->CharacterStanceType, IsInSpecialAction);
 	
 	if (SaveAttack)
 	{
 		SaveAttack = false;
 		AttackCount++;
 		
-		if (AttackCount > AttackMontages.Num())
+		if (AttackCount > Montages.Num())
 		{
 			AttackCount = 0;
 		}
 
-		if (AttackMontages.IsValidIndex(AttackCount - 1))
-			OwnerCharacter->PlayAnimMontage(AttackMontages[AttackCount - 1]);
+		if (Montages.IsValidIndex(AttackCount - 1))
+			OwnerCharacter->PlayAnimMontage(Montages[AttackCount - 1]);
 
 		RotateToControlRotation();
 	}

@@ -39,6 +39,8 @@ public:
 	void ProcessDestroy();
 
 public:
+	uint32 SkillObjectId = 0;
+	
 	UPROPERTY(EditAnywhere)
 	EC_SkillObjectType SkillObjectType = EC_SkillObjectType::None;
 
@@ -60,8 +62,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 	
-	UPROPERTY()
-	ACharacter* OwnerCharacter = nullptr;
+	TObjectPtr<ACharacter> OwnerCharacter = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> DeSpawnSound;

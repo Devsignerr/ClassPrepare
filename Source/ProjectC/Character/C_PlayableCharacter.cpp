@@ -125,17 +125,9 @@ void AC_PlayableCharacter::Jump(const FInputActionValue& Value)
 void AC_PlayableCharacter::Attack(const FInputActionValue& Value)
 {
 	const bool IsPressed = Value[0] != 0.f;
-
-	if (BattleComponent->CharacterStanceType == EC_CharacterStanceType::Staff && ActionComponent->IsInSpecialAction)
-	{
-		check(BattleComponent)
-		BattleComponent->FireProjectile();
-	}
-	else
-	{
-		check(ActionComponent);
-		ActionComponent->Attack(IsPressed);
-	}
+	
+	check(ActionComponent);
+	ActionComponent->Attack(IsPressed);
 }
 
 void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)

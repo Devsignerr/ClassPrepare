@@ -16,6 +16,55 @@ struct FC_SkillSlotData
 	TMap<EC_SkillSlotType, uint32> SkillIds;
 };
 
+USTRUCT(BlueprintType)
+struct FC_ComboAttackKey
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	EC_CharacterStanceType CharacterStanceType = EC_CharacterStanceType::Sword;
+
+	UPROPERTY(EditAnywhere)
+	bool bSpecialAction = false;
+
+	FC_ComboAttackKey()
+	{
+		
+	}
+
+	FC_ComboAttackKey(const EC_CharacterStanceType StanceType, bool SpecialAction)
+	{
+		CharacterStanceType = StanceType;
+		bSpecialAction = SpecialAction;
+	}
+
+	bool operator==(const FC_ComboAttackKey& ComboAttackKey) const
+	{
+		return ComboAttackKey.CharacterStanceType == CharacterStanceType && ComboAttackKey.bSpecialAction == bSpecialAction;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FC_ComboAttackData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> AttackMontages;
+};
+
+USTRUCT(BlueprintType)
+struct FC_ComboEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FC_ComboAttackKey Key;
+
+	UPROPERTY(EditAnywhere)
+	FC_ComboAttackData Data;
+};
+
 UCLASS()
 class PROJECTC_API UC_PlayerDataAsset : public UDataAsset
 {
@@ -35,7 +84,7 @@ public:
 	FName WeaponSocketName;
 
 	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> AttackMontages;
+	TArray<FC_ComboEntry> ComboAttackMontages; 
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RollMontage;

@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "..\..\Interface\C_CharacterInterface.h"
+#include "Engine/StaticMeshActor.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 #include "ProjectC/SkillObject/C_SkillObject.h"
 
@@ -110,6 +111,29 @@ void UC_SkillComponent::FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor
 			{
 				if (CharacterInterface->IsDead())
 					continue;
+			}
+
+			bool bWallDetected = false;
+			
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(OwnerCharacter.Get());
+			
+			TArray<FHitResult> HitResults;
+			if (GetWorld()->LineTraceMultiByChannel(HitResults, OwnerCharacter->GetActorLocation(), Enemy->GetActorLocation(), ECC_WorldStatic, Params))
+			{
+				for (FHitResult& Result : HitResults)
+				{
+					if (Result.GetActor()->IsA(AStaticMeshActor::StaticClass()))
+					{
+						bWallDetected = true;
+						break;
+					}
+				}
+			}
+
+			if (bWallDetected)
+			{
+				continue;
 			}
 			
 			if (FVector::Dist(OwnerCharacterPos, Enemy->GetActorLocation()) <= SkillRange)
@@ -293,7 +317,9 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 		FVector ToTargetVector = TargetPos - ExecInfo.ExecStartPos;
 		FVector ToTargetDir = ToTargetVector.GetSafeNormal();
 
-		TargetPos += ToTargetDir * 200.f;
+		float OverRunDistance = ExecTableRow->ExecProperty_0;
+
+		TargetPos += ToTargetDir * OverRunDistance;
 
 		float ToTargetLength = (TargetPos - ExecInfo.ExecStartPos).Length();
 		float Duration = ExecTableRow->Duration;
@@ -370,6 +396,7 @@ void UC_SkillComponent::ProcessMultipleExec(float DeltaTime, FC_SkillInfo& Skill
 
 					AC_SkillObject* SkillObject = GetWorld()->SpawnActorDeferred<AC_SkillObject>(SkillObjectClass, Transform, GetOwner(), nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					SkillObject->OwnerCharacter = OwnerCharacter.Get();
+					SkillObject->SkillObjectId = ExecTableRow->ExecProperty_0;
 					SkillObject->FinishSpawning(Transform);
 				}
 			}

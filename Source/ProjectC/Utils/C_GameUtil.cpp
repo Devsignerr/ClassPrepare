@@ -5,6 +5,7 @@
 #include "ProjectC/Cosmetic/C_CameraShake.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "NiagaraFunctionLibrary.h"
+#include "ProjectC/Data/C_PlayerDataAsset.h"
 
 FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType CharacterType)
 {
@@ -148,4 +149,19 @@ void FC_GameUtil::SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSyste
 UNiagaraComponent* FC_GameUtil::SpawnEffectAttached(UNiagaraSystem* NiagaraSystem, USceneComponent* AttachToComponent, FName AttachPointName, FVector Location, FRotator Rotation, EAttachLocation::Type LocationType, bool bAutoDestroy)
 {
 	return UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystem, AttachToComponent, AttachPointName, Location, Rotation, LocationType, bAutoDestroy);
+}
+
+TArray<UAnimMontage*> FC_GameUtil::GetComboAttackMontages(UC_PlayerDataAsset* PlayerDataAsset, EC_CharacterStanceType StanceType, bool bInSpecialAttack)
+{
+	TArray<FC_ComboEntry>& ComboAttackMontageEntries = PlayerDataAsset->ComboAttackMontages;
+	
+	for (const FC_ComboEntry& ComboEntry : ComboAttackMontageEntries)
+	{
+		if (ComboEntry.Key == FC_ComboAttackKey(StanceType, bInSpecialAttack))
+		{
+			return ComboEntry.Data.AttackMontages;
+		}
+	}
+
+	return TArray<UAnimMontage*>();
 }

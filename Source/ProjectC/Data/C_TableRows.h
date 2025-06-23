@@ -188,6 +188,9 @@ struct FC_ExecTableRow : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* HitFX_Cascade = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	float HitEffectScale = 1.f;
 	
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.f;
@@ -233,6 +236,9 @@ struct FC_SkillObjectTableRow : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere)
 	uint32 DataId = 0;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 0;
 
 	UPROPERTY(EditAnywhere)
 	EC_SkillObjectType SkillObjectType = EC_SkillObjectType::None;
