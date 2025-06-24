@@ -126,6 +126,7 @@ enum class EC_ExecType : uint8
 	DashToTarget,
 	Projectile,
 	Pushback,
+	Dot,
 	Num
 };
 

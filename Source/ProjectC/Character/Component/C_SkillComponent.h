@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "C_SkillComponent.generated.h"
 
+class UNiagaraComponent;
 struct FC_ExecData;
 
 struct FC_ExecInfo
@@ -18,6 +19,7 @@ struct FC_ExecInfo
 	bool bExecFinished = false;
 
 	float ElapsedTime = 0.f;
+	float IntervalElapsedTime = 0.f;
 
 	float AnimStartTime = 0.f;
 	float ExecStartTime = 0.f;
@@ -27,6 +29,8 @@ struct FC_ExecInfo
 
 	FVector ExecStartPos = FVector::ZeroVector;
 	FRotator ExecStartRot = FRotator::ZeroRotator;
+
+	TObjectPtr<UNiagaraComponent> AttachedFX = nullptr;
 };
 
 struct FC_SkillInfo

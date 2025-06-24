@@ -2,6 +2,7 @@
 #include "C_SkillComponent.h"
 
 #include "C_CrowdControlComponent.h"
+#include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
@@ -38,10 +39,10 @@ void UC_SkillComponent::Tick_PlaySkill(float DeltaTime)
 	{
 		FC_SkillTableRow* SkillTableRow = FC_GameUtil::GetSkillData(SkillInfo.SkillDataId);
 		check(SkillTableRow);
-		
-		ProcessSkill(DeltaTime, SkillInfo);
-		SkillInfo.ElapsedTime += DeltaTime;
 
+		SkillInfo.ElapsedTime += DeltaTime;
+		ProcessSkill(DeltaTime, SkillInfo);
+		
 		if (SkillInfo.ElapsedTime > SkillInfo.LifeTime)
 		{
 			SkillToCoolDown.Add(SkillInfo);
@@ -230,7 +231,7 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
-	
+
 	if (ExecTableRow->ExecType == EC_ExecType::Dash)
 	{
 		float DashRange = ExecTableRow->ExecProperty_0;
@@ -262,6 +263,44 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 				float BoxHeight = ExecTableRow->ExecCollisionProperty_0;
 				float BoxWidth = ExecTableRow->ExecCollisionProperty_1;
 				float BoxLength = DashRange / 2.f;
+				
+				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
+				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+			}
+		}
+	}
+	else if (ExecTableRow->ExecType == EC_ExecType::Dot)
+	{
+		FVector CurrentPos = FVector::ZeroVector;
+		if (ExecTableRow->SkillPosBoneName != NAME_None)
+		{
+			USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+			check(SkeletalMeshComponent);
+	
+			CurrentPos = SkeletalMeshComponent->GetSocketLocation(ExecTableRow->SkillPosBoneName);
+		}
+		else
+		{
+			CurrentPos = OwnerCharacter->GetActorLocation();
+		}
+		FRotator DotDir = OwnerCharacter->GetControlRotation();
+		ExecInfo.IntervalElapsedTime += DeltaTime;
+
+		float Interval = ExecTableRow->ExecProperty_0;
+
+		if (ExecInfo.IntervalElapsedTime >= Interval && !ExecInfo.bExecCollisionSpawned)
+		{
+			ExecInfo.IntervalElapsedTime = 0.f;
+
+			FVector ExecCollisionPos = CurrentPos + DotDir.Vector() * ExecTableRow->ExecCollisionProperty_2;
+			FRotator ExecCollisionRot = DotDir;
+			
+			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
+			if (CollisionType == EC_ExecCollisionType::Box)
+			{
+				float BoxHeight = ExecTableRow->ExecCollisionProperty_0;
+				float BoxWidth = ExecTableRow->ExecCollisionProperty_1;
+				float BoxLength = ExecTableRow->ExecCollisionProperty_2;
 				
 				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
 				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
@@ -386,8 +425,17 @@ void UC_SkillComponent::ProcessMultipleExec(float DeltaTime, FC_SkillInfo& Skill
 			
 					USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
 					check(SkeletalMeshComponent);
+
+					FVector Location = FVector::ZeroVector;
+					if (ExecTableRow->SkillPosBoneName != NAME_None)
+					{
+						Location = SkeletalMeshComponent->GetSocketLocation(ExecTableRow->SkillPosBoneName);
+					}
+					else
+					{
+						Location = OwnerCharacter->GetActorLocation();
+					}
 	
-					FVector Location = SkeletalMeshComponent->GetSocketLocation(TEXT("hand_l"));
 					FRotator Rotation = (TargetLocation - Location).Rotation();
 
 					FTransform Transform;
@@ -429,7 +477,9 @@ void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShap
 				FVector FXLocation = HitCharacter->GetActorLocation();
 				FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->HitFX_Niagara, FXLocation, FRotator::ZeroRotator);
 				FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->HitFX_Cascade, FXLocation, FRotator::ZeroRotator);
-				FC_GameUtil::CameraShake();
+
+				if (ExecTableRow->bPlayCameraShake)
+					FC_GameUtil::CameraShake();
 
 				if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Result.GetActor()))
 				{
@@ -454,9 +504,19 @@ void UC_SkillComponent::OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecIn
 	
 	ExecInfo.ExecStartPos = OwnerCharacter->GetActorLocation();
 	ExecInfo.ExecStartRot = OwnerCharacter->GetActorRotation();
-	
-	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_Start, ExecInfo.ExecStartPos, FRotator::ZeroRotator);
-	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_Start, ExecInfo.ExecStartPos, FRotator::ZeroRotator);
+
+	USkeletalMeshComponent* SkeletalMesh = OwnerCharacter->GetMesh();
+	check(SkeletalMesh);
+
+	if (ExecTableRow->bAttachFx)
+	{
+		ExecInfo.AttachedFX = FC_GameUtil::SpawnEffectAttached(ExecTableRow->ExecFX_Niagara_Start, SkeletalMesh, ExecTableRow->SkillPosBoneName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+	}
+	else
+	{
+		FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_Start, ExecInfo.ExecStartPos, ExecInfo.ExecStartRot);
+		FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_Start, ExecInfo.ExecStartPos, ExecInfo.ExecStartRot);
+	}
 }
 
 void UC_SkillComponent::OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo)
@@ -464,6 +524,14 @@ void UC_SkillComponent::OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
 	
-	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_End, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
-	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_End, OwnerCharacter->GetActorLocation(), FRotator::ZeroRotator);
+	const FVector Location = OwnerCharacter->GetActorLocation();
+	const FRotator Rotation = OwnerCharacter->GetActorRotation();
+	
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_End, Location, Rotation);
+	FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_End, Location, Rotation);
+
+	if (ExecInfo.AttachedFX)
+	{
+		ExecInfo.AttachedFX->Deactivate();
+	}
 }

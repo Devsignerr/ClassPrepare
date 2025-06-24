@@ -153,15 +153,30 @@ UNiagaraComponent* FC_GameUtil::SpawnEffectAttached(UNiagaraSystem* NiagaraSyste
 
 TArray<UAnimMontage*> FC_GameUtil::GetComboAttackMontages(UC_PlayerDataAsset* PlayerDataAsset, EC_CharacterStanceType StanceType, bool bInSpecialAttack)
 {
-	TArray<FC_ComboEntry>& ComboAttackMontageEntries = PlayerDataAsset->ComboAttackMontages;
+	TArray<FC_ComboAttackEntry>& ComboAttackMontageEntries = PlayerDataAsset->ComboAttackMontages;
 	
-	for (const FC_ComboEntry& ComboEntry : ComboAttackMontageEntries)
+	for (const FC_ComboAttackEntry& ComboEntry : ComboAttackMontageEntries)
 	{
-		if (ComboEntry.Key == FC_ComboAttackKey(StanceType, bInSpecialAttack))
+		if (ComboEntry.Key == FC_ComboKey(StanceType, bInSpecialAttack))
 		{
 			return ComboEntry.Data.AttackMontages;
 		}
 	}
 
 	return TArray<UAnimMontage*>();
+}
+
+uint32 FC_GameUtil::GetSkillId(UC_PlayerDataAsset* PlayerDataAsset, EC_SkillSlotType SkillSlotType, EC_CharacterStanceType StanceType, bool bInSpecialAttack)
+{
+	TArray<FC_SkillEntry>& SkillIdEntries = PlayerDataAsset->SkillSlotDatas;
+	
+	for (const FC_SkillEntry& SkillEntry : SkillIdEntries)
+	{
+		if (SkillEntry.Key == FC_ComboKey(StanceType, bInSpecialAttack))
+		{
+			return *SkillEntry.Data.SkillIds.Find(SkillSlotType);
+		}
+	}
+
+	return 0;
 }

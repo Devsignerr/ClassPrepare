@@ -17,7 +17,7 @@ struct FC_SkillSlotData
 };
 
 USTRUCT(BlueprintType)
-struct FC_ComboAttackKey
+struct FC_ComboKey
 {
 	GENERATED_BODY()
 	
@@ -27,18 +27,15 @@ struct FC_ComboAttackKey
 	UPROPERTY(EditAnywhere)
 	bool bSpecialAction = false;
 
-	FC_ComboAttackKey()
-	{
-		
-	}
+	FC_ComboKey(){}
 
-	FC_ComboAttackKey(const EC_CharacterStanceType StanceType, bool SpecialAction)
+	FC_ComboKey(const EC_CharacterStanceType StanceType, bool SpecialAction)
 	{
 		CharacterStanceType = StanceType;
 		bSpecialAction = SpecialAction;
 	}
 
-	bool operator==(const FC_ComboAttackKey& ComboAttackKey) const
+	bool operator==(const FC_ComboKey& ComboAttackKey) const
 	{
 		return ComboAttackKey.CharacterStanceType == CharacterStanceType && ComboAttackKey.bSpecialAction == bSpecialAction;
 	}
@@ -54,15 +51,27 @@ struct FC_ComboAttackData
 };
 
 USTRUCT(BlueprintType)
-struct FC_ComboEntry
+struct FC_ComboAttackEntry
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	FC_ComboAttackKey Key;
+	FC_ComboKey Key;
 
 	UPROPERTY(EditAnywhere)
 	FC_ComboAttackData Data;
+};
+
+USTRUCT(BlueprintType)
+struct FC_SkillEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FC_ComboKey Key;
+
+	UPROPERTY(EditAnywhere)
+	FC_SkillSlotData Data;
 };
 
 UCLASS()
@@ -84,14 +93,14 @@ public:
 	FName WeaponSocketName;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FC_ComboEntry> ComboAttackMontages; 
+	TArray<FC_ComboAttackEntry> ComboAttackMontages; 
 
+	UPROPERTY(EditAnywhere)
+	TArray<FC_SkillEntry> SkillSlotDatas;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> RollMontage;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> JumpSound;
-
-	UPROPERTY(EditAnywhere)
-	TMap<EC_CharacterStanceType, FC_SkillSlotData> SkillSlotDatas;
 };

@@ -14,6 +14,7 @@
 #include "ProjectC/Data/C_InputDataAsset.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 #include "ProjectC/UI/C_HUDWidget.h"
+#include "ProjectC/Utils/C_GameUtil.h"
 
 AC_PlayableCharacter::AC_PlayableCharacter()
 {
@@ -222,9 +223,10 @@ void AC_PlayableCharacter::Num_1(const FInputActionValue& Value)
 		return;
 	
 	check(SkillComponent);
-
-	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
-	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_1);
+	check(BattleComponent);
+	check(ActionComponent);
+	
+	const uint32 SkillId = FC_GameUtil::GetSkillId(PlayerData, EC_SkillSlotType::Num_1, BattleComponent->CharacterStanceType, ActionComponent->IsInSpecialAction);
 	
 	SkillComponent->RequestPlaySkill(SkillId);
 }
@@ -236,9 +238,10 @@ void AC_PlayableCharacter::Num_2(const FInputActionValue& Value)
 		return;
 	
 	check(SkillComponent);
-
-	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
-	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_2);
+	check(BattleComponent);
+	check(ActionComponent);
+	
+	const uint32 SkillId = FC_GameUtil::GetSkillId(PlayerData, EC_SkillSlotType::Num_2, BattleComponent->CharacterStanceType, ActionComponent->IsInSpecialAction);
 	
 	SkillComponent->RequestPlaySkill(SkillId);
 }
@@ -250,9 +253,10 @@ void AC_PlayableCharacter::Num_3(const FInputActionValue& Value)
 		return;
 	
 	check(SkillComponent);
-
-	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
-	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_3);
+	check(BattleComponent);
+	check(ActionComponent);
+	
+	const uint32 SkillId = FC_GameUtil::GetSkillId(PlayerData, EC_SkillSlotType::Num_3, BattleComponent->CharacterStanceType, ActionComponent->IsInSpecialAction);
 	
 	SkillComponent->RequestPlaySkill(SkillId);
 }
@@ -264,9 +268,10 @@ void AC_PlayableCharacter::Num_4(const FInputActionValue& Value)
 		return;
 	
 	check(SkillComponent);
-
-	FC_SkillSlotData& SkillSlotData = *PlayerData->SkillSlotDatas.Find(BattleComponent->CharacterStanceType);
-	uint32 SkillId = *SkillSlotData.SkillIds.Find(EC_SkillSlotType::Num_4);
+	check(BattleComponent);
+	check(ActionComponent);
+	
+	const uint32 SkillId = FC_GameUtil::GetSkillId(PlayerData, EC_SkillSlotType::Num_4, BattleComponent->CharacterStanceType, ActionComponent->IsInSpecialAction);
 	
 	SkillComponent->RequestPlaySkill(SkillId);
 }

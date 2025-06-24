@@ -227,6 +227,18 @@ struct FC_ExecTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	float CrowdControlId = INDEX_NONE;
+
+	UPROPERTY(EditAnywhere)
+	bool bAttachFx = false;
+
+	UPROPERTY(EditAnywhere)
+	FName SkillPosBoneName = NAME_None;
+
+	UPROPERTY(EditAnywhere)
+	bool bPlayCameraShake = true;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInstance> HitMaterial = nullptr;
 };
 
 USTRUCT(BlueprintType)
