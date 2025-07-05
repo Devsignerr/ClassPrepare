@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "C_CharacterInterface.generated.h"
 
+class UC_BattleComponent;
 class UC_CharacterDataAsset;
 class UC_CrowdControlComponent;
 
@@ -28,6 +29,8 @@ public:
 	
 	virtual UStaticMeshComponent* GetStaticMeshComponent() = 0;
 	virtual UC_CrowdControlComponent* GetCrowdControlComponent() = 0;
+	virtual UC_SkillComponent* GetSkillComponent() const = 0;
+	virtual UC_BattleComponent* GetBattleComponent() const = 0;
 	virtual TPair<FName, FName> GetWeaponTraceNames() = 0;
 
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() = 0;

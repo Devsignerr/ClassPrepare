@@ -31,6 +31,7 @@ struct FC_ExecInfo
 	FRotator ExecStartRot = FRotator::ZeroRotator;
 
 	TObjectPtr<UNiagaraComponent> AttachedFX = nullptr;
+	TArray<TObjectPtr<UMaterialInterface>> OriginalMaterials;
 };
 
 struct FC_SkillInfo
@@ -78,7 +79,7 @@ public:
 	void ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot);
 	void ProcessMultipleExec(float DeltaTime, FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo, FVector StartPos, FRotator StartRot);
 
-	void SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot);
+	void CheckCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot);
 
 	void OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo);
 	void OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo);

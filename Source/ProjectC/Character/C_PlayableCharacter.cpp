@@ -33,7 +33,6 @@ AC_PlayableCharacter::AC_PlayableCharacter()
 	LockOnComponent = CreateDefaultSubobject<UC_LockOnComponent>(TEXT("LockOnComponent"));
 	ActionComponent = CreateDefaultSubobject<UC_ActionComponent>(TEXT("ActionComponent"));
 	AimComponent = CreateDefaultSubobject<UC_AimComponent>(TEXT("AimComponent"));
-	SkillComponent = CreateDefaultSubobject<UC_SkillComponent>(TEXT("SkillComponent"));
 	
 	// 카메라가 어태치된 부모의 회전값을 따라감. true 로 하면 입력값에 따라 회전해버림 .
 	// true 인 경우는 1인칭 게임일때

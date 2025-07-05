@@ -1,6 +1,7 @@
 
 #include "C_SkillComponent.h"
 
+#include "C_ActionComponent.h"
 #include "C_CrowdControlComponent.h"
 #include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +11,7 @@
 #include "ProjectC/Data/C_TableRows.h"
 #include "..\..\Interface\C_CharacterInterface.h"
 #include "Engine/StaticMeshActor.h"
+#include "ProjectC/Interface/C_PlayerCharacterInterface.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 #include "ProjectC/SkillObject/C_SkillObject.h"
 
@@ -157,6 +159,14 @@ bool UC_SkillComponent::CanPlaySkill(uint32 SkillId)
 void UC_SkillComponent::PlaySkill(FC_SkillInfo& SkillInfo)
 {
 	CurrentPlayingSkillInfos.Add(SkillInfo);
+
+	if (IC_PlayerCharacterInterface* CharacterInterface = Cast<IC_PlayerCharacterInterface>(OwnerCharacter))
+	{
+		UC_ActionComponent* ActionComponent = CharacterInterface->GetActionComponent();
+		check(ActionComponent);
+
+		ActionComponent->ResetCombo();
+	}
 }
 
 void UC_SkillComponent::CalcSkillTime(uint32 SKillId, float& SkillLifeTime, TArray<FC_ExecInfo>& ExecInfos)
@@ -238,19 +248,21 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 		float Duration = ExecTableRow->Duration;
 
 		float CurveAlpha = ExecInfo.ElapsedTime / Duration;
-		float PosAlpha = ExecTableRow->ExecCurve->GetFloatValue(CurveAlpha);
+		float PosAlpha = 0;
+		
+		if (ExecTableRow->ExecCurve)
+			PosAlpha = ExecTableRow->ExecCurve->GetFloatValue(CurveAlpha);
+		else
+			PosAlpha = CurveAlpha;
 
 		FVector CurrentPos = OwnerCharacter->GetActorLocation();
 		FVector NewPos = ExecInfo.ExecStartPos + ExecInfo.ExecStartRot.Vector() * DashRange * PosAlpha;
+		NewPos.Z = CurrentPos.Z;
+		
+		NewPos = FC_GameUtil::FindSurfacePos(OwnerCharacter.Get(), NewPos);
+		OwnerCharacter->SetActorLocation(NewPos);
 
-		FHitResult Result;
-		OwnerCharacter->SetActorLocation(NewPos, true, &Result);
-		if (Result.bBlockingHit)
-		{
-			OwnerCharacter->SetActorLocation(CurrentPos);
-		}
-
-		if (CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
+		if (ExecTableRow->bSpawnCollision && CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
 		{
 			ExecInfo.bExecCollisionSpawned = true;
 
@@ -265,7 +277,7 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 				float BoxLength = DashRange / 2.f;
 				
 				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
-				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+				CheckCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
 	}
@@ -288,7 +300,7 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 
 		float Interval = ExecTableRow->ExecProperty_0;
 
-		if (ExecInfo.IntervalElapsedTime >= Interval && !ExecInfo.bExecCollisionSpawned)
+		if (ExecTableRow->bSpawnCollision && ExecInfo.IntervalElapsedTime >= Interval && !ExecInfo.bExecCollisionSpawned)
 		{
 			ExecInfo.IntervalElapsedTime = 0.f;
 
@@ -303,13 +315,13 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 				float BoxLength = ExecTableRow->ExecCollisionProperty_2;
 				
 				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
-				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+				CheckCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
 	}
 	else if (ExecTableRow->ExecType == EC_ExecType::Pushback)
 	{
-		if (!ExecInfo.bExecCollisionSpawned)
+		if (ExecTableRow->bSpawnCollision && !ExecInfo.bExecCollisionSpawned)
 		{
 			ExecInfo.bExecCollisionSpawned = true;
 			
@@ -330,7 +342,7 @@ void UC_SkillComponent::ProcessNoneTargetExec(float DeltaTime, FC_ExecInfo& Exec
 			EC_ExecCollisionType CollisionType = ExecTableRow->ExecCollisionType;
 			if (CollisionType == EC_ExecCollisionType::Sphere)
 			{
-				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+				CheckCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
 	}
@@ -367,17 +379,13 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 		float PosAlpha = ExecTableRow->ExecCurve->GetFloatValue(CurveAlpha);
 
 		FVector NewPos = ExecInfo.ExecStartPos + ToTargetDir * ToTargetLength * PosAlpha;
+		NewPos.Z = CurrentPos.Z;
 		
-		FHitResult Result;
-		OwnerCharacter->SetActorLocation(NewPos, true, &Result);
+		NewPos = FC_GameUtil::FindSurfacePos(OwnerCharacter.Get(), NewPos);
+		OwnerCharacter->SetActorLocation(NewPos);
 		OwnerCharacter->SetActorRotation(ToTargetDir.Rotation());
 		
-		if (Result.bBlockingHit)
-		{
-			OwnerCharacter->SetActorLocation(CurrentPos);
-		}
-		
-		if (CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
+		if (ExecTableRow->bSpawnCollision && CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
 		{
 			ExecInfo.bExecCollisionSpawned = true;
 
@@ -392,7 +400,7 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 				float BoxLength = (TargetPos - ExecInfo.ExecStartPos).Length() / 2.f;
 				
 				FCollisionShape CollisionShape = FCollisionShape::MakeBox(FVector(BoxLength, BoxWidth, BoxHeight));
-				SpawnExecCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
+				CheckCollision(ExecInfo, CollisionShape, ExecCollisionPos, ExecCollisionRot);
 			}
 		}
 	}
@@ -452,7 +460,7 @@ void UC_SkillComponent::ProcessMultipleExec(float DeltaTime, FC_SkillInfo& Skill
 	}
 }
 
-void UC_SkillComponent::SpawnExecCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot)
+void UC_SkillComponent::CheckCollision(FC_ExecInfo& ExecInfo, FCollisionShape CollisionShape, FVector Pos, FRotator Rot)
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
@@ -501,13 +509,13 @@ void UC_SkillComponent::OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecIn
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
-	
-	ExecInfo.ExecStartPos = OwnerCharacter->GetActorLocation();
-	ExecInfo.ExecStartRot = OwnerCharacter->GetActorRotation();
 
 	USkeletalMeshComponent* SkeletalMesh = OwnerCharacter->GetMesh();
 	check(SkeletalMesh);
-
+	
+	ExecInfo.ExecStartPos = OwnerCharacter->GetActorLocation();
+	ExecInfo.ExecStartRot = OwnerCharacter->GetActorRotation();
+	
 	if (ExecTableRow->bAttachFx)
 	{
 		ExecInfo.AttachedFX = FC_GameUtil::SpawnEffectAttached(ExecTableRow->ExecFX_Niagara_Start, SkeletalMesh, ExecTableRow->SkillPosBoneName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
@@ -517,12 +525,29 @@ void UC_SkillComponent::OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecIn
 		FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Niagara_Start, ExecInfo.ExecStartPos, ExecInfo.ExecStartRot);
 		FC_GameUtil::SpawnEffectAtLocation(GetWorld(), ExecTableRow->ExecFX_Cascade_Start, ExecInfo.ExecStartPos, ExecInfo.ExecStartRot);
 	}
+
+	if (ExecTableRow->MaterialInterface)
+	{
+		TArray<UMaterialInterface*> MaterialInterfaces = SkeletalMesh->GetMaterials();
+			
+		for (int32 i = 0; i < MaterialInterfaces.Num(); ++i)
+		{
+			UMaterialInterface* MaterialInstance = MaterialInterfaces[i];
+			
+			ExecInfo.OriginalMaterials.Add(MaterialInstance);
+
+			SkeletalMesh->SetMaterial(i, ExecTableRow->MaterialInterface);
+		}
+	}
 }
 
 void UC_SkillComponent::OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo)
 {
 	FC_ExecTableRow* ExecTableRow = FC_GameUtil::GetExecData(ExecInfo.ExecData->ExecDataId);
 	check(ExecTableRow);
+
+	USkeletalMeshComponent* SkeletalMesh = OwnerCharacter->GetMesh();
+	check(SkeletalMesh);
 	
 	const FVector Location = OwnerCharacter->GetActorLocation();
 	const FRotator Rotation = OwnerCharacter->GetActorRotation();
@@ -533,5 +558,15 @@ void UC_SkillComponent::OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo
 	if (ExecInfo.AttachedFX)
 	{
 		ExecInfo.AttachedFX->Deactivate();
+	}
+
+	if (ExecTableRow->MaterialInterface)
+	{
+		TArray<UMaterialInterface*> MaterialInterfaces = SkeletalMesh->GetMaterials();
+		
+		for (int32 i = 0; i < MaterialInterfaces.Num(); ++i)
+		{
+			SkeletalMesh->SetMaterial(i, ExecInfo.OriginalMaterials[i]);
+		}
 	}
 }

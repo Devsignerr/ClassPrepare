@@ -79,7 +79,6 @@ public:
 	virtual UCameraComponent* GetCameraComponent() const override { return FollowCamera; }
 	virtual UC_ActionComponent* GetActionComponent() const override { return ActionComponent; }
 	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
-	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
 	virtual UC_SkillComponent* GetSkillComponent() const override { return SkillComponent; }
 	virtual UC_PlayerDataAsset* GetPlayerData() const override { return PlayerData; }
 
@@ -107,9 +106,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_AimComponent> AimComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UC_SkillComponent> SkillComponent;
 
 	//============= Input ===========================================================================
 	

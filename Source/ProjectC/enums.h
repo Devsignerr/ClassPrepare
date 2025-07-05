@@ -11,6 +11,7 @@ enum class EC_DataTableType : int32
 	Exec,
 	SkillObject,
 	CrowdControl,
+	StatusEffect,
 	Num
 };
 
@@ -147,5 +148,13 @@ enum class EC_CrowdControlType : uint8
 	Pushback,
 	Stun,
 	Ragdoll,
+	Freeze,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_StatusEffectType : uint8
+{
+	None,
 	Num
 };

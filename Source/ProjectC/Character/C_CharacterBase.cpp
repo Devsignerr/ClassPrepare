@@ -42,6 +42,7 @@ AC_CharacterBase::AC_CharacterBase()
 	BattleComponent = CreateDefaultSubobject<UC_BattleComponent>(TEXT("BattleComponent"));
 	CrowdControlComponent = CreateDefaultSubobject<UC_CrowdControlComponent>(TEXT("CrowdControlComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
+	SkillComponent = CreateDefaultSubobject<UC_SkillComponent>(TEXT("SkillComponent"));
 	WeaponStaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponStaticComponent"));
 	WeaponStaticComponent->SetupAttachment(GetMesh());
 	

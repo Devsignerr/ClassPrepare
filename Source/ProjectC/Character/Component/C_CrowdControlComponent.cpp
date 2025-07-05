@@ -4,6 +4,7 @@
 #include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/Data/C_CharacterDataAsset.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Interface/C_CharacterInterface.h"
@@ -63,8 +64,14 @@ void UC_CrowdControlComponent::RequestPlayCC(uint32 CrowdControlId, AActor* Caus
 	if (!CanPlayCC(Info))
 		return;
 
-	StopCC();
-	PlayCC(Info);	
+	//이미 실행중인 CC가 있을경우 ID가 다를때에만 Stop처리
+	if (CrowdControlInfo.bValid)
+	{
+		if (CrowdControlInfo.CrowdControlDataId != CrowdControlId)
+			StopCC();
+	}
+
+	PlayCC(Info);
 }
 
 bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& Info)
@@ -78,22 +85,27 @@ bool UC_CrowdControlComponent::CanPlayCC(FC_CrowdControlInfo& Info)
 	return true;
 }
 
-void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo Info)
+void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo& Info)
 {
+	const bool ShouldPlayFx = Info.CrowdControlDataId != CrowdControlInfo.CrowdControlDataId || !CrowdControlInfo.bValid;
+
+	if (ShouldPlayFx)
+		PlayFX(Info);
+	else
+		Info.SpawnedFX = CrowdControlInfo.SpawnedFX;
+
 	CrowdControlInfo = Info;
-	CrowdControlInfo.bValid = true;
-	
 	OnStartCC();
 	
+	CrowdControlInfo.bValid = true;
 	OnStartCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
 void UC_CrowdControlComponent::StopCC()
 {
-	CrowdControlInfo.bValid = false;
-	
 	OnStopCC();
 	
+	CrowdControlInfo.bValid = false;
 	OnEndCCDelegate.Broadcast(CrowdControlInfo.CrowdControlType, CrowdControlInfo.Causer.Get());
 }
 
@@ -127,11 +139,13 @@ void UC_CrowdControlComponent::OnStartCC()
 	{
 	
 	}
-	
-	if (UNiagaraSystem* NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
+	else if (CrowdControlInfo.CrowdControlType == EC_CrowdControlType::Freeze)
 	{
-		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		CrowdControlInfo.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+		check(SkeletalMeshComponent);
+
+		OwnerCharacter->GetCharacterMovement()->DisableMovement();
+		SkeletalMeshComponent->SetComponentTickEnabled(false);
 	}
 	
 	if (UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset())
@@ -152,8 +166,53 @@ void UC_CrowdControlComponent::OnStartCC()
 
 void UC_CrowdControlComponent::OnStopCC()
 {
+	FC_CrowdControlTableRow* CrowdControlTableRow = FC_GameUtil::GetCrowdControlData(CrowdControlInfo.CrowdControlDataId);
+	check(CrowdControlTableRow);
+	
 	if (CrowdControlInfo.SpawnedFX && CrowdControlInfo.SpawnedFX->IsActive())
 		CrowdControlInfo.SpawnedFX->Deactivate();
+
+	if (CrowdControlTableRow->MaterialInterface)
+	{
+		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+		check(SkeletalMeshComponent);
+
+		SkeletalMeshComponent->SetOverlayMaterial(nullptr);
+	}
+	
+	if (CrowdControlInfo.CrowdControlType == EC_CrowdControlType::Freeze)
+	{
+		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+		check(SkeletalMeshComponent);
+		
+		OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		SkeletalMeshComponent->SetComponentTickEnabled(true);
+	}
+}
+
+void UC_CrowdControlComponent::PlayFX(FC_CrowdControlInfo& Info)
+{
+	FC_CrowdControlTableRow* CrowdControlTableRow = FC_GameUtil::GetCrowdControlData(Info.CrowdControlDataId);
+	check(CrowdControlTableRow);
+	
+	if (UNiagaraSystem* NiagaraSystem = CrowdControlTableRow->CrowdControlFX)
+	{
+		FVector RelativePos = FVector(0.f, 0.f, OwnerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		Info.SpawnedFX = FC_GameUtil::SpawnEffectAttached(NiagaraSystem, OwnerCharacter->GetCapsuleComponent(), NAME_None, RelativePos, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+	}
+	
+	if (CrowdControlTableRow->MaterialInterface)
+	{
+		USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
+		check(SkeletalMeshComponent);
+
+		SkeletalMeshComponent->SetOverlayMaterial(CrowdControlTableRow->MaterialInterface);
+	}
+}
+
+void UC_CrowdControlComponent::StopFX()
+{
+	
 }
 
 bool UC_CrowdControlComponent::IsCrowdControlled()

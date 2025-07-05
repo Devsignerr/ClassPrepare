@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FC_OnEndCCDelegate, EC_CrowdControl
 
 struct FC_CrowdControlInfo
 {
-	uint32 CrowdControlDataId = 0;
+	uint32 CrowdControlDataId = -1;
 	EC_CrowdControlType CrowdControlType = EC_CrowdControlType::None;
 	float LifeTime = 0.f;
 	float ElapsedTime = 0.f;
@@ -52,11 +52,14 @@ public:
 	
 	void RequestPlayCC(uint32 CrowdControlId, AActor* Causer);
 	bool CanPlayCC(FC_CrowdControlInfo& Info);
-	void PlayCC(FC_CrowdControlInfo Info);
+	void PlayCC(FC_CrowdControlInfo& Info);
 	void StopCC();
 
 	void OnStartCC();
 	void OnStopCC();
+
+	void PlayFX(FC_CrowdControlInfo& Info);
+	void StopFX();
 
 	bool IsCrowdControlled();
 

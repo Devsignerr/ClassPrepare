@@ -238,7 +238,10 @@ struct FC_ExecTableRow : public FTableRowBase
 	bool bPlayCameraShake = true;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInstance> HitMaterial = nullptr;
+	bool bSpawnCollision = true;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> MaterialInterface = nullptr;
 };
 
 USTRUCT(BlueprintType)

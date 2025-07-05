@@ -49,14 +49,15 @@ void UC_ActionComponent::Move(FVector2D MovementVector)
 	if (!CanAction(EC_ActionType::Move))
 		return;
 
-	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
-	const UC_LockOnComponent* LockOnComponent = Interface->GetLockOnComponent();
+	const IC_PlayerCharacterInterface* PlayerInterface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	const IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
+	const UC_LockOnComponent* LockOnComponent = PlayerInterface->GetLockOnComponent();
 	check(LockOnComponent);
 
-	UC_SkillComponent* SkillComponent = Interface->GetSkillComponent();
+	UC_SkillComponent* SkillComponent = CharacterInterface->GetSkillComponent();
 	check(SkillComponent);
 
-	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	UC_BattleComponent* BattleComponent = CharacterInterface->GetBattleComponent();
 	check(BattleComponent);
 	
 	InputVector = MovementVector;
@@ -156,11 +157,12 @@ void UC_ActionComponent::Attack(bool IsPressed)
 	if (!CanAction(EC_ActionType::Attack))
 		return;
 
-	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
-	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
+	const IC_PlayerCharacterInterface* PlayerInterface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	const IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
+	UC_PlayerDataAsset* PlayerData = PlayerInterface->GetPlayerData();
 	check(PlayerData);
 
-	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	UC_BattleComponent* BattleComponent = CharacterInterface->GetBattleComponent();
 	check(BattleComponent);
 
 	TArray<UAnimMontage*> Montages = FC_GameUtil::GetComboAttackMontages(PlayerData, BattleComponent->CharacterStanceType, IsInSpecialAction);
@@ -213,10 +215,11 @@ void UC_ActionComponent::OnLanded()
 void UC_ActionComponent::ComboAttackSave()
 {
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
+	const IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
 
-	UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+	UC_BattleComponent* BattleComponent = CharacterInterface->GetBattleComponent();
 	check(BattleComponent);
 
 	TArray<UAnimMontage*> Montages = FC_GameUtil::GetComboAttackMontages(PlayerData, BattleComponent->CharacterStanceType, IsInSpecialAction);
@@ -314,7 +317,9 @@ void UC_ActionComponent::Roll(bool bPressed)
 		
 		const APlayerController* PlayerController = CastChecked<APlayerController>(OwnerCharacter->GetController());
 		const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
-		UC_BattleComponent* BattleComponent = Interface->GetBattleComponent();
+		const IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
+		
+		UC_BattleComponent* BattleComponent = CharacterInterface->GetBattleComponent();
 		check(BattleComponent);
 
 		UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();

@@ -36,7 +36,9 @@ public:
 
 	static TArray<UAnimMontage*> GetComboAttackMontages(UC_PlayerDataAsset* PlayerDataAsset, EC_CharacterStanceType StanceType, bool bInSpecialAttack);
 	static uint32 GetSkillId(UC_PlayerDataAsset* PlayerDataAsset, EC_SkillSlotType SkillSlotType, EC_CharacterStanceType StanceType, bool bInSpecialAttack);
-		
+
+	static FVector FindSurfacePos(ACharacter* Character, FVector& CurrentPos);
+	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);
 };

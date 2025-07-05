@@ -32,8 +32,6 @@ public:
 	virtual UCameraComponent* GetCameraComponent() const = 0;
 	virtual UC_ActionComponent* GetActionComponent() const = 0;
 	virtual UC_LockOnComponent* GetLockOnComponent() const = 0;
-	virtual UC_BattleComponent* GetBattleComponent() const = 0;
-	virtual UC_SkillComponent* GetSkillComponent() const = 0;
 	virtual UC_PlayerDataAsset* GetPlayerData() const = 0;
 
 	virtual FOnLandDelegate* GetOnLandedDelegate() = 0;

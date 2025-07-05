@@ -46,6 +46,8 @@ public:
 
 	virtual UStaticMeshComponent* GetStaticMeshComponent() override { return WeaponStaticComponent; }
 	virtual UC_CrowdControlComponent* GetCrowdControlComponent() override { return CrowdControlComponent; }
+	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
+	virtual UC_SkillComponent* GetSkillComponent() const override { return SkillComponent; }
 	virtual TPair<FName, FName> GetWeaponTraceNames() override;
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() override { return CharacterData; }
 
@@ -75,6 +77,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> WeaponStaticComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UC_SkillComponent> SkillComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_CharacterDataAsset> CharacterData;

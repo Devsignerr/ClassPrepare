@@ -11,7 +11,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHpChangedDelegate, float /*CurrentHp*/, 
 DECLARE_MULTICAST_DELEGATE(FC_OnDeadDelegate);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FC_CharacterStatTableRow& /*BaseStat*/, const FC_CharacterStatTableRow& /*ModifierStat*/);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnC_leComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTC_API UC_StatComponent : public UActorComponent
 {
 	GENERATED_BODY()

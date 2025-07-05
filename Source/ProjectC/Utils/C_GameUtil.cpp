@@ -1,10 +1,14 @@
 #include "C_GameUtil.h"
+
+#include "NavigationSystem.h"
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
 #include "ProjectC/ProjectC.h"
 #include "ProjectC/Cosmetic/C_CameraShake.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 
 FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType CharacterType)
@@ -179,4 +183,53 @@ uint32 FC_GameUtil::GetSkillId(UC_PlayerDataAsset* PlayerDataAsset, EC_SkillSlot
 	}
 
 	return 0;
+}
+
+FVector FC_GameUtil::FindSurfacePos(ACharacter* Character, FVector& CurrentPos)
+{
+	UWorld* World = Character->GetWorld();
+	check(World);
+
+	FVector SweepStartPos = CurrentPos + FVector(0.f, 0.f, 200.f);
+	FVector SweepEndPos = CurrentPos - FVector(0.f, 0.f, 200.f);
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	FCollisionQueryParams QueryParams;
+	
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	QueryParams.AddIgnoredActor(Character);
+
+	float Radius = Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	float Height = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(Radius, Height);
+	
+	FHitResult HitResult;
+	World->SweepSingleByObjectType(HitResult, SweepStartPos, SweepEndPos, FQuat::Identity, ObjectQueryParams, CollisionShape, QueryParams);
+
+	if (HitResult.bBlockingHit)
+	{
+		FVector TargetLocation = HitResult.ImpactPoint;
+		FNavLocation ProjectedLocation;
+
+		UNavigationSystemV1* NavigationSystemV1 = UNavigationSystemV1::GetCurrent(World);
+		check(NavigationSystemV1);
+
+		bool bValid = NavigationSystemV1->ProjectPointToNavigation(
+			TargetLocation,
+			ProjectedLocation,
+			FVector(Radius, Radius, Height) // 주변 검사 범위
+		);
+
+		if (bValid)
+		{
+			return ProjectedLocation.Location + FVector(0.f, 0.f, Height);
+		}
+		else
+		{
+			return CurrentPos;
+		}
+	}
+	
+	return FVector::ZeroVector;
 }
