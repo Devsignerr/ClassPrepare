@@ -88,9 +88,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MovementSpeed_Sprint;
-	
-	UPROPERTY(EditAnywhere)
-	FName WeaponSocketName;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FC_ComboAttackEntry> ComboAttackMontages; 
@@ -103,4 +100,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> JumpSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> DamageMaterial = nullptr;
 };

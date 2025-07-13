@@ -23,13 +23,17 @@ protected:
 	virtual FC_EnemyTableRow* GetEnemyData() override;
 
 	virtual void ResetState() override;
-	virtual void ChangeState(EC_EnemyStateType StateType) override;
+	virtual void RequestChangeState(EC_EnemyStateType StateType) override;
+	bool CanChangeState(EC_EnemyStateType StateType);
+	void ChangeState(EC_EnemyStateType StateType);
 	
 	virtual AActor* GetPatrolRoute() override;
 
 	virtual void SetAIAttackFinishDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void Attack() override;
-	virtual void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
+
+	virtual void OnAttackMontageEnd(UAnimMontage* Montage, bool bInterrupted);
+	virtual void OnTurnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 
 	virtual void SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished) override;
 	virtual void TurnInPlace(float TurnAnimDegree) override;
@@ -40,6 +44,12 @@ protected:
 	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer) override;
 
 	virtual void OnDead() override;
+
+	virtual void OnLand(const FHitResult& Result) override;
+
+	virtual void OnStartSkill(uint32 SkillId) override;
+	virtual void OnEndSkill(uint32 SkillId) override;
+	
 public:
 	UFUNCTION(BlueprintCallable) 
 	virtual EC_EnemyStateType GetState() override;
@@ -49,8 +59,8 @@ public:
 
 private:
 	FAICharacterAttackFinished OnAttackFinished;
-	FAICharacterTurnFinished OnCharacterTurnFinished;
 	
+	FAICharacterTurnFinished OnCharacterTurnFinished;
 	FC_EnemyTableRow* EnemyTableRow = nullptr;
 
 	UPROPERTY()

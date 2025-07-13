@@ -4,19 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTDecorator.h"
-#include "BTDecorator_IsInAttackRange.generated.h"
+#include "BTDecorator_CheckRange.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class PROJECTC_API UBTDecorator_IsInAttackRange : public UBTDecorator
+class PROJECTC_API UBTDecorator_CheckRange : public UBTDecorator
 {
 	GENERATED_BODY()
 	
 public:
-	UBTDecorator_IsInAttackRange();
+	UBTDecorator_CheckRange();
 
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+
+	UPROPERTY(EditAnywhere)
+	float Range = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bCheckAttackRange = false;
 };

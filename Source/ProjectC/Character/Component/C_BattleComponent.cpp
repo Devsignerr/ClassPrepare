@@ -1,15 +1,14 @@
 
 #include "C_BattleComponent.h"
 
+#include "C_ActionComponent.h"
+#include "C_AimComponent.h"
 #include "Engine/DamageEvents.h"
-#include "Kismet/GameplayStatics.h"
-#include "Particles/ParticleSystem.h"
 #include "ProjectC/ProjectC.h"
 #include "ProjectC/Character/C_CharacterBase.h"
-#include "ProjectC/Character/C_PlayableCharacter.h"
+#include "ProjectC/Data/C_CharacterDataAsset.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 #include "ProjectC/Interface/C_PlayerCharacterInterface.h"
-#include "ProjectC/SkillObject/C_SkillObject.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 
 UC_BattleComponent::UC_BattleComponent()
@@ -26,8 +25,21 @@ void UC_BattleComponent::BeginPlay()
 
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
 
-	Weapons.Add(0);
-	Weapons.Add(1);
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(OwnerCharacter);
+	check(CharacterInterface);
+
+	UC_CharacterDataAsset* CharacterData = CharacterInterface->GetCharacterDataAsset();
+	check(CharacterData);
+
+	TArray<FC_WeaponData>& WeaponDatas = CharacterData->WeaponIds;
+
+	for (int32 i = 0; i < WeaponDatas.Num(); ++i)
+	{
+		Weapons.Add(WeaponDatas[i]);
+	}
+
+	CurWeaponIdx = -1;
+	SwapWeapon();
 }
 
 void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,26 +55,29 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	TraceElapsedTime = 0.f;
 
-	AC_CharacterBase* ClassCharacter = Cast<AC_CharacterBase>(GetOwner());
-	if (!ClassCharacter)
-		return;
+	AC_CharacterBase* Character = Cast<AC_CharacterBase>(GetOwner());
+	check(Character);
 
-	const USkeletalMeshComponent* Mesh = ClassCharacter->GetMesh();
-	if (!Mesh)
-		return;
+	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(Character);
+	check(CharacterInterface);
+
+	UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset();
+	check(CharacterDataAsset);
+
+	const USkeletalMeshComponent* Mesh = Character->GetMesh();
+	check(Mesh);
 
 	const UWorld* World = GetWorld();
-	if (!World)
-		return;
+	check(World);
 
 	FVector CurStartBoneLocation = FVector::ZeroVector;
 	FVector CurEndBoneLocation = FVector::ZeroVector;
 
 	if (HasWeapon())
 	{
-		if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+		if (IC_CharacterInterface* Interface = Cast<IC_CharacterInterface>(GetOwner()))
 		{
-			UStaticMeshComponent* WeaponMesh = Interface->GetWeaponStaticMeshComponent();
+			UStaticMeshComponent* WeaponMesh = bTraceRightWeapon? Interface->GetWeapon_R_StaticMeshComponent() : Interface->GetWeapon_L_StaticMeshComponent();
 			check(WeaponMesh);
 
 			CurStartBoneLocation = WeaponMesh->GetSocketLocation(TraceStartBoneName);
@@ -102,7 +117,7 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	for (const auto& Line : TraceLines)
 	{
 		FHitResult HitResult;
-		if (World->LineTraceSingleByChannel(HitResult, Line.Key, Line.Value, ECC_Pawn, Params))
+		if (World->LineTraceSingleByChannel(HitResult, Line.Key, Line.Value, FC_GameUtil::GetAttackCollisionChannel(Character->CharacterDataId), Params))
 		{
 			AActor* HitActor = HitResult.GetActor();
 
@@ -114,12 +129,14 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 					DamagedActor.Add(HitActor);
 
-					const float Damage = ClassCharacter->StatComponent->GetTotalStat().Attack;
+					const float Damage = Character->StatComponent->GetTotalStat().Attack;
 
 					FDamageEvent DamageEvent;
-					HitActor->TakeDamage(Damage, DamageEvent, ClassCharacter->GetController(), ClassCharacter);
+					HitActor->TakeDamage(Damage, DamageEvent, Character->GetController(), Character);
 
-					//FC_GameUtil::SpawnEffectAtLocation(GetWorld(), )
+					FC_GameUtil::CameraShake();
+					
+					FC_GameUtil::PlayHitStop(this, 0.15f, 0.0f);
 				}
 			}
 		}
@@ -133,20 +150,25 @@ void UC_BattleComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	PrevEndBoneLocation = CurEndBoneLocation;
 }
 
-void UC_BattleComponent::StartTraceWithWeapon()
+void UC_BattleComponent::StartTraceWithWeapon(bool bRight)
 {
 	bTracing = true;
+	bTraceRightWeapon = bRight;
+
+	FC_WeaponTableRow* WeaponTableRow = bRight ? Weapon_R_TableRow : Weapon_L_TableRow;
+	if (!WeaponTableRow)
+		return;
 	
 	TraceStartBoneName = WeaponTableRow->TraceStartSocketName;
 	TraceEndBoneName = WeaponTableRow->TraceEndSocketName;
 
-	if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+	if (IC_CharacterInterface* Interface = Cast<IC_CharacterInterface>(GetOwner()))
 	{
-		UStaticMeshComponent* WeaponStaticMeshComponent = Interface->GetWeaponStaticMeshComponent();
-		check(WeaponStaticMeshComponent);
+		UStaticMeshComponent* WeaponMesh = bTraceRightWeapon? Interface->GetWeapon_R_StaticMeshComponent() : Interface->GetWeapon_L_StaticMeshComponent();
+		check(WeaponMesh);
 
-		PrevStartBoneLocation = WeaponStaticMeshComponent->GetSocketLocation(TraceStartBoneName);
-		PrevEndBoneLocation = WeaponStaticMeshComponent->GetSocketLocation(TraceEndBoneName);
+		PrevStartBoneLocation = WeaponMesh->GetSocketLocation(TraceStartBoneName);
+		PrevEndBoneLocation = WeaponMesh->GetSocketLocation(TraceEndBoneName);
 	}
 }
 
@@ -172,8 +194,34 @@ void UC_BattleComponent::EndTrace()
 	TraceElapsedTime = 0.f;
 }
 
+bool UC_BattleComponent::CanSwapWeapon()
+{
+	const IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
+	UC_SkillComponent* SkillComponent = CharacterInterface->GetSkillComponent();
+	check(SkillComponent);
+
+	if (SkillComponent->IsPlayingSkill())
+		return false;
+
+	if (IC_PlayerCharacterInterface* PlayerCharacterInterface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+	{
+		UC_ActionComponent* ActionComponent = PlayerCharacterInterface->GetActionComponent();
+		check(ActionComponent);
+
+		if (ActionComponent->IsInSpecialAction)
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 void UC_BattleComponent::SwapWeapon()
 {
+	if (!CanSwapWeapon())
+		return;
+	
 	CurWeaponIdx++;
 
 	const int32 MaxWeaponIdx = Weapons.Num();
@@ -181,37 +229,46 @@ void UC_BattleComponent::SwapWeapon()
 	if (CurWeaponIdx >= MaxWeaponIdx)
 		CurWeaponIdx = 0;
 
-	const uint8 CurWeaponId = Weapons[CurWeaponIdx];
+	if (!Weapons.IsValidIndex(CurWeaponIdx))
+		return;
+
+	const FC_WeaponData& CurWeaponIds = Weapons[CurWeaponIdx];
 
 	CharacterStanceType = static_cast<EC_CharacterStanceType>(CurWeaponIdx);
-	
+
 	UnEquipWeapon();
-	EquipWeapon(CurWeaponId);
+	
+	EquipWeapon(CurWeaponIds.WeaponId_L, false);
+	EquipWeapon(CurWeaponIds.WeaponId_R, true);
 }
 
-void UC_BattleComponent::EquipWeapon(uint8 InWeaponId)
+void UC_BattleComponent::EquipWeapon(uint8 InWeaponId, bool bRightHand)
 {
-	WeaponTableRow = FC_GameUtil::GetWeaponData(InWeaponId);
-	if (!WeaponTableRow)
+	if (bRightHand)
+		Weapon_R_TableRow = FC_GameUtil::GetWeaponData(InWeaponId);
+	else
+		Weapon_L_TableRow = FC_GameUtil::GetWeaponData(InWeaponId);
+	
+	if ((bRightHand && !Weapon_R_TableRow)|| !bRightHand && !Weapon_L_TableRow)
 	{
 		UnEquipWeapon();
 		return;
 	}
 	
-	FName WeaponSocketName = NAME_None;
-	
-	if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+	if (IC_CharacterInterface* Interface = Cast<IC_CharacterInterface>(GetOwner()))
 	{
-		UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
-		check(PlayerData);
+		UC_CharacterDataAsset* CharacterData = Interface->GetCharacterDataAsset();
+		check(CharacterData);
 
-		WeaponSocketName = PlayerData->WeaponSocketName;
+		FC_WeaponTableRow* WeaponTableRow = bRightHand ? Weapon_R_TableRow : Weapon_L_TableRow;
+		
+		FName WeaponSocketName = bRightHand? CharacterData->WeaponSocketName_R : CharacterData->WeaponSocketName_L;
 
 		const ACharacter* Character = CastChecked<ACharacter>(GetOwner());
 		USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh();
 		check(SkeletalMeshComponent);
 		
-		UStaticMeshComponent* WeaponStaticMeshComponent = Interface->GetWeaponStaticMeshComponent();
+		UStaticMeshComponent* WeaponStaticMeshComponent = bRightHand? Interface->GetWeapon_R_StaticMeshComponent() : Interface->GetWeapon_L_StaticMeshComponent();
 		check(WeaponStaticMeshComponent);
 
 		WeaponStaticMeshComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
@@ -227,21 +284,28 @@ void UC_BattleComponent::EquipWeapon(uint8 InWeaponId)
 
 void UC_BattleComponent::UnEquipWeapon()
 {
-	WeaponTableRow = nullptr;
+	Weapon_L_TableRow = nullptr;
+	Weapon_R_TableRow = nullptr;
 
-	if (const IC_PlayerCharacterInterface* Interface = Cast<IC_PlayerCharacterInterface>(GetOwner()))
+	if (IC_CharacterInterface* Interface = Cast<IC_CharacterInterface>(GetOwner()))
 	{
-		UStaticMeshComponent* WeaponStaticMeshComponent = Interface->GetWeaponStaticMeshComponent();
-		check(WeaponStaticMeshComponent);
+		UStaticMeshComponent* Weapon_L_StaticMeshComponent = Interface->GetWeapon_L_StaticMeshComponent();
+		check(Weapon_L_StaticMeshComponent);
+		
+		UStaticMeshComponent* Weapon_R_StaticMeshComponent = Interface->GetWeapon_R_StaticMeshComponent();
+		check(Weapon_R_StaticMeshComponent);
 
-		WeaponStaticMeshComponent->SetStaticMesh(nullptr);
-		WeaponStaticMeshComponent->SetVisibility(false);
+		Weapon_L_StaticMeshComponent->SetStaticMesh(nullptr);
+		Weapon_L_StaticMeshComponent->SetVisibility(false);
+
+		Weapon_R_StaticMeshComponent->SetStaticMesh(nullptr);
+		Weapon_R_StaticMeshComponent->SetVisibility(false);
 	}
 }
 
 bool UC_BattleComponent::HasWeapon()
 {
-	if (WeaponTableRow)
+	if (Weapon_L_TableRow || Weapon_R_TableRow)
 		return true;
 
 	return false;

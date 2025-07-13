@@ -89,15 +89,6 @@ FC_EnemyTableRow* AC_AIController::GetEnemyData()
 
 void AC_AIController::OnPerceptionUpdate(const TArray<AActor*>& UpdatedActors)
 {
-	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
-	ensure(CharacterInterface);
-
-	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
-	check(CrowdControlComponent);
-
-	if (CrowdControlComponent->IsCrowdControlled())
-		return;
-	
 	for (AActor* UpdatedActor : UpdatedActors)
 	{
 		if (GetAIStimulus(UpdatedActor, EC_AISenseType::Sight).WasSuccessfullySensed())
@@ -137,7 +128,7 @@ void AC_AIController::SetupSenseConfig()
 	HearingSense->DetectionByAffiliation.bDetectEnemies = true;
 	HearingSense->SetMaxAge(5.f);
 
-	DamageSense->SetMaxAge(2.f);
+	DamageSense->SetMaxAge(10.f);
 
 	//생성자에서 ConfigureSense 해주지 않으면 문제 발생해서 굳이 2번 처리 해주는것
 	PerceptionComponent->ConfigureSense(*SightSense);
@@ -189,8 +180,7 @@ void AC_AIController::HandleSensedSight(AActor* InActor)
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 	
-	AIPawn->ChangeState(EC_EnemyStateType::Battle);
-	GetBlackboardComponent()->SetValueAsEnum(TEXT("State"), static_cast<uint8>(EC_EnemyStateType::Battle));
+	AIPawn->RequestChangeState(EC_EnemyStateType::Battle);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);
 }
 
@@ -198,11 +188,8 @@ void AC_AIController::HandleSensedHearing(AActor* InActor, FVector InLocation)
 {
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
-
-	if (AIPawn->GetState() == EC_EnemyStateType::Battle)
-		return;
 	
-	AIPawn->ChangeState(EC_EnemyStateType::Investigating);
+	AIPawn->RequestChangeState(EC_EnemyStateType::Investigating);
 	GetBlackboardComponent()->SetValueAsVector(TEXT("InvestigatingPos"), InLocation);
 }
 
@@ -211,7 +198,7 @@ void AC_AIController::HandleSensedDamage(AActor* InActor)
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 
-	AIPawn->ChangeState(EC_EnemyStateType::Battle);
+	AIPawn->RequestChangeState(EC_EnemyStateType::Battle);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), InActor);
 }
 
@@ -220,16 +207,7 @@ void AC_AIController::HandleLoseTarget(AActor* InActor)
 	IC_CharacterAIInterface* AIPawn = Cast<IC_CharacterAIInterface>(GetPawn());
 	ensure(AIPawn);
 
-	IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(GetPawn());
-	ensure(CharacterInterface);
-
-	UC_CrowdControlComponent* CrowdControlComponent = CharacterInterface->GetCrowdControlComponent();
-	check(CrowdControlComponent);
-
-	if (CrowdControlComponent->IsCrowdControlled())
-		return;
-
-	AIPawn->ChangeState(EC_EnemyStateType::Patrol);
+	AIPawn->RequestChangeState(EC_EnemyStateType::Patrol);
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
 }
 

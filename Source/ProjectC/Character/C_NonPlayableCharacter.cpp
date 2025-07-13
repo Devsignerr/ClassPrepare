@@ -31,7 +31,7 @@ void AC_NonPlayableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FC_EnemyTableRow* TableRow = FC_GameUtil::GetEnemyData(CharacterType))
+	if (FC_EnemyTableRow* TableRow = FC_GameUtil::GetEnemyData(CharacterDataId))
 	{
 		EnemyTableRow = TableRow;
 	}
@@ -50,22 +50,22 @@ void AC_NonPlayableCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (IsTurning && EnemyState != EC_EnemyStateType::Dead)
+	if (IsTurning)
 	{
 		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{
-			const float CurveValue = AnimInstance->GetCurveValue(TEXT("DistanceToPivot"));
-			UE_LOG(LogProjectC, Log, TEXT("%.2f"), CurveValue);
-			const float MaxCurveVal = -FMath::Abs(TurnDegree);
-			
-			// 3. 회전 진행률 (비율)
-			float TurnAlpha = 1.f - FMath::Clamp(CurveValue / MaxCurveVal, 0.f, 1.f);  // 0.0 ~ 1.0
-			
-			// 5. 회전 적용
-			float FinalYaw = TurnStartYaw + (TurnDegree * TurnAlpha);
-			FRotator NewRot = FRotator(0.f, FinalYaw, 0.f);
-			NewRot = FMath::RInterpTo(GetActorRotation(), NewRot, DeltaSeconds, 10.f);
-			SetActorRotation(NewRot);
+			// const float CurveValue = AnimInstance->GetCurveValue(TEXT("DistanceToPivot"));
+			// UE_LOG(LogProjectC, Log, TEXT("%.2f"), CurveValue);
+			// const float MaxCurveVal = -FMath::Abs(TurnDegree);
+			//
+			// // 3. 회전 진행률 (비율)
+			// float TurnAlpha = 1.f - FMath::Clamp(CurveValue / MaxCurveVal, 0.f, 1.f);  // 0.0 ~ 1.0
+			//
+			// // 5. 회전 적용
+			// float FinalYaw = TurnStartYaw + (TurnDegree * TurnAlpha);
+			// FRotator NewRot = FRotator(0.f, FinalYaw, 0.f);
+			// NewRot = FMath::RInterpTo(GetActorRotation(), NewRot, DeltaSeconds, 10.f);
+			// SetActorRotation(NewRot);
 		}
 	}
 }
@@ -80,7 +80,7 @@ FC_EnemyTableRow* AC_NonPlayableCharacter::GetEnemyData()
 	if (EnemyTableRow)
 		return EnemyTableRow;
 	
-	FC_EnemyTableRow* TableRow = FC_GameUtil::GetEnemyData(CharacterType);
+	FC_EnemyTableRow* TableRow = FC_GameUtil::GetEnemyData(CharacterDataId);
 	ensure(TableRow);
 	
 	return TableRow;
@@ -89,6 +89,60 @@ FC_EnemyTableRow* AC_NonPlayableCharacter::GetEnemyData()
 void AC_NonPlayableCharacter::ResetState()
 {
 	ChangeState(EC_EnemyStateType::Patrol);
+}
+
+void AC_NonPlayableCharacter::RequestChangeState(EC_EnemyStateType StateType)
+{
+	if (!CanChangeState(StateType))
+		return;
+
+	ChangeState(StateType);
+}
+
+bool AC_NonPlayableCharacter::CanChangeState(EC_EnemyStateType StateType)
+{
+	if (EnemyState == EC_EnemyStateType::Dead)
+		return false;
+
+	if (EnemyState == StateType)
+		return false;
+	
+	if (EnemyState == EC_EnemyStateType::Battle)
+	{
+		if (StateType == EC_EnemyStateType::Investigating)
+		{
+			return false;
+		}
+	}
+
+	if (EnemyState == EC_EnemyStateType::CrowdControlled)
+	{
+		if (StateType == EC_EnemyStateType::Battle)
+			return false;
+
+		if (StateType == EC_EnemyStateType::SkillUsing)
+			return false;
+
+		if (StateType == EC_EnemyStateType::Patrol)
+			return false;
+
+		if (StateType == EC_EnemyStateType::Investigating)
+			return false;
+	}
+
+	if (EnemyState == EC_EnemyStateType::SkillUsing)
+	{
+		if (StateType == EC_EnemyStateType::Battle)
+			return false;
+
+		if (StateType == EC_EnemyStateType::Patrol)
+			return false;
+
+		if (StateType == EC_EnemyStateType::Investigating)
+			return false;
+	}
+	
+	return true;
 }
 
 void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
@@ -107,13 +161,17 @@ void AC_NonPlayableCharacter::ChangeState(EC_EnemyStateType StateType)
 		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Run;
 	}
 	else if (EnemyState == EC_EnemyStateType::Investigating)
-	{
+	{  
 		GetCharacterMovement()->MaxWalkSpeed = EnemyTableRow->MovementSpeed_Walk;
+	}
+	else if (EnemyState == EC_EnemyStateType::CrowdControlled)
+	{
+		IsTurning = false;
 	}
 
 	if (AAIController* AIContoller = Cast<AAIController>(GetController()))
 	{
-		AIContoller->GetBlackboardComponent()->SetValueAsEnum(TEXT("State"), static_cast<uint8>(StateType));
+		AIContoller->GetBlackboardComponent()->SetValueAsEnum(TEXT("State"), static_cast<uint8>(EnemyState));
 	}
 }
 
@@ -143,27 +201,28 @@ void AC_NonPlayableCharacter::SetAIAttackFinishDelegate(const FAICharacterAttack
 void AC_NonPlayableCharacter::Attack()
 {
 	check(EnemyTableRow);
-	UAnimMontage* AttackAnim = EnemyTableRow->AttackAnim;
+	TArray<TObjectPtr<UAnimMontage>>& AttackAnims = EnemyTableRow->AttackAnims;
+
+	int32 ArraySize = AttackAnims.Num();
+	uint32 RandomValue = FMath::RandRange(0, ArraySize - 1);
+
+	check(AttackAnims.IsValidIndex(RandomValue));
 	
-	PlayAnimMontage(AttackAnim);
-	
-	FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnMontageEnd);
+	PlayAnimMontage(AttackAnims[RandomValue]);
+	FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnAttackMontageEnd);
 	GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(EndDelegate);
 }
 
-void AC_NonPlayableCharacter::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+void AC_NonPlayableCharacter::OnAttackMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 {
-	check(EnemyTableRow);
-	UAnimMontage* AttackAnim = EnemyTableRow->AttackAnim;
-	
-	if (Montage == AttackAnim)
-		OnAttackFinished.ExecuteIfBound();
-	else if (Montage == TurnAnimMontage)
-	{
-		OnCharacterTurnFinished.ExecuteIfBound();
-		TurnAnimMontage = nullptr;
-		IsTurning = false;
-	}
+	OnAttackFinished.ExecuteIfBound();
+}
+
+void AC_NonPlayableCharacter::OnTurnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+{
+	OnCharacterTurnFinished.ExecuteIfBound();
+	TurnAnimMontage = nullptr;
+	IsTurning = false;
 }
 
 void AC_NonPlayableCharacter::SetAITurnFinishDelegate(const FAICharacterTurnFinished& InOnTurnFinished)
@@ -192,7 +251,7 @@ void AC_NonPlayableCharacter::TurnInPlace(float TurnAnimDegree)
 	
 	PlayAnimMontage(TurnAnimMontage);
 	
-	FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnMontageEnd);
+	FOnMontageEnded EndDelegate = FOnMontageEnded::CreateUObject(this, &ThisClass::OnTurnMontageEnd);
 	GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(EndDelegate);
 }
 
@@ -206,13 +265,32 @@ float AC_NonPlayableCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 		DamageCauser->GetActorLocation(),
 		GetActorLocation());
 	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (Damage > KINDA_SMALL_NUMBER)
+	{
+		if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
+		{
+			AnimInst->Montage_Play(EnemyTableRow->HitReact, 1.f, EMontagePlayReturnType::MontageLength, 0.f, false);
+		}
+	}
+	
+	return Damage;
 }
 
 void AC_NonPlayableCharacter::OnStartCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
 {
 	Super::OnStartCrowdControl(CrowdControlType, Causer);
-	ChangeState(EC_EnemyStateType::CrowdControlled);
+
+	if (EnemyState != EC_EnemyStateType::SkillUsing)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		check(AnimInstance);
+		
+		AnimInstance->StopAllMontages(0.1f);
+	}
+	
+	RequestChangeState(EC_EnemyStateType::CrowdControlled);
 }
 
 void AC_NonPlayableCharacter::OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer)
@@ -246,6 +324,42 @@ void AC_NonPlayableCharacter::OnDead()
 
 	check(CrowdControlComponent);
 	CrowdControlComponent->StopCC();
+
+	check(WidgetComponent);
+	WidgetComponent->SetVisibility(false);
 	
 	ChangeState(EC_EnemyStateType::Dead);
+}
+
+void AC_NonPlayableCharacter::OnLand(const FHitResult& Result)
+{
+	Super::OnLand(Result);
+
+	OnLandedDelegate.Broadcast();
+}
+
+void AC_NonPlayableCharacter::OnStartSkill(uint32 SkillId)
+{
+	Super::OnStartSkill(SkillId);
+
+	RequestChangeState(EC_EnemyStateType::SkillUsing);
+
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		AIController->StopMovement();
+	}
+
+	GetCharacterMovement()->DisableMovement();
+}
+
+void AC_NonPlayableCharacter::OnEndSkill(uint32 SkillId)
+{
+	Super::OnEndSkill(SkillId);
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	check(CrowdControlComponent);
+	
+	if (!CrowdControlComponent->IsCrowdControlled())
+		ChangeState(EC_EnemyStateType::Battle);
 }

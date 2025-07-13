@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BTDecorator_IsInAttackRange.h"
+#include "BTDecorator_CheckRange.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "ProjectC/Interface/C_CharacterAIInterface.h"
 
-UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
+UBTDecorator_CheckRange::UBTDecorator_CheckRange()
 {
-	NodeName = TEXT("IsInAttackRange");
+	NodeName = TEXT("CheckRange");
 }
 
-bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UBTDecorator_CheckRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
@@ -34,7 +34,12 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	const float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
 	const float AttackRangeWithRadius = EnemyTableRow->AttackRange;
 
-	bResult = DistanceToTarget <= AttackRangeWithRadius;
+	if (bCheckAttackRange)
+		bResult = DistanceToTarget <= AttackRangeWithRadius;
+	else
+	{
+		bResult = DistanceToTarget <= Range;
+	}
 	
 	return bResult;
 }

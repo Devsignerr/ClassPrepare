@@ -17,6 +17,9 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	bool bStart = false;
+	
+	UPROPERTY(EditAnywhere)
+	bool bRight = true;
 
 	UPROPERTY(EditAnywhere)
 	FName TraceStartBoneName;

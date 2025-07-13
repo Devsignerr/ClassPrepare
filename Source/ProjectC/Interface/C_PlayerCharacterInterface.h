@@ -13,8 +13,7 @@ class UC_ActionComponent;
 class UC_BattleComponent;
 class UC_PlayerDataAsset;
 class UC_LockOnComponent;
-
-DECLARE_MULTICAST_DELEGATE(FOnLandDelegate)
+class UC_AimComponent;
 
 UINTERFACE(MinimalAPI)
 class UC_PlayerCharacterInterface : public UInterface
@@ -27,12 +26,10 @@ class PROJECTC_API IC_PlayerCharacterInterface
 	GENERATED_BODY()
 
 public:
-	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const = 0;
 	virtual USpringArmComponent* GetSpringArmComponent() const = 0;
+	virtual UC_AimComponent* GetAimComponent() const = 0;
 	virtual UCameraComponent* GetCameraComponent() const = 0;
 	virtual UC_ActionComponent* GetActionComponent() const = 0;
 	virtual UC_LockOnComponent* GetLockOnComponent() const = 0;
 	virtual UC_PlayerDataAsset* GetPlayerData() const = 0;
-
-	virtual FOnLandDelegate* GetOnLandedDelegate() = 0;
 };

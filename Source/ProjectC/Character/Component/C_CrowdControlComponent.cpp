@@ -103,6 +103,9 @@ void UC_CrowdControlComponent::PlayCC(FC_CrowdControlInfo& Info)
 
 void UC_CrowdControlComponent::StopCC()
 {
+	if (!CrowdControlInfo.bValid)
+		return;
+	
 	OnStopCC();
 	
 	CrowdControlInfo.bValid = false;
@@ -146,22 +149,7 @@ void UC_CrowdControlComponent::OnStartCC()
 
 		OwnerCharacter->GetCharacterMovement()->DisableMovement();
 		SkeletalMeshComponent->SetComponentTickEnabled(false);
-	}
-	
-	if (UC_CharacterDataAsset* CharacterDataAsset = CharacterInterface->GetCharacterDataAsset())
-	{
-		if (TObjectPtr<UAnimMontage> AnimMontage = CharacterDataAsset->KnockbackAnim)
-		{
-			USkeletalMeshComponent* SkeletalMeshComponent = OwnerCharacter->GetMesh();
-			check(SkeletalMeshComponent);
-
-			UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
-			check(AnimInstance);
-
-			AnimInstance->StopAllMontages(0.2f);
-			AnimInstance->Montage_Play(AnimMontage);
-		}
-	}
+	} 
 }
 
 void UC_CrowdControlComponent::OnStopCC()
@@ -169,7 +157,7 @@ void UC_CrowdControlComponent::OnStopCC()
 	FC_CrowdControlTableRow* CrowdControlTableRow = FC_GameUtil::GetCrowdControlData(CrowdControlInfo.CrowdControlDataId);
 	check(CrowdControlTableRow);
 	
-	if (CrowdControlInfo.SpawnedFX && CrowdControlInfo.SpawnedFX->IsActive())
+	if ( CrowdControlInfo.SpawnedFX && CrowdControlInfo.SpawnedFX->IsActive())
 		CrowdControlInfo.SpawnedFX->Deactivate();
 
 	if (CrowdControlTableRow->MaterialInterface)

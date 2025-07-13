@@ -1,17 +1,13 @@
 
 #include "C_SkillComponent.h"
-
-#include "C_ActionComponent.h"
 #include "C_CrowdControlComponent.h"
 #include "NiagaraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectC/Data/C_TableRows.h"
 #include "..\..\Interface\C_CharacterInterface.h"
 #include "Engine/StaticMeshActor.h"
-#include "ProjectC/Interface/C_PlayerCharacterInterface.h"
+#include "ProjectC/Character/C_CharacterBase.h"
 #include "ProjectC/Utils/C_GameUtil.h"
 #include "ProjectC/SkillObject/C_SkillObject.h"
 
@@ -54,6 +50,8 @@ void UC_SkillComponent::Tick_PlaySkill(float DeltaTime)
 	for (FC_SkillInfo& SkillInfo : SkillToCoolDown)
 	{
 		CoolDownSkillInfos.Add(SkillInfo);
+		
+		OnEndSkillDelegate.Broadcast(SkillInfo.SkillDataId);
 	}
 
 	CurrentPlayingSkillInfos.RemoveAll(
@@ -96,6 +94,11 @@ void UC_SkillComponent::RequestPlaySkill(uint32 SkillId)
 
 		PlaySkill(SkillInfo);
 	}
+}
+
+void UC_SkillComponent::RequestStopSkill(uint32 SkillId)
+{
+	
 }
 
 void UC_SkillComponent::FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor>>& Targets)
@@ -160,13 +163,7 @@ void UC_SkillComponent::PlaySkill(FC_SkillInfo& SkillInfo)
 {
 	CurrentPlayingSkillInfos.Add(SkillInfo);
 
-	if (IC_PlayerCharacterInterface* CharacterInterface = Cast<IC_PlayerCharacterInterface>(OwnerCharacter))
-	{
-		UC_ActionComponent* ActionComponent = CharacterInterface->GetActionComponent();
-		check(ActionComponent);
-
-		ActionComponent->ResetCombo();
-	}
+	OnStartSkillDelegate.Broadcast(SkillInfo.SkillDataId);
 }
 
 void UC_SkillComponent::CalcSkillTime(uint32 SKillId, float& SkillLifeTime, TArray<FC_ExecInfo>& ExecInfos)
@@ -362,7 +359,7 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 	
 	if (ExecTableRow->ExecType == EC_ExecType::DashToTarget)
 	{
-		FVector TargetPos = Target->GetActorLocation();
+		FVector TargetPos = ExecInfo.ExecEndPos;
 		FVector CurrentPos = OwnerCharacter->GetActorLocation();
 
 		FVector ToTargetVector = TargetPos - ExecInfo.ExecStartPos;
@@ -383,7 +380,7 @@ void UC_SkillComponent::ProcessChainAttackExec(float DeltaTime, FC_SkillInfo& Sk
 		
 		NewPos = FC_GameUtil::FindSurfacePos(OwnerCharacter.Get(), NewPos);
 		OwnerCharacter->SetActorLocation(NewPos);
-		OwnerCharacter->SetActorRotation(ToTargetDir.Rotation());
+		OwnerCharacter->SetActorRotation(ExecInfo.ExecEndRot);
 		
 		if (ExecTableRow->bSpawnCollision && CurveAlpha > 0.5f && !ExecInfo.bExecCollisionSpawned)
 		{
@@ -468,12 +465,15 @@ void UC_SkillComponent::CheckCollision(FC_ExecInfo& ExecInfo, FCollisionShape Co
 	UWorld* World = GetWorld();
 	check(World);
 
+	AC_CharacterBase* CharacterBase = Cast<AC_CharacterBase>(OwnerCharacter);
+	check(CharacterBase);
+
 	//DrawDebugBox(World, Pos, CollisionShape.GetExtent(), Rot.Quaternion(), FColor::Red, false, 3.f);
 		
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(OwnerCharacter.Get());
-	if (World->OverlapMultiByChannel(OverlapResults, Pos, Rot.Quaternion(), ECC_Pawn, CollisionShape, QueryParams))
+	if (World->OverlapMultiByChannel(OverlapResults, Pos, Rot.Quaternion(), FC_GameUtil::GetAttackCollisionChannel(CharacterBase->CharacterDataId), CollisionShape, QueryParams))
 	{
 		for (FOverlapResult& Result : OverlapResults)
 		{
@@ -538,6 +538,29 @@ void UC_SkillComponent::OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecIn
 
 			SkeletalMesh->SetMaterial(i, ExecTableRow->MaterialInterface);
 		}
+	}
+	
+	if (ExecTableRow->ExecType == EC_ExecType::DashToTarget)
+	{
+		TArray<TWeakObjectPtr<AActor>>& Targets = SkillInfo.Targets;
+		if (Targets.IsEmpty())
+			return;
+
+		uint32 TargetIndex = ExecInfo.ExecSequence % Targets.Num();
+		TWeakObjectPtr<ACharacter> Target = Cast<ACharacter>(Targets[TargetIndex]);
+		if (!Target.IsValid())
+			return;
+		
+		FVector TargetPos = Target->GetActorLocation();
+
+		FVector ToTargetVector = TargetPos - ExecInfo.ExecStartPos;
+		FVector ToTargetDir = ToTargetVector.GetSafeNormal();
+
+		float OverRunDistance = ExecTableRow->ExecProperty_0;
+		TargetPos += ToTargetDir * OverRunDistance;
+
+		ExecInfo.ExecEndPos = TargetPos;
+		ExecInfo.ExecEndRot = ToTargetDir.GetSafeNormal2D().Rotation();
 	}
 }
 

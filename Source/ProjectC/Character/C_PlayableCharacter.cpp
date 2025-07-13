@@ -52,13 +52,6 @@ void AC_PlayableCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
-	if (!LandedDelegate.IsAlreadyBound(this, &ThisClass::OnLanded))
-		LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
-
-	//TODO : TestEquip
-	check(BattleComponent);
-	BattleComponent->EquipWeapon(0);
 }
 
 void AC_PlayableCharacter::PossessedBy(AController* NewController)
@@ -134,6 +127,10 @@ void AC_PlayableCharacter::AdjustMovement(const bool IsPressed)
 {
 	if (IsPressed && !ActionComponent->IsInSpecialAction)
 	{
+		FRotator ControlRotation = GetControlRotation();
+		ControlRotation.Pitch = 0.f;
+		SetActorRotation(ControlRotation);
+		
 		GetCharacterMovement()->MaxWalkSpeed = PlayerData->MovementSpeed_Walk;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 	}
@@ -162,9 +159,18 @@ void AC_PlayableCharacter::AdjustCamera(bool bIsPressed)
 	}
 }
 
-void AC_PlayableCharacter::OnLand(FHitResult& Result)
+void AC_PlayableCharacter::OnStartSkill(uint32 SkillId)
 {
-	OnLandedDelegate.Broadcast();
+	Super::OnStartSkill(SkillId);
+
+	check(ActionComponent);
+	ActionComponent->ResetCombo();
+}
+
+void AC_PlayableCharacter::OnEndSkill(uint32 SkillId)
+{
+	Super::OnEndSkill(SkillId);
+	
 }
 
 void AC_PlayableCharacter::SpecialAction(const FInputActionValue& Value)
@@ -172,10 +178,13 @@ void AC_PlayableCharacter::SpecialAction(const FInputActionValue& Value)
 	const bool IsPressed = Value[0] != 0.f;
 	
 	check(ActionComponent);
-	
-	AdjustMovement(IsPressed);
-	AdjustCamera(IsPressed);
 
+	if (ActionComponent->CanAction(EC_ActionType::SpecialAction))
+	{
+		AdjustMovement(IsPressed);
+		AdjustCamera(IsPressed);
+	}
+	
 	ActionComponent->SpecialAction(IsPressed);
 }
 

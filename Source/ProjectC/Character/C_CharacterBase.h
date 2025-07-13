@@ -14,6 +14,7 @@
 
 class UC_CharacterDataAsset;
 class UC_CrowdControlComponent;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterLocked, bool, bLocked);
 
 UCLASS(config=Game)
@@ -29,7 +30,7 @@ protected:
 	virtual void PostInitializeComponents() override;
 	
 	virtual void AttackTrace(bool bStart, FName TraceStartBoneName, FName TraceEndBoneName) override;
-	virtual void AttackTraceWithWeapon(bool bStart) override;
+	virtual void AttackTraceWithWeapon(bool bStart, bool bRight) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
@@ -43,12 +44,16 @@ public:
 
 	virtual void OnDead();
 	virtual bool IsDead() override;
+	
+	UFUNCTION()
+	virtual void OnLand(const FHitResult& Result);
 
-	virtual UStaticMeshComponent* GetStaticMeshComponent() override { return WeaponStaticComponent; }
+	virtual UStaticMeshComponent* GetWeapon_L_StaticMeshComponent() override { return Weapon_L_StaticComponent; }
+	virtual UStaticMeshComponent* GetWeapon_R_StaticMeshComponent() override { return Weapon_R_StaticComponent; }
 	virtual UC_CrowdControlComponent* GetCrowdControlComponent() override { return CrowdControlComponent; }
 	virtual UC_BattleComponent* GetBattleComponent() const override { return BattleComponent; }
 	virtual UC_SkillComponent* GetSkillComponent() const override { return SkillComponent; }
-	virtual TPair<FName, FName> GetWeaponTraceNames() override;
+	virtual TPair<FName, FName> GetWeaponTraceNames(bool bRight) override;
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() override { return CharacterData; }
 
 	UFUNCTION()
@@ -56,12 +61,25 @@ public:
 
 	UFUNCTION()
 	virtual void OnEndCrowdControl(EC_CrowdControlType CrowdControlType, AActor* Causer);
+
+	virtual FC_OnStartSkillDelegate& GetOnStartSkillDelegate() override;
+	virtual FC_OnEndSkillDelegate& GetOnEndSkillDelegate() override;
+	
+	virtual FC_OnLandDelegate* GetOnLandedDelegate() override { return &OnLandedDelegate; }
+	
+	UFUNCTION()
+	virtual void OnStartSkill(uint32 SkillId);
+
+	UFUNCTION()
+	virtual void OnEndSkill(uint32 SkillId);
 	
 public:
-	UPROPERTY(EditAnywhere) 
-	EC_CharacterType CharacterType;
+	FC_OnLandDelegate OnLandedDelegate;
 	
 	FOnCharacterLocked OnCharacterLocked;
+
+	UPROPERTY(EditAnywhere) 
+	uint32 CharacterDataId = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_BattleComponent> BattleComponent;
@@ -76,7 +94,10 @@ public:
 	TObjectPtr<UC_WidgetComponent> WidgetComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> WeaponStaticComponent;
+	TObjectPtr<UStaticMeshComponent> Weapon_L_StaticComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> Weapon_R_StaticComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UC_SkillComponent> SkillComponent;

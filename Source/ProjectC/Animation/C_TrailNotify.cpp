@@ -15,14 +15,15 @@ void UC_TrailNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 
 	if (MeshComp)
 	{
-		if (IC_CharacterInterface* AttackPawn = Cast<IC_CharacterInterface>(MeshComp->GetOwner()))
+		if (IC_CharacterInterface* CharacterInterface = Cast<IC_CharacterInterface>(MeshComp->GetOwner()))
 		{
-			if (bWeaponTrail && AttackPawn->HasWeapon())
+			if (bWeaponTrail && CharacterInterface->HasWeapon())
 			{
-				UStaticMeshComponent* StaticMeshComponent = AttackPawn->GetStaticMeshComponent();
+				UStaticMeshComponent* StaticMeshComponent = bRight? CharacterInterface->GetWeapon_R_StaticMeshComponent() : CharacterInterface->GetWeapon_L_StaticMeshComponent();
 				check(StaticMeshComponent);
 
-				TPair<FName, FName> WeaponTraceNames = AttackPawn->GetWeaponTraceNames();
+
+				TPair<FName, FName> WeaponTraceNames = CharacterInterface->GetWeaponTraceNames(bRight);
 
 				FVector StartPos = StaticMeshComponent->GetSocketLocation(WeaponTraceNames.Key);
 				FVector EndPos = StaticMeshComponent->GetSocketLocation(WeaponTraceNames.Value);

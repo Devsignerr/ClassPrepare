@@ -6,7 +6,6 @@
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
 #include "NiagaraSystem.h"
-#include "ProjectC/Character/Component/C_SkillComponent.h"
 #include "C_TableRows.generated.h"
 
 USTRUCT(BlueprintType)
@@ -28,14 +27,14 @@ struct FC_CharacterStatTableRow : public FTableRowBase
 
 	FC_CharacterStatTableRow() : MaxHp(0.0f), Attack(0.0f){}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
-	EC_CharacterType CharacterType;
+	UPROPERTY(EditAnywhere, Category = Type)
+	uint32 DataId = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float MaxHp;
+	float MaxHp = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float Attack;
+	float Attack = 0.f;
 
 	FC_CharacterStatTableRow operator+(const FC_CharacterStatTableRow& Other) const
 	{
@@ -54,8 +53,8 @@ struct FC_EnemyTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
-	EC_CharacterType EnemyType;
+	UPROPERTY(EditAnywhere, Category = Type)
+	uint32 DataId = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMesh* SkeletalMesh = nullptr;
@@ -76,6 +75,9 @@ struct FC_EnemyTableRow : public FTableRowBase
 	float MovementSpeed_Run = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MovementSpeed_Strafe = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -94,7 +96,7 @@ struct FC_EnemyTableRow : public FTableRowBase
 	float AutoSuccessRangeFromLastSeenLocation = 0.f;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> AttackAnim = nullptr;
+	TArray<TObjectPtr<UAnimMontage>> AttackAnims;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> Left90TurnAnim = nullptr;
@@ -107,6 +109,9 @@ struct FC_EnemyTableRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> Right180TurnAnim = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAnimMontage> HitReact = nullptr;
 };
 
 USTRUCT(BlueprintType)

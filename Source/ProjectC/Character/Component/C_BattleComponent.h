@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "ProjectC/enums.h"
+#include "ProjectC/Data/C_CharacterDataAsset.h"
 #include "C_BattleComponent.generated.h"
 
 
@@ -26,13 +27,14 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void StartTraceWithWeapon();
+	void StartTraceWithWeapon(bool bRight);
 	void StartTrace(FName InTraceStartBoneName, FName InTraceEndBoneName);
 	void EndTrace();
-	
+
+	bool CanSwapWeapon();
 	void SwapWeapon();
 	
-	void EquipWeapon(uint8 InWeaponId);
+	void EquipWeapon(uint8 InWeaponId, bool bRightHand);
 	void UnEquipWeapon();
 	bool HasWeapon();
 
@@ -41,6 +43,7 @@ public:
 public:
 	//============================ Trace ============================
 	bool bTracing = false;
+	bool bTraceRightWeapon = false;
 	
 	FName TraceStartBoneName;
 	FName TraceEndBoneName;
@@ -56,11 +59,12 @@ public:
 	//========================= Weapon ==============================
 	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 
-	FC_WeaponTableRow* WeaponTableRow = nullptr;
-
+	FC_WeaponTableRow* Weapon_L_TableRow = nullptr;
+	FC_WeaponTableRow* Weapon_R_TableRow = nullptr;
+	
 	UPROPERTY(BlueprintReadOnly)
 	EC_CharacterStanceType CharacterStanceType = EC_CharacterStanceType::Sword;
 
 	int32 CurWeaponIdx = 0;
-	TArray<uint8> Weapons; 
+	TArray<FC_WeaponData> Weapons; 
 };

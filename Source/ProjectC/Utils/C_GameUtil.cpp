@@ -1,5 +1,5 @@
 #include "C_GameUtil.h"
-
+#include "Containers/Ticker.h"
 #include "NavigationSystem.h"
 #include "Engine/DataTable.h"
 #include "ProjectC/enums.h"
@@ -11,12 +11,12 @@
 #include "GameFramework/Character.h"
 #include "ProjectC/Data/C_PlayerDataAsset.h"
 
-FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType CharacterType)
+FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(uint32 DataId)
 {
 	TArray<FC_CharacterStatTableRow*> CharacterTableRows = GetAllRows<FC_CharacterStatTableRow>(EC_DataTableType::CharacterStat);
-	if (FC_CharacterStatTableRow** FoundRow = CharacterTableRows.FindByPredicate([CharacterType](const FC_CharacterStatTableRow* Row)
+	if (FC_CharacterStatTableRow** FoundRow = CharacterTableRows.FindByPredicate([DataId](const FC_CharacterStatTableRow* Row)
 	{
-		return Row->CharacterType == CharacterType;
+		return Row->DataId == DataId;
 	}))
 	{
 		return *FoundRow;
@@ -26,12 +26,12 @@ FC_CharacterStatTableRow* FC_GameUtil::GetCharacterStatData(EC_CharacterType Cha
 	return nullptr;
 }
 
-FC_EnemyTableRow* FC_GameUtil::GetEnemyData(EC_CharacterType EnemyType)
+FC_EnemyTableRow* FC_GameUtil::GetEnemyData(uint32 EnemyId)
 {
 	TArray<FC_EnemyTableRow*> EnemyTableRows = GetAllRows<FC_EnemyTableRow>(EC_DataTableType::Enemy);
-	if (FC_EnemyTableRow** FoundRow = EnemyTableRows.FindByPredicate([EnemyType](const FC_EnemyTableRow* Row)
+	if (FC_EnemyTableRow** FoundRow = EnemyTableRows.FindByPredicate([EnemyId](const FC_EnemyTableRow* Row)
 	{
-		return Row->EnemyType == EnemyType;
+		return Row->DataId == EnemyId;
 	}))
 	{
 		return *FoundRow;
@@ -70,6 +70,16 @@ UC_CameraDataAsset* FC_GameUtil::GetCameraData(EC_CameraType CameraType)
 	}
 
 	return nullptr;
+}
+
+ECollisionChannel FC_GameUtil::GetAttackCollisionChannel(uint32 DataId)
+{
+	if (DataId == 0)
+	{
+		return ECC_GameTraceChannel4;
+	}
+
+	return ECC_GameTraceChannel3;
 }
 
 FC_SkillTableRow* FC_GameUtil::GetSkillData(uint32 SkillId)
@@ -232,4 +242,22 @@ FVector FC_GameUtil::FindSurfacePos(ACharacter* Character, FVector& CurrentPos)
 	}
 	
 	return FVector::ZeroVector;
+}
+
+void FC_GameUtil::PlayHitStop(UObject* WorldObject, float Duration, float Dilation)
+{
+	UWorld* World = WorldObject->GetWorld();
+	check(World);
+
+	UGameplayStatics::SetGlobalTimeDilation(World, Dilation);
+
+	// 0.2초 실제 시간 후 한 번만 실행
+	FTSTicker::GetCoreTicker().AddTicker(
+		FTickerDelegate::CreateLambda([World](float)
+		{
+			UGameplayStatics::SetGlobalTimeDilation(World, 1.f);
+			return false;  // 다시 호출하지 않음
+		}),
+		Duration  // 실제 초 기준
+	);
 }

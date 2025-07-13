@@ -9,9 +9,10 @@
 #include "Component\C_CrowdControlComponent.h"
 #include "Component/C_StatComponent.h"
 #include "Component/C_WidgetComponent.h"
-#include "ProjectC/Data/C_CharacterDataAsset.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectC/UI/C_HpBarWidget.h"
 #include "ProjectC/UI/C_LockOnWidget.h"
+#include "ProjectC/Utils/C_GameUtil.h"
 
 AC_CharacterBase::AC_CharacterBase()
 {
@@ -43,8 +44,11 @@ AC_CharacterBase::AC_CharacterBase()
 	CrowdControlComponent = CreateDefaultSubobject<UC_CrowdControlComponent>(TEXT("CrowdControlComponent"));
 	StatComponent = CreateDefaultSubobject<UC_StatComponent>(TEXT("StatComponent"));
 	SkillComponent = CreateDefaultSubobject<UC_SkillComponent>(TEXT("SkillComponent"));
-	WeaponStaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponStaticComponent"));
-	WeaponStaticComponent->SetupAttachment(GetMesh());
+	
+	Weapon_L_StaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon_L_StaticComponent"));
+	Weapon_L_StaticComponent->SetupAttachment(GetMesh());
+	Weapon_R_StaticComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon_R_StaticComponent"));
+	Weapon_R_StaticComponent->SetupAttachment(GetMesh());
 	
 	WidgetComponent = CreateDefaultSubobject<UC_WidgetComponent>(TEXT("WidgetComponent"));
 	WidgetComponent->SetupAttachment(GetMesh());
@@ -72,6 +76,9 @@ void AC_CharacterBase::BeginPlay()
 
 	if (!CrowdControlComponent->OnEndCCDelegate.IsAlreadyBound(this, &ThisClass::OnEndCrowdControl))
 		CrowdControlComponent->OnEndCCDelegate.AddDynamic(this, &ThisClass::OnEndCrowdControl);
+	
+	if (!LandedDelegate.IsAlreadyBound(this, &ThisClass::OnLand))
+		LandedDelegate.AddDynamic(this, &ThisClass::OnLand);
 }
 
 void AC_CharacterBase::PostInitializeComponents()
@@ -79,8 +86,19 @@ void AC_CharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	check(StatComponent);
-	StatComponent->OnDead.AddUObject(this, &ThisClass::OnDead);
-	StatComponent->OnStatChanged.AddUObject(this, &ThisClass::ApplyStat);
+	check(SkillComponent);
+	
+	if (!StatComponent->OnDead.IsBoundToObject(this))
+		StatComponent->OnDead.AddUObject(this, &ThisClass::OnDead);
+
+	if (!StatComponent->OnStatChanged.IsBoundToObject(this))
+		StatComponent->OnStatChanged.AddUObject(this, &ThisClass::ApplyStat);
+	
+	if (!SkillComponent->OnStartSkillDelegate.IsAlreadyBound(this, &ThisClass::OnStartSkill))
+		SkillComponent->OnStartSkillDelegate.AddDynamic(this, &ThisClass::OnStartSkill);
+
+	if (!SkillComponent->OnEndSkillDelegate.IsAlreadyBound(this, &ThisClass::OnEndSkill))
+		SkillComponent->OnEndSkillDelegate.AddDynamic(this, &ThisClass::OnEndSkill);
 }
 
 void AC_CharacterBase::ApplyStat(const FC_CharacterStatTableRow& BaseStat, const FC_CharacterStatTableRow& ModifierStat)
@@ -98,10 +116,10 @@ void AC_CharacterBase::AttackTrace(bool bStart, FName TraceStartBoneName, FName 
 		BattleComponent->EndTrace();
 }
 
-void AC_CharacterBase::AttackTraceWithWeapon(bool bStart)
+void AC_CharacterBase::AttackTraceWithWeapon(bool bStart, bool bRight)
 {
 	if (bStart)
-		BattleComponent->StartTraceWithWeapon();
+		BattleComponent->StartTraceWithWeapon(bRight);
 	else
 		BattleComponent->EndTrace();
 }
@@ -150,7 +168,7 @@ bool AC_CharacterBase::IsDead()
 	return StatComponent->CurrentHp < KINDA_SMALL_NUMBER;
 }
 
-TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames()
+TPair<FName, FName> AC_CharacterBase::GetWeaponTraceNames(bool bRight)
 {
 	return {BattleComponent->TraceStartBoneName, BattleComponent->TraceEndBoneName};
 }
@@ -163,8 +181,33 @@ void AC_CharacterBase::OnEndCrowdControl(EC_CrowdControlType CrowdControlType, A
 {
 }
 
+FC_OnStartSkillDelegate& AC_CharacterBase::GetOnStartSkillDelegate()
+{
+	check(SkillComponent);
+	return SkillComponent->OnStartSkillDelegate;
+}
+
+FC_OnEndSkillDelegate& AC_CharacterBase::GetOnEndSkillDelegate()
+{
+	check(SkillComponent);
+	return SkillComponent->OnEndSkillDelegate;
+}
+
+void AC_CharacterBase::OnStartSkill(uint32 SkillId)
+{
+}
+
+void AC_CharacterBase::OnEndSkill(uint32 SkillId)
+{
+}
+
 float AC_CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
 	const float Damage = StatComponent->ApplyDamage(DamageAmount, DamageCauser);
 	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void AC_CharacterBase::OnLand(const FHitResult& Result)
+{
+	OnLandedDelegate.Broadcast();
 }

@@ -70,23 +70,19 @@ public:
 	void AdjustCamera(bool bIsPressed);
 
 public:
-	UFUNCTION()
-	void OnLand(FHitResult& Result);
+	virtual void OnStartSkill(uint32 SkillId) override;
+	virtual void OnEndSkill(uint32 SkillId) override;
 
 public:
-	virtual UStaticMeshComponent* GetWeaponStaticMeshComponent() const override { return WeaponStaticComponent; }
 	virtual USpringArmComponent* GetSpringArmComponent() const override { return CameraBoom; }
 	virtual UCameraComponent* GetCameraComponent() const override { return FollowCamera; }
 	virtual UC_ActionComponent* GetActionComponent() const override { return ActionComponent; }
 	virtual UC_LockOnComponent* GetLockOnComponent() const override { return LockOnComponent; }
+	virtual UC_AimComponent* GetAimComponent() const override { return AimComponent; }
 	virtual UC_SkillComponent* GetSkillComponent() const override { return SkillComponent; }
 	virtual UC_PlayerDataAsset* GetPlayerData() const override { return PlayerData; }
-
-	virtual FOnLandDelegate* GetOnLandedDelegate() override { return &OnLandedDelegate; }
 	
 public:
-	FOnLandDelegate OnLandedDelegate;
-	
 	//============= Component =========================================================================
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

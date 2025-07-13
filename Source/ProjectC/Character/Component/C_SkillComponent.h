@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "C_SkillComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FC_OnStartSkillDelegate, uint32, SkillId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FC_OnEndSkillDelegate, uint32, SkillId);
+
 class UNiagaraComponent;
 struct FC_ExecData;
 
@@ -29,6 +32,9 @@ struct FC_ExecInfo
 
 	FVector ExecStartPos = FVector::ZeroVector;
 	FRotator ExecStartRot = FRotator::ZeroRotator;
+
+	FVector ExecEndPos = FVector::ZeroVector;
+	FRotator ExecEndRot = FRotator::ZeroRotator;
 
 	TObjectPtr<UNiagaraComponent> AttachedFX = nullptr;
 	TArray<TObjectPtr<UMaterialInterface>> OriginalMaterials;
@@ -66,6 +72,7 @@ protected:
 	
 public:
 	void RequestPlaySkill(uint32 SkillId);
+	void RequestStopSkill(uint32 SkillId);
 	void FindTargets(uint32 SkillId, TArray<TWeakObjectPtr<AActor>>& Targets);
 	bool CanPlaySkill(uint32 SkillId);
 	void PlaySkill(FC_SkillInfo& SkillInfo);
@@ -83,6 +90,8 @@ public:
 
 	void OnStartExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo);
 	void OnEndExec(FC_SkillInfo& SkillInfo, FC_ExecInfo& ExecInfo);
+
+	bool IsPlayingSkill() { return !CurrentPlayingSkillInfos.IsEmpty(); }
 public:
 	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 	
@@ -90,4 +99,7 @@ public:
 	TArray<FC_SkillInfo> CoolDownSkillInfos;
 	
 	TArray<uint32> CoolDownSkillId;
+
+	FC_OnStartSkillDelegate OnStartSkillDelegate;
+	FC_OnEndSkillDelegate OnEndSkillDelegate;
 };

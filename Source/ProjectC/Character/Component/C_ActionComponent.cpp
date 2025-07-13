@@ -21,7 +21,7 @@ void UC_ActionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerCharacter = CastChecked<ACharacter>(GetOwner());
-	IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(OwnerCharacter);
+	IC_CharacterInterface* Interface = CastChecked<IC_CharacterInterface>(OwnerCharacter);
 
 	if (!Interface->GetOnLandedDelegate()->IsBoundToObject(this))
 		Interface->GetOnLandedDelegate()->AddUObject(this, &ThisClass::OnLanded);
@@ -46,6 +46,8 @@ void UC_ActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UC_ActionComponent::Move(FVector2D MovementVector)
 {
+	InputVector = MovementVector;
+	
 	if (!CanAction(EC_ActionType::Move))
 		return;
 
@@ -59,8 +61,6 @@ void UC_ActionComponent::Move(FVector2D MovementVector)
 
 	UC_BattleComponent* BattleComponent = CharacterInterface->GetBattleComponent();
 	check(BattleComponent);
-	
-	InputVector = MovementVector;
 	
 	if (!LockOnComponent->IsLockOnMode() || IsRunning)
 	{
@@ -194,6 +194,7 @@ void UC_ActionComponent::Attack(bool IsPressed)
 			AddLock(EC_LockCauseType::Attack, EC_ActionType::Move);
 		
 		AddLock(EC_LockCauseType::Attack, EC_ActionType::Jump);
+		AddLock(EC_LockCauseType::Attack, EC_ActionType::SpecialAction);
 	}
 }
 
@@ -204,7 +205,7 @@ void UC_ActionComponent::OnGuardSuccess(AActor* DamageCauser)
 	FVector DamageCauserLocation = DamageCauser->GetActorLocation();
 
 	FVector ForceDir = (OwnerLocation - DamageCauserLocation).GetSafeNormal2D();
-	OwnerCharacter->GetCharacterMovement()->AddForce(ForceDir * 100.f);
+	OwnerCharacter->GetCharacterMovement()->Velocity += ForceDir * 800.f;
 }
 
 void UC_ActionComponent::OnLanded()
@@ -267,6 +268,10 @@ void UC_ActionComponent::SpecialAction(bool bPressed)
 	const IC_PlayerCharacterInterface* Interface = CastChecked<IC_PlayerCharacterInterface>(GetOwner());
 	UC_PlayerDataAsset* PlayerData = Interface->GetPlayerData();
 	check(PlayerData);
+
+	IC_CharacterInterface* CharacterInterface = CastChecked<IC_CharacterInterface>(GetOwner());
+	UC_SkillComponent* SkillComponent = CharacterInterface->GetSkillComponent();
+	check(SkillComponent);
 	
 	if (bPressed && !IsInSpecialAction)
 	{
@@ -274,12 +279,15 @@ void UC_ActionComponent::SpecialAction(bool bPressed)
 			return;
 		
 		IsInSpecialAction = true;
+		ResetCombo();
 
 		AddLock(EC_LockCauseType::SpecialAction, EC_ActionType::Run);
 	}
 	else if (!bPressed && IsInSpecialAction)
 	{
 		IsInSpecialAction = false;
+
+		//SkillComponent->RequestStopSkill()
 
 		ForceReleaseLock(EC_LockCauseType::SpecialAction);
 	}

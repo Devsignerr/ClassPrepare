@@ -10,29 +10,65 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efac3ec1-be0b-469a-8078-4fed9690fc7c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatusEffectComponent.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatusEffectComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_ChoosePattern.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_ChoosePattern.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_JumpBack.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_JumpBack.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetFocus.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetFocus.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetMovementSpeed.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetMovementSpeed.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_UseSkill.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_UseSkill.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectC/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Data/CrowdControl.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/CrowdControl.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/ABP_Enemy.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/ABP_Enemy.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BB_EnemyBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BB_EnemyBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BT_EnemyBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/AI/BT_EnemyBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/Animation/Kallari/ABP_Kallari_Locomotion.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/Animation/Kallari/ABP_Kallari_Locomotion.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/NonPlayer/BP_Enemy.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/NonPlayer/BP_Enemy.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/ABP_Player.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_01.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_01.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_02.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_02.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_03.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/Animation/AM_2H_AttackCombo_03.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/BP_Player.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Character/Player/Mesh/Separated_Mesh/Weapon/SM_sword_Sword.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Character/Player/Mesh/Separated_Mesh/Weapon/SM_sword_Sword.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Camera/AimCameraData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Camera/AimCameraData.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Character/DA_Kallari.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Character/DA_Kallari.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/CharacterStat.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/CharacterStat.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Enemy.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Enemy.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Data/Exec.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Exec.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Data/Skill.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Skill.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Level/Test.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/Test.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Data/Weapon.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Data/Weapon.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_IsInAttackRange.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_CheckRange.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_IsInAttackRange.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTDecorator_CheckRange.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/AI/BTTask_SetState.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/AI/C_AIController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/AI/C_AIController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Animation/C_AttackTrace.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Animation/C_AttackTrace.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Animation/C_AttackTrace.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Animation/C_AttackTrace.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_CharacterBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_NonPlayableCharacter.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/C_PlayableCharacter.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_ActionComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_AimComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_BattleComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_CrowdControlComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_CrowdControlComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_CrowdControlComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_CrowdControlComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_SkillComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Character/Component/C_StatComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Cosmetic/C_TrailNotify.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Animation/C_TrailNotify.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Cosmetic/C_TrailNotify.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Animation/C_TrailNotify.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_CharacterDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_CharacterDataAsset.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_PlayerDataAsset.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Data/C_TableRows.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterAIInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterAIInterface.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_CharacterInterface.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Interface/C_PlayerCharacterInterface.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/ProjectC.Build.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/Utils/C_GameUtil.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectC/enums.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectC/enums.h" afterDir="false" />
@@ -46,50 +82,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://1" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.38.33130/include/xatomic.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/ProjectC/UHT/C_PlayerDataAsset.generated.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://E:/UnrealEngine/UE_5.3/Engine/Plugins/Runtime/GeometryProcessing/Source/GeometryAlgorithms/Private/ThirdParty/clipper/clipper.h" root0="SKIP_HIGHLIGHTING" />
@@ -252,7 +245,16 @@
       <workItem from="1751447354575" duration="2547000" />
       <workItem from="1751521874156" duration="9328000" />
       <workItem from="1751614178144" duration="2016000" />
-      <workItem from="1751639876962" duration="7627000" />
+      <workItem from="1751639876962" duration="17507000" />
+      <workItem from="1751775859287" duration="23366000" />
+      <workItem from="1751864706871" duration="18137000" />
+      <workItem from="1751912411363" duration="1208000" />
+      <workItem from="1751948477825" duration="13419000" />
+      <workItem from="1752037946752" duration="5206000" />
+      <workItem from="1752109915100" duration="20373000" />
+      <workItem from="1752215573850" duration="1237000" />
+      <workItem from="1752288982329" duration="14209000" />
+      <workItem from="1752378108639" duration="6712000" />
     </task>
     <servers />
   </component>

@@ -21,6 +21,7 @@ enum class EC_CharacterType : int32
 	None,
 	Player,
 	Kallari,
+	Skeleton,
 	Num
 };
 
@@ -33,6 +34,7 @@ enum class EC_EnemyStateType : uint8
 	Investigating = 3,
 	CrowdControlled = 4,
 	Dead = 5,
+	SkillUsing = 6,
 	Num = 3
 };
 
@@ -156,5 +158,15 @@ UENUM(BlueprintType)
 enum class EC_StatusEffectType : uint8
 {
 	None,
+	Num
+};
+
+UENUM(BlueprintType)
+enum class EC_MovementType : uint8
+{
+	None,
+	Strafe,
+	Walk,
+	Run,
 	Num
 };

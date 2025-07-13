@@ -26,7 +26,7 @@ public:
 	virtual FC_EnemyTableRow* GetEnemyData() = 0;
 
 	virtual void ResetState() = 0;
-	virtual void ChangeState(EC_EnemyStateType StateType) = 0;
+	virtual void RequestChangeState(EC_EnemyStateType StateType) = 0;
 	virtual EC_EnemyStateType GetState() = 0;
 
 	virtual AActor* GetPatrolRoute() = 0;

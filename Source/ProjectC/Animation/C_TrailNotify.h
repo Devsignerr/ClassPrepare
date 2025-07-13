@@ -19,6 +19,9 @@ public:
 	bool bWeaponTrail = false;
 
 	UPROPERTY(EditAnywhere)
+	bool bRight = true;
+
+	UPROPERTY(EditAnywhere)
 	FName BodyTrailBoneName_Start;
 
 	UPROPERTY(EditAnywhere)

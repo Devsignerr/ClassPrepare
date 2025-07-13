@@ -22,7 +22,7 @@ EBTNodeResult::Type UBTTask_SetState::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		return EBTNodeResult::Failed;
 	}
 
-	AIPawn->ChangeState(StateType);
+	AIPawn->RequestChangeState(StateType);
 	
 	return EBTNodeResult::Succeeded;
 }

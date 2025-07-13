@@ -15,7 +15,7 @@ void UC_AttackTrace::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 		{
 			if (AttackPawn->HasWeapon())
 			{
-				AttackPawn->AttackTraceWithWeapon(bStart);
+				AttackPawn->AttackTraceWithWeapon(bStart, bRight);
 			}
 			else
 			{

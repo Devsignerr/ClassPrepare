@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "ProjectC/Character/Component/C_SkillComponent.h"
 #include "C_CharacterInterface.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FC_OnLandDelegate)
+
+class FC_OnSkillMontageEnded;
 class UC_BattleComponent;
 class UC_CharacterDataAsset;
 class UC_CrowdControlComponent;
@@ -25,14 +29,21 @@ class PROJECTC_API IC_CharacterInterface
 public:
 	virtual bool HasWeapon() = 0;
 	virtual void AttackTrace(bool bStart, FName TraceStartBoneName, FName TraceEndBoneName) = 0;
-	virtual void AttackTraceWithWeapon(bool bStart) = 0;
+	virtual void AttackTraceWithWeapon(bool bStart, bool bRight) = 0;
 	
-	virtual UStaticMeshComponent* GetStaticMeshComponent() = 0;
+	virtual UStaticMeshComponent* GetWeapon_L_StaticMeshComponent() = 0;
+	virtual UStaticMeshComponent* GetWeapon_R_StaticMeshComponent() = 0;
 	virtual UC_CrowdControlComponent* GetCrowdControlComponent() = 0;
 	virtual UC_SkillComponent* GetSkillComponent() const = 0;
 	virtual UC_BattleComponent* GetBattleComponent() const = 0;
-	virtual TPair<FName, FName> GetWeaponTraceNames() = 0;
+	virtual TPair<FName, FName> GetWeaponTraceNames(bool bRight) = 0;
 
 	virtual UC_CharacterDataAsset* GetCharacterDataAsset() = 0;
 	virtual bool IsDead() = 0;
+
+	virtual FC_OnStartSkillDelegate& GetOnStartSkillDelegate() = 0;
+	virtual FC_OnEndSkillDelegate& GetOnEndSkillDelegate() = 0;
+
+	
+	virtual FC_OnLandDelegate* GetOnLandedDelegate() = 0;
 };

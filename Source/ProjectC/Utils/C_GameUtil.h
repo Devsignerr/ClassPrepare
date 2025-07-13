@@ -19,15 +19,18 @@ struct FC_CharacterStatTableRow;
 class PROJECTC_API FC_GameUtil
 {
 public:
-	static FC_CharacterStatTableRow* GetCharacterStatData(EC_CharacterType CharacterType);
-	static FC_EnemyTableRow* GetEnemyData(EC_CharacterType EnemyType);
+	static FC_CharacterStatTableRow* GetCharacterStatData(uint32 DataId);
+	static FC_EnemyTableRow* GetEnemyData(uint32 EnemyId);
 	static FC_WeaponTableRow* GetWeaponData(uint8 WeaponId);
-	static UC_CameraDataAsset* GetCameraData(EC_CameraType CameraType);
 	static FC_SkillTableRow* GetSkillData(uint32 SkillId);
 	static FC_ExecTableRow* GetExecData(uint32 ExecId);
 	static FC_SkillObjectTableRow* GetSkillObjectData(uint32 SkillObjectId);
 	static FC_CrowdControlTableRow* GetCrowdControlData(uint32 CrowdControlId);
+	
+	static UC_CameraDataAsset* GetCameraData(EC_CameraType CameraType);
 
+	static ECollisionChannel GetAttackCollisionChannel(uint32 DataId);
+	
 	static void CameraShake();
 	static void SpawnEffectAtLocation(UObject* WorldContextObj, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation);
 	static void SpawnEffectAtLocation(UObject* WorldContextObj, UParticleSystem* ParticleSystem, FVector Location, FRotator Rotation);
@@ -38,6 +41,7 @@ public:
 	static uint32 GetSkillId(UC_PlayerDataAsset* PlayerDataAsset, EC_SkillSlotType SkillSlotType, EC_CharacterStanceType StanceType, bool bInSpecialAttack);
 
 	static FVector FindSurfacePos(ACharacter* Character, FVector& CurrentPos);
+	static void PlayHitStop(UObject* WorldObject, float Duration, float Dilation);
 	
 	template <typename T>
 	static TArray<T*> GetAllRows(EC_DataTableType DataTableType);

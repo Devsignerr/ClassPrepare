@@ -6,6 +6,20 @@
 #include "Engine/DataAsset.h"
 #include "C_CharacterDataAsset.generated.h"
 
+class UNiagaraSystem;
+
+USTRUCT(BlueprintType)
+struct FC_WeaponData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintType, EditAnywhere)
+	int32 WeaponId_L = -1;
+
+	UPROPERTY(BlueprintType, EditAnywhere)
+	int32 WeaponId_R = -1;
+};
+
 UCLASS()
 class PROJECTC_API UC_CharacterDataAsset : public UDataAsset
 {
@@ -13,5 +27,17 @@ class PROJECTC_API UC_CharacterDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAnimMontage> KnockbackAnim;
-};
+	TObjectPtr<UNiagaraSystem> HitFX;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> GuardFX;
+
+	UPROPERTY(EditAnywhere)
+	FName WeaponSocketName_L;
+
+	UPROPERTY(EditAnywhere)
+	FName WeaponSocketName_R;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FC_WeaponData> WeaponIds;
+ };

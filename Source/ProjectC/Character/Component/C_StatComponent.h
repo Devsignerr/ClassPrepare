@@ -21,6 +21,7 @@ public:
 	UC_StatComponent();
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void InitializeComponent() override;
 
 public:
@@ -47,6 +48,8 @@ public:
 
 	float MaxHp;
 	float CurrentHp;
+
+	TWeakObjectPtr<ACharacter> OwnerCharacter = nullptr;
 
 	UPROPERTY(Meta = (AllowPrivateAccess = "true"))
 	FC_CharacterStatTableRow BaseStat;
